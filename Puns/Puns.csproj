@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="0.14.0" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="Syn.Oryzer" Version="1.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="CategoryLists.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CategoryLists.resx</DependentUpon>
+    </Compile>
+    <Compile Update="WordNet.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WordNet.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="CategoryLists.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CategoryLists.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="WordNet.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>WordNet.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\wainw\.nuget\packages\microsoft.phoneticmatching\0.0.7\build\..\runtimes\win-x64\native\maluubaspeech-csharp.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CMU\CMU.csproj" />
+  </ItemGroup>
+
+</Project>
