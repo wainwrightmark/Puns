@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Puns {
+namespace WordNet {
     using System;
     
     
@@ -22,24 +22,24 @@ namespace Puns {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class WordNet {
+    public class DictionaryFiles {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal WordNet() {
+        internal DictionaryFiles() {
         }
         
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Puns.WordNet", typeof(WordNet).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WordNet.DictionaryFiles", typeof(DictionaryFiles).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace Puns {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] dataAdj {
+        public static byte[] dataAdj {
             get {
                 object obj = ResourceManager.GetObject("dataAdj", resourceCulture);
                 return ((byte[])(obj));
@@ -73,7 +73,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] dataAdv {
+        public static byte[] dataAdv {
             get {
                 object obj = ResourceManager.GetObject("dataAdv", resourceCulture);
                 return ((byte[])(obj));
@@ -83,7 +83,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] dataNoun {
+        public static byte[] dataNoun {
             get {
                 object obj = ResourceManager.GetObject("dataNoun", resourceCulture);
                 return ((byte[])(obj));
@@ -93,7 +93,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] dataVerb {
+        public static byte[] dataVerb {
             get {
                 object obj = ResourceManager.GetObject("dataVerb", resourceCulture);
                 return ((byte[])(obj));
@@ -103,7 +103,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] indexAdj {
+        public static byte[] indexAdj {
             get {
                 object obj = ResourceManager.GetObject("indexAdj", resourceCulture);
                 return ((byte[])(obj));
@@ -113,7 +113,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] indexAdv {
+        public static byte[] indexAdv {
             get {
                 object obj = ResourceManager.GetObject("indexAdv", resourceCulture);
                 return ((byte[])(obj));
@@ -123,7 +123,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] indexNoun {
+        public static byte[] indexNoun {
             get {
                 object obj = ResourceManager.GetObject("indexNoun", resourceCulture);
                 return ((byte[])(obj));
@@ -133,7 +133,7 @@ namespace Puns {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] indexVerb {
+        public static byte[] indexVerb {
             get {
                 object obj = ResourceManager.GetObject("indexVerb", resourceCulture);
                 return ((byte[])(obj));

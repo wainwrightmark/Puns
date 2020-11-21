@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puns", "Puns\Puns.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puns.Blazor", "Puns.Blazor\Puns.Blazor.csproj", "{7DA3B48A-A5A1-4400-AC96-FE3CA83C502C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puns.Test", "Puns.Test\Puns.Test.csproj", "{55169E97-C97F-4013-A26B-55BD1B5DCEB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puns.Test", "Puns.Test\Puns.Test.csproj", "{55169E97-C97F-4013-A26B-55BD1B5DCEB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMU", "CMU\CMU.csproj", "{75581EC9-84E0-426D-96FF-C143E3B04D82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMU", "CMU\CMU.csproj", "{75581EC9-84E0-426D-96FF-C143E3B04D82}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordNet", "WordNet\WordNet.csproj", "{C57B800E-DAA3-4E1F-AA05-A5E495588076}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{75581EC9-84E0-426D-96FF-C143E3B04D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75581EC9-84E0-426D-96FF-C143E3B04D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75581EC9-84E0-426D-96FF-C143E3B04D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C57B800E-DAA3-4E1F-AA05-A5E495588076}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C57B800E-DAA3-4E1F-AA05-A5E495588076}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C57B800E-DAA3-4E1F-AA05-A5E495588076}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C57B800E-DAA3-4E1F-AA05-A5E495588076}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

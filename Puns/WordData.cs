@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Syn.Oryzer.LanguageProcessing.WordNet;
+using WordNet;
 
 namespace Puns
 {
@@ -12,23 +11,8 @@ namespace Puns
 
         private static readonly Lazy<WordNetEngine> WordNetEngine = new Lazy<WordNetEngine>(() =>
         {
+
             var wordNetEngine = new WordNetEngine();
-
-            wordNetEngine.AddDataSource(new StreamReader(new MemoryStream(WordNet.dataAdj)), PartOfSpeech.Adjective);
-            wordNetEngine.AddDataSource(new StreamReader(new MemoryStream(WordNet.dataAdv)), PartOfSpeech.Adverb);
-            wordNetEngine.AddDataSource(new StreamReader(new MemoryStream(WordNet.dataNoun)), PartOfSpeech.Noun);
-            wordNetEngine.AddDataSource(new StreamReader(new MemoryStream(WordNet.dataVerb)), PartOfSpeech.Verb);
-
-            wordNetEngine.AddIndexSource(new StreamReader(new MemoryStream(WordNet.indexAdj)), PartOfSpeech.Adjective);
-            wordNetEngine.AddIndexSource(new StreamReader(new MemoryStream(WordNet.indexAdv)), PartOfSpeech.Adverb);
-            wordNetEngine.AddIndexSource(new StreamReader(new MemoryStream(WordNet.indexNoun)), PartOfSpeech.Noun);
-            wordNetEngine.AddIndexSource(new StreamReader(new MemoryStream(WordNet.indexVerb)), PartOfSpeech.Verb);
-
-            Console.WriteLine(@"Loading word net engine");
-            wordNetEngine.Load();
-
-            Console.WriteLine(@"Loaded word net engine");
-
             return wordNetEngine;
             });
 
@@ -41,9 +25,7 @@ namespace Puns
         /// <returns></returns>
         public static bool IsGoodWord(string s)
         {
-            var result =
-            WordNetEngine.Value.GetSynSets(s, PartOfSpeech.Adjective, PartOfSpeech.Adverb, PartOfSpeech.Noun,
-                PartOfSpeech.Verb);
+            var result = WordNetEngine.Value.GetSynSets(s);
 
             return result.Any();
         }
@@ -62,7 +44,7 @@ namespace Puns
 
         public static IEnumerable<RelatedWord> GetRelatedWords2(string relatedToWord, SynSet synSet)
         {
-            var synSets = synSet.GetRelatedSynSets(Relations, true).Prepend(synSet);
+            var synSets = synSet.GetRelatedSynSets(Relations, true, WordNetEngine.Value).Prepend(synSet);
 
             foreach (var set in synSets)
             foreach (var word in set.Words)
@@ -81,14 +63,14 @@ namespace Puns
 
                 var reason = $"{synSetRelation}".Trim();
 
-                foreach (var relatedSynSet in synSet.GetRelatedSynSets(synSetRelation, false))
+                foreach (var relatedSynSet in synSet.GetRelatedSynSets(synSetRelation, false, WordNetEngine.Value))
                 {
                     foreach (var word in relatedSynSet.Words)
                         yield return new RelatedWord(word, relatedToWord, reason, relatedSynSet.Gloss);
 
                     if (synSetRelation != SynSetRelation.TopicDomain) continue;
 
-                    foreach (var sameTopicDomainSynSet in relatedSynSet.GetRelatedSynSets(SynSetRelation.TopicDomainMember, false))
+                    foreach (var sameTopicDomainSynSet in relatedSynSet.GetRelatedSynSets(SynSetRelation.TopicDomainMember, false, WordNetEngine.Value))
                     foreach (var word in sameTopicDomainSynSet.Words)
                     {
                         if (IsSingleWord(word))

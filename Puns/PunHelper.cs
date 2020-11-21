@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CMU;
 using MoreLinq;
-using Syn.Oryzer.LanguageProcessing.WordNet;
+using WordNet;
 
 namespace Puns
 {
@@ -19,7 +19,7 @@ namespace Puns
 
             if (originalWord.Symbols.Count == replacementWord.Symbols.Count) //same number of syllables
             {
-                if (originalWord.Symbols.First() != replacementWord.Symbols.First() && originalWord.Symbols.Last() != replacementWord.Symbols.Last())
+                if (originalWord.Symbols[0] != replacementWord.Symbols[0] && originalWord.Symbols[^1] != replacementWord.Symbols[^1])
                     return false;
 
                 return originalWord.Symbols.Select(x => x.GetSyllableType())

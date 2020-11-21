@@ -1,5 +1,5 @@
 ﻿using System;
-using Syn.Oryzer.LanguageProcessing.WordNet;
+using WordNet;
 
 namespace Puns
 {

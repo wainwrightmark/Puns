@@ -1,11 +1,13 @@
 ﻿@page "/puns"
-@using Syn.Oryzer.LanguageProcessing.WordNet
-@using System.Collections.Immutable
+@using WordNet
 
+<div class="themeBox">
 <br/>
 <label>Theme</label>
 <input type="text" style="width: 100%" @bind="Theme"/>
 <br/>
+</div>
+
 
 @foreach (var synSet in SynSets)
 {
@@ -16,14 +18,16 @@
             _crossedOffSynsets.Remove(synSet);
     });
 
-
+    <div class="synsetBox">
     <input type="checkbox" checked="@(!_crossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
     <label>@synSet.Gloss</label>
     <br />
+    </div>
+
 }
 <br />
 
-
+<div class="categoryBox">
 <label>Category</label>
 <select @bind="PunCategory">
     @foreach (var c in Enum.GetValues<PunCategory>())
@@ -31,18 +35,19 @@
         <option value="@c">@c</option>
     }
 </select>
-<br/>
 
-
-<button disabled="@(!Enabled)" class="btn btn-primary" @onclick="Find">
-    @(Enabled?"Pun!":"Loading Pun Data")
-</button>
-<br/>
-
-
+</div>
 
 <br/>
 
+<div class="GenerateButton">
+    <button disabled="@(IsGenerating || !Enabled)" class="btn btn-primary" @onclick="Find">
+    @(IsGenerating? "Generating Puns" :(Enabled?"Pun!":"Loading Pun Data") )
+    </button>
+</div>
+
+<br/>
+<br/>
 <hr/>
 
 @if(PunList != null)
@@ -61,16 +66,21 @@
                 RevealedWords.Remove(grouping.Key);
         };
 
-    <h1>
+    <div class="punHeader">
+        <h1>
         @grouping.Key (@grouping.Count())
         <button @onclick="toggle">@(collapsed?"+":"-")</button>
     </h1>
+    </div>
 
-    <div hidden="@collapsed">
+
+
+    <div hidden="@collapsed" class="punGroup">
         @foreach (var pun in grouping)
     {
         <br/>
         <label>@pun.NewPhrase</label>
+        <label> (@pun.OldPhrase)</label>
         <br/>
     }
 
@@ -88,7 +98,7 @@
 
     public string? Theme { get; set; }// = "Fish";
 
-    public IEnumerable<SynSet> SynSets => string.IsNullOrWhiteSpace(Theme)? ImmutableList<SynSet>.Empty : WordData.GetSynsets(Theme);
+    public IEnumerable<SynSet> SynSets => GetSynSets(Theme);
 
 
     private readonly HashSet<SynSet> _crossedOffSynsets = new HashSet<SynSet>();
@@ -99,14 +109,34 @@
 
     private HashSet<string> RevealedWords { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+    public bool IsGenerating { get; set; } = false;
+
+    private IEnumerable<SynSet> GetSynSets(string theme)
+    {
+        if(string.IsNullOrWhiteSpace(Theme))
+            return Enumerable.Empty<SynSet>();
+        else
+        {
+            var sets = WordData.GetSynsets(Theme).ToList();
+            return sets;
+        }
+    }
 
 
     private void Find()
     {
-        if (string.IsNullOrWhiteSpace(Theme)) return;
+        if (string.IsNullOrWhiteSpace(Theme))
+        {
+            IsGenerating = false;
+            return;
+        }
+
+        IsGenerating = true;
 
         PunList = null;
         RevealedWords.Clear();
+
+        Console.WriteLine(@"Getting Puns");
 
         var puns = SynSets.Except(_crossedOffSynsets)
             .SelectMany(synSet => PunHelper.GetPuns(PunCategory, Theme, synSet));
@@ -116,5 +146,10 @@
             .GroupBy(x=>x.Word, StringComparer.OrdinalIgnoreCase)
             .OrderByDescending(x=>x.Count())
             .ToList();
+
+        Console.WriteLine(@"Puns Got");
+
+        IsGenerating = false;
+        this.StateHasChanged();
     }
 }

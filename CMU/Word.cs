@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
@@ -10,6 +11,7 @@ namespace CMU
     {
         public static Result<ILookup<string, Word>> TryCreateLookup()
         {
+            var sw = Stopwatch.StartNew();
             Console.WriteLine(@"Creating Phonetics Lookup");
 
             var text = Resource.Dict;
@@ -25,7 +27,7 @@ namespace CMU
             }
 
             var lookup = results.ToLookup(x => x.Text, StringComparer.OrdinalIgnoreCase);
-            Console.WriteLine(@"Phonetics Lookup Created");
+            Console.WriteLine($@"Phonetics Lookup Created ({sw.ElapsedMilliseconds}ms)");
 
             return Result.Success(lookup);
         }

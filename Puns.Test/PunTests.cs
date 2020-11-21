@@ -49,15 +49,17 @@ namespace Puns.Test
         public void TestPunHelper(string theme, PunCategory category)
         {
 
-            var synSets = WordData.GetSynsets(theme);
+            var synSets = WordData.GetSynsets(theme).ToList();
 
             var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet)).ToList();
 
             puns.Should().HaveCountGreaterThan(2);
 
-            foreach (var pun in puns.Select(x=>(x.NewPhrase, x.OldPhrase)).Distinct())
+            TestOutputHelper.WriteLine(puns.Count + " puns");
+
+            foreach (var (newPhrase, oldPhrase) in puns.Select(x=>(x.NewPhrase, x.OldPhrase)).Distinct())
             {
-                TestOutputHelper.WriteLine($"{pun.NewPhrase} ({pun.OldPhrase})");
+                TestOutputHelper.WriteLine($"{newPhrase} ({oldPhrase})");
             }
         }
 
