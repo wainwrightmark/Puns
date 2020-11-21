@@ -27,7 +27,7 @@ namespace CMU
             }
 
             var lookup = results.ToLookup(x => x.Text, StringComparer.OrdinalIgnoreCase);
-            Console.WriteLine($@"Phonetics Lookup Created ({sw.ElapsedMilliseconds}ms)");
+            Console.WriteLine($@"Phonetics Lookup Created ({sw.ElapsedMilliseconds}ms) ({lookup.Count} rows)");
 
             return Result.Success(lookup);
         }
