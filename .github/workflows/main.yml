@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.7.2
         with:
-          dotnet-version: 5.0
+          dotnet-version: 5.0.100
       
       - name: Publish .NET Core Project
         run: dotnet publish Puns.Blazor.csproj -c Release -o release --nologo
