@@ -8,7 +8,27 @@ namespace Pronunciation
 {
     public class PronunciationEngine
     {
-        public IEnumerable<PhoneticsWord> GetPhoneticsWords(string text) => Lookup[text].Select(x => x.Value);
+        public IEnumerable<PhoneticsWord> GetPhoneticsWords(string text)
+        {
+            var splits = text.Split('_', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if(splits.Length == 1)
+                return Lookup[splits.Single()].Select(x => x.Value);
+
+            var words = new List<PhoneticsWord>();
+
+            foreach (var split in splits)
+            {
+                var word = Lookup[split].Select(x=>x.Value).FirstOrDefault(); //todo multiple pronunciations
+                if(word == default)
+                    return Enumerable.Empty<PhoneticsWord>();
+
+                words.Add(word);
+            }
+
+            var newPhoneticsWord = new PhoneticsWord(text, 0, words.SelectMany(x => x.Symbols).ToList());
+
+            return new[] {newPhoneticsWord};
+        }
 
         public PronunciationEngine() => Lookup = TryCreateLookup();
 
