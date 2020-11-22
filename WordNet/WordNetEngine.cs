@@ -76,7 +76,7 @@ namespace WordNet
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
-                    if (line == null || line.StartsWith(' ')) continue;
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith(' ')) continue;
                     var pair = SynSet.InstantiateLazy(line, partOfSpeech);
                     yield return pair;
                 }
@@ -99,7 +99,7 @@ namespace WordNet
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
-                    if (line == null || line.StartsWith(' ')) continue;
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith(' ')) continue;
 
                     var spaceIndex = line.IndexOf(' ');
                     if(spaceIndex == -1) continue;
