@@ -42,21 +42,18 @@ namespace WordNet
 
         #endregion
 
-        private SynSet(IReadOnlyList<string> words,
+        private SynSet(
+            SynsetId id,
+            IReadOnlyList<string> words,
             string gloss,
-            string offset,
-            PartOfSpeech partOfSpeech,
             LexicographerFileName lexicographerFileName,
-            ILookup<SynSetRelation, string> relationSynSets,
-            ILookup<SynSetRelation, (string synSetId, int sourceWordIndex, int targetWordIndex)> lexicalRelations)
+            ILookup<SynSetRelation, SynsetId> relationSynSets,
+            ILookup<SynSetRelation, (SynsetId synSetId, int sourceWordIndex, int targetWordIndex)> lexicalRelations)
         {
-            ID = PartOfSpeech + ":" +  Offset;
+            Id = id;
             Words = words;
             Gloss = gloss;
-            Offset = offset;
-            PartOfSpeech = partOfSpeech;
             LexicographerFileName = lexicographerFileName;
-            _hashCode = HashCode.Combine(Offset, PartOfSpeech);
             _relationSynSets = relationSynSets;
             _lexicalRelations = lexicalRelations;
         }
@@ -65,7 +62,7 @@ namespace WordNet
         /// <summary>
         /// Gets the ID of this synset in the form POS:Offset
         /// </summary>
-        public string ID { get; }
+        public SynsetId Id { get; }
 
         /// <summary>
         /// Gets semantic relations that exist between this synset and other synsets
@@ -86,9 +83,7 @@ namespace WordNet
         /// <summary>
         /// Gets the POS of the current synset
         /// </summary>
-        public PartOfSpeech PartOfSpeech { get; }
-
-        public string Offset { get; }
+        public PartOfSpeech PartOfSpeech => Id.PartOfSpeech;
 
 
         /// <summary>
@@ -101,21 +96,20 @@ namespace WordNet
         /// </summary>
         public IReadOnlyList<string> Words { get; }
 
-        private readonly ILookup<SynSetRelation, string> _relationSynSets;
-        private readonly ILookup<SynSetRelation, (string synSetId, int sourceWordIndex, int targetWordIndex)> _lexicalRelations;
-
-        private readonly int _hashCode;
+        private readonly ILookup<SynSetRelation, SynsetId> _relationSynSets;
+        private readonly ILookup<SynSetRelation, (SynsetId synSetId, int sourceWordIndex, int targetWordIndex)> _lexicalRelations;
 
         #region construction
 
-        public static (string id, Lazy<SynSet> lazySet) InstantiateLazy(string definition, PartOfSpeech partOfSpeech)
+        public static (SynsetId id, Lazy<SynSet> lazySet) InstantiateLazy(string definition, PartOfSpeech partOfSpeech)
         {
-            var offset = GetField(definition, 0);
-            var id = partOfSpeech + ":" + offset;
+            var offset = uint.Parse(GetField(definition, 0));
+
+            var synsetId = new SynsetId(partOfSpeech, offset);
 
             var lazySet = new Lazy<SynSet>(()=> Instantiate(definition, partOfSpeech));
 
-            return (id, lazySet);
+            return (synsetId, lazySet);
         }
 
 
@@ -127,7 +121,8 @@ namespace WordNet
         /// <param name="partOfSpeech">Part of speech to use</param>
         public static SynSet Instantiate(string definition, PartOfSpeech partOfSpeech)
         {
-            var offset = GetField(definition, 0);
+            var offset = uint.Parse(GetField(definition, 0));
+            var id = new SynsetId(partOfSpeech, offset);
 
             /* get lexicographer file name...the enumeration lines up precisely with the wordnet spec (see the lexnames file) except that
              * it starts with None, so we need to add 1 to the definition line's value to get the correct file name */
@@ -170,8 +165,8 @@ namespace WordNet
             relationFieldStart = definition.IndexOf(' ', relationFieldStart) + 1;
 
             // grab each related synset
-            var relationSynSets = new List<(SynSetRelation relation, string relatedSetId)>();
-            var lexicalRelationSynSets = new List<(SynSetRelation relation, string relatedSetId, int sourceWordId, int targetWordId) >();
+            var relationSynSets = new List<(SynSetRelation relation, SynsetId relatedSetId)>();
+            var lexicalRelationSynSets = new List<(SynSetRelation relation, SynsetId relatedSetId, int sourceWordId, int targetWordId) >();
             for (var relationNum = 0; relationNum < numRelations; ++relationNum)
             {
                 static string GetNextFieldValue(string definition, ref int fieldStart)
@@ -185,14 +180,14 @@ namespace WordNet
                     return fieldValue;
                 }
                 var relationSymbol = GetNextFieldValue(definition, ref relationFieldStart);
-                var relatedSynSetOffset = GetNextFieldValue(definition, ref relationFieldStart) ;
+                var relatedSynSetOffset = uint.Parse(GetNextFieldValue(definition, ref relationFieldStart));
                 var relatedSynSetPartOfSpeech = GetPartOfSpeech(GetNextFieldValue(definition, ref relationFieldStart) );
                 var indexes = GetNextFieldValue(definition, ref relationFieldStart);
                 var sourceWordIndex = int.Parse(indexes.Substring(0, 2), NumberStyles.HexNumber);
                 var targetWordIndex = int.Parse(indexes[2..], NumberStyles.HexNumber);
 
 
-                var relatedSynSetId = relatedSynSetPartOfSpeech + ":" + relatedSynSetOffset;
+                var relatedSynSetId = new SynsetId(relatedSynSetPartOfSpeech, relatedSynSetOffset);
 
                 // get relation
                 var relation = partOfSpeech.GetSynSetRelation(relationSymbol);
@@ -208,7 +203,7 @@ namespace WordNet
             var relationSynSetsLookup = relationSynSets.ToLookup(x => x.relation, x => x.relatedSetId);
             var lexicalSynSetsLookup = lexicalRelationSynSets.ToLookup(x=>x.relation, x=> (x.relatedSetId, x.sourceWordId, x.targetWordId));
 
-            return new SynSet(words, gloss, offset, partOfSpeech, lexicographerFileName, relationSynSetsLookup, lexicalSynSetsLookup);
+            return new SynSet(id, words, gloss, lexicographerFileName, relationSynSetsLookup, lexicalSynSetsLookup);
         }
 
         /// <summary>
@@ -308,7 +303,7 @@ namespace WordNet
         /// <returns>Synsets related to the given one by the given relations</returns>
         public IEnumerable<SynSet> GetRelatedSynSets(IReadOnlyCollection<SynSetRelation> relations, bool recursive, WordNetEngine engine)
         {
-            var visited = new HashSet<string>{ID};
+            var visited = new HashSet<SynsetId>{Id};
             var toDo = new Stack<SynSet>();
             toDo.Push(this);
 
@@ -320,7 +315,7 @@ namespace WordNet
                         // only add synset if it isn't already present (wordnet contains cycles)
                         if (visited.Add(relatedSynset))
                         {
-                            var ss2 = engine.SynSetDictionary[relatedSynset].Value;
+                            var ss2 = engine.GetSynset(relatedSynset);
                             yield return ss2;
 
                             if (recursive) toDo.Push(ss2);
@@ -516,7 +511,7 @@ namespace WordNet
         /// Gets hash code for this synset
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() => _hashCode;
+        public override int GetHashCode() => Id.GetHashCode();
 
         /// <summary>
         /// Checks whether the current synset equals another
@@ -525,11 +520,8 @@ namespace WordNet
         /// <returns>True if equal, false otherwise</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is SynSet synSet))
-                return false;
-
-
-            return PartOfSpeech == synSet.PartOfSpeech && Offset  == synSet.Offset;
+            if (obj is SynSet synSet) return Id == synSet.Id;
+            return false;
         }
 
         /// <summary>

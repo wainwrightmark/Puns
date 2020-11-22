@@ -7,213 +7,35 @@ using System.Text;
 
 namespace WordNet
 {
-    /// <summary>
-    /// SynSet relations
-    /// </summary>
-    public enum SynSetRelation
+    public readonly struct SynsetId : IEquatable<SynsetId>
     {
-        None,
-        AlsoSee,
-        Antonym,
-        Attribute,
-        Cause,
-        DerivationallyRelated,
-        DerivedFromAdjective,
-        Entailment,
-        Hypernym,
-        Hyponym,
-        InstanceHypernym,
-        InstanceHyponym,
-        MemberHolonym,
-        MemberMeronym,
-        PartHolonym,
-        ParticipleOfVerb,
-        PartMeronym,
-        Pertainym,
-        RegionDomain,
-        RegionDomainMember,
-        SimilarTo,
-        SubstanceHolonym,
-        SubstanceMeronym,
-        TopicDomain,
-        TopicDomainMember,
-        UsageDomain,
-        UsageDomainMember,
-        VerbGroup,
-    }
-
-    /// <summary>
-    /// WordNet parts-of-speech
-    /// </summary>
-    public enum PartOfSpeech
-    {
-        None,
-        Noun,
-        Verb,
-        Adjective,
-        Adverb
-    }
-
-    /// <summary>
-    /// Lexicographer file names
-    /// </summary>
-    public enum LexicographerFileName
-    {
-        None,
-        AdjAll,
-        AdjPert,
-        AdvAll,
-        NounTops,
-        NounAct,
-        NounAnimal,
-        NounArtifact,
-        NounAttribute,
-        NounBody,
-        NounCognition,
-        NounCommunication,
-        NounEvent,
-        NounFeeling,
-        NounFood,
-        NounGroup,
-        NounLocation,
-        NounMotive,
-        NounObject,
-        NounPerson,
-        NounPhenomenon,
-        NounPlant,
-        NounPossession,
-        NounProcess,
-        NounQuantity,
-        NounRelation,
-        NounShape,
-        NounState,
-        NounSubstance,
-        NounTime,
-        VerbBody,
-        VerbChange,
-        VerbCognition,
-        VerbCommunication,
-        VerbCompetition,
-        VerbConsumption,
-        VerbContact,
-        VerbCreation,
-        VerbEmotion,
-        VerbMotion,
-        VerbPerception,
-        VerbPossession,
-        VerbSocial,
-        VerbStative,
-        VerbWeather,
-        AdjPpl
-    }
-
-
-    public static class Helpers
-    {
-        /// <summary>
-        /// SynSet relation symbols that are available for each POS
-        /// </summary>
-        public static IReadOnlyDictionary<PartOfSpeech, IReadOnlyDictionary<string, SynSetRelation>> PartOfSpeechSymbolRelationDictionary { get; } = CreatePosSymbolRelationDictionary();
-
-        /// <summary>
-        /// Static constructor
-        /// </summary>
-        private static IReadOnlyDictionary<PartOfSpeech, IReadOnlyDictionary<string, SynSetRelation>> CreatePosSymbolRelationDictionary()
+        public SynsetId(PartOfSpeech partOfSpeech, uint id)
         {
-            var dict = new Dictionary<PartOfSpeech, IReadOnlyDictionary<string, SynSetRelation>>();
-
-            // noun relations
-            var nounSymbolRelation = new Dictionary<string, SynSetRelation>
-            {
-                {"!", SynSetRelation.Antonym},
-                {"@", SynSetRelation.Hypernym},
-                {"@i", SynSetRelation.InstanceHypernym},
-                {"~", SynSetRelation.Hyponym},
-                {"~i", SynSetRelation.InstanceHyponym},
-                {"#m", SynSetRelation.MemberHolonym},
-                {"#s", SynSetRelation.SubstanceHolonym},
-                {"#p", SynSetRelation.PartHolonym},
-                {"%m", SynSetRelation.MemberMeronym},
-                {"%s", SynSetRelation.SubstanceMeronym},
-                {"%p", SynSetRelation.PartMeronym},
-                {"=", SynSetRelation.Attribute},
-                {"+", SynSetRelation.DerivationallyRelated},
-                {";c", SynSetRelation.TopicDomain},
-                {"-c", SynSetRelation.TopicDomainMember},
-                {";r", SynSetRelation.RegionDomain},
-                {"-r", SynSetRelation.RegionDomainMember},
-                {";u", SynSetRelation.UsageDomain},
-                {"-u", SynSetRelation.UsageDomainMember},
-                {@"\", SynSetRelation.DerivedFromAdjective}
-            };
-            // appears in WordNet 3.1
-            dict.Add(PartOfSpeech.Noun, nounSymbolRelation);
-
-            // verb relations
-            var verbSymbolRelation = new Dictionary<string, SynSetRelation>
-            {
-                {"!", SynSetRelation.Antonym},
-                {"@", SynSetRelation.Hypernym},
-                {"~", SynSetRelation.Hyponym},
-                {"*", SynSetRelation.Entailment},
-                {">", SynSetRelation.Cause},
-                {"^", SynSetRelation.AlsoSee},
-                {"$", SynSetRelation.VerbGroup},
-                {"+", SynSetRelation.DerivationallyRelated},
-                {";c", SynSetRelation.TopicDomain},
-                {";r", SynSetRelation.RegionDomain},
-                {";u", SynSetRelation.UsageDomain}
-            };
-            dict.Add(PartOfSpeech.Verb, verbSymbolRelation);
-
-            // adjective relations
-            var adjectiveSymbolRelation = new Dictionary<string, SynSetRelation>
-            {
-                {"!", SynSetRelation.Antonym},
-                {"&", SynSetRelation.SimilarTo},
-                {"<", SynSetRelation.ParticipleOfVerb},
-                {@"\", SynSetRelation.Pertainym},
-                {"=", SynSetRelation.Attribute},
-                {"^", SynSetRelation.AlsoSee},
-                {";c", SynSetRelation.TopicDomain},
-                {";r", SynSetRelation.RegionDomain},
-                {";u", SynSetRelation.UsageDomain},
-                {"+", SynSetRelation.DerivationallyRelated}
-            };
-            // not in documentation
-            dict.Add(PartOfSpeech.Adjective, adjectiveSymbolRelation);
-
-            // adverb relations
-            var adverbSymbolRelation = new Dictionary<string, SynSetRelation>
-            {
-                {"!", SynSetRelation.Antonym},
-                {@"\", SynSetRelation.DerivedFromAdjective},
-                {";c", SynSetRelation.TopicDomain},
-                {";r", SynSetRelation.RegionDomain},
-                {";u", SynSetRelation.UsageDomain},
-                {"+", SynSetRelation.DerivationallyRelated}
-            };
-            // not in documentation
-            dict.Add(PartOfSpeech.Adverb, adverbSymbolRelation);
-
-            return dict;
+            PartOfSpeech = partOfSpeech;
+            Id = id;
         }
 
-        /// <summary>
-        /// Gets the relation for a given POS and symbol
-        /// </summary>
-        /// <param name="partOfSpeech">POS to get relation for</param>
-        /// <param name="symbol">Symbol to get relation for</param>
-        /// <returns>SynSet relation</returns>
-        public static SynSetRelation GetSynSetRelation(this PartOfSpeech partOfSpeech, string symbol) => PartOfSpeechSymbolRelationDictionary[partOfSpeech][symbol];
+        public PartOfSpeech PartOfSpeech { get; }
 
+        public uint Id { get; }
+
+        /// <inheritdoc />
+        public bool Equals(SynsetId other) => PartOfSpeech == other.PartOfSpeech && Id == other.Id;
+
+        /// <inheritdoc />
+        public override bool Equals(object obj) => obj is SynsetId other && Equals(other);
+
+        /// <inheritdoc />
+        public override int GetHashCode() => HashCode.Combine((int) PartOfSpeech, Id);
+
+        public static bool operator ==(SynsetId left, SynsetId right) => left.Equals(right);
+
+        public static bool operator !=(SynsetId left, SynsetId right) => !left.Equals(right);
+
+        /// <inheritdoc />
+        public override string ToString() => $"{PartOfSpeech}:{Id}";
     }
 
-    /// <summary>
-    /// Provides access to the WordNet resource via two alternative methods, in-memory and disk-based. The latter is blazingly
-    /// fast but also hugely inefficient in terms of memory consumption. The latter uses essentially zero memory but is slow
-    /// because all searches have to be conducted on-disk.
-    /// </summary>
     public class WordNetEngine
     {
         /// <summary>
@@ -239,14 +61,14 @@ namespace WordNet
 
             var sw1 = Stopwatch.StartNew();
 
-            Console.WriteLine("Loading wordnet data");
+            Console.WriteLine(@"Loading wordnet data");
 
             SynSetDictionary = dataFiles.SelectMany(x => GetSynsetsFromData(x.bytes, x.partOfSpeech))
                 .ToDictionary(x => x.id, x => x.sets);
 
-            Console.WriteLine($"Loaded wordnet data ({sw1.ElapsedMilliseconds}ms)");
+            Console.WriteLine(@$"Loaded wordnet data ({sw1.ElapsedMilliseconds}ms)");
 
-            static IEnumerable<(string id, Lazy<SynSet> sets)> GetSynsetsFromData(byte[] bytes, PartOfSpeech partOfSpeech)
+            static IEnumerable<(SynsetId id, Lazy<SynSet> sets)> GetSynsetsFromData(byte[] bytes, PartOfSpeech partOfSpeech)
             {
                 using var stream = new MemoryStream(bytes);
                 using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -261,14 +83,15 @@ namespace WordNet
             }
 
             var sw2 = Stopwatch.StartNew();
-            Console.WriteLine("Loading wordnet index");
+            Console.WriteLine(@"Loading wordnet index");
 
             WordLookup = indexFiles.SelectMany(x => GetReferencesFromIndex(x.bytes, x.partOfSpeech))
-                .ToLookup(x => x.word, x => (x.partOfSpeech, x.synsetId));
+                .GroupBy(x=>x.word, x=>x.ids)
+                .ToDictionary(x=>x.Key, GroupLazy);
 
-            Console.WriteLine($"Loaded wordnet index ({sw2.ElapsedMilliseconds}ms)");
+            Console.WriteLine(@$"Loaded wordnet index ({sw2.ElapsedMilliseconds}ms)");
 
-            static IEnumerable<(string word, PartOfSpeech partOfSpeech, string synsetId)> GetReferencesFromIndex(byte[] bytes, PartOfSpeech partOfSpeech)
+            static IEnumerable<(string word, Lazy<IReadOnlyCollection<SynsetId>> ids)> GetReferencesFromIndex(byte[] bytes, PartOfSpeech partOfSpeech)
             {
                 using var stream = new MemoryStream(bytes);
                 using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -277,39 +100,79 @@ namespace WordNet
                 {
                     var line = reader.ReadLine();
                     if (line == null || line.StartsWith(' ')) continue;
-                    var fields = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
+                    var spaceIndex = line.IndexOf(' ');
+                    if(spaceIndex == -1) continue;
 
-                    var word = fields[0];
+                    var word = line.Substring(0, spaceIndex);
+                    var normalizedWord = NormalizeWord(word);
+
+                    var list = new Lazy<IReadOnlyCollection<SynsetId>>(()=> GetIds(line, partOfSpeech));
+
+                    yield return (normalizedWord, list);
+                }
+
+                static IReadOnlyCollection<SynsetId> GetIds(string l, PartOfSpeech partOfSpeech)
+                {
+                    var fields = l.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
                     var numberOfSynSets = int.Parse(fields[2]);
 
-                    var normalizedWord = NormalizeWord(word);
+                    var ids = new List<SynsetId>();
 
                     for (var i = 0; i < numberOfSynSets; i++)
                     {
-                        var id = fields[fields.Length - 1 - i];
-                        var synsetId = $"{partOfSpeech}:{id}";
-                        yield return (normalizedWord, partOfSpeech, synsetId);
+                        var id = uint.Parse(fields[fields.Length - 1 - i]);
+                        var synsetId = new SynsetId(partOfSpeech, id);
+                        ids.Add(synsetId);
                     }
+
+                    return ids;
                 }
             }
 
+        }
+
+        private static Lazy<IReadOnlyCollection<T>> GroupLazy<T>(IEnumerable<Lazy<IReadOnlyCollection<T>>> stuff)
+        {
+            using var enumerator = stuff.GetEnumerator();
+
+            if(!enumerator.MoveNext())//zero elements
+                return new Lazy<IReadOnlyCollection<T>>(Array.Empty<T>);
+
+            var first = enumerator.Current;
+
+            if (!enumerator.MoveNext()) // one element
+                return first;
+
+            //many
+            var list = new List<Lazy<IReadOnlyCollection<T>>>()
+            {
+                first, enumerator.Current
+            };
+
+            while (enumerator.MoveNext()) list.Add(enumerator.Current);
+
+
+            return new Lazy<IReadOnlyCollection<T>>(()=> list.SelectMany(x=>x.Value).ToList());
         }
 
 
         /// <summary>
         /// Dictionary mapping synset ids to lazy synsets
         /// </summary>
-        public IReadOnlyDictionary<string, Lazy<SynSet>> SynSetDictionary { get; }
+        private IReadOnlyDictionary<SynsetId, Lazy<SynSet>> SynSetDictionary { get; }
 
         /// <summary>
         /// Lookup mapping words to SynSet ids.
         /// </summary>
-        public ILookup<string, (PartOfSpeech partOfSpeech, string synsetId)> WordLookup { get; }
+        private IReadOnlyDictionary<string, Lazy<IReadOnlyCollection<SynsetId>>> WordLookup { get; }
 
         private static string NormalizeWord(string word) => word.ToLower().Replace(' ', '_');
 
         #region synset retrieval
+
+        public SynSet GetSynset(SynsetId id) => SynSetDictionary[id].Value;
 
         /// <summary>
         /// Gets all synsets for a word, optionally restricting the returned synsets to one or more parts of speech. This
@@ -325,12 +188,13 @@ namespace WordNet
         {
             var niceWord = NormalizeWord(word);
 
-            foreach (var (partOfSpeech, synsetId) in WordLookup[niceWord])
+            if (!WordLookup.TryGetValue(niceWord, out var sets)) yield break;
+
+            foreach (var  synsetId in sets.Value)
             {
-                if (posRestriction.Any() && !posRestriction.Contains(partOfSpeech)) continue;
+                if (posRestriction.Any() && !posRestriction.Contains(synsetId.PartOfSpeech)) continue;
 
-                var synSet =  SynSetDictionary[synsetId].Value;
-
+                var synSet = SynSetDictionary[synsetId].Value;
                 yield return synSet;
             }
         }
