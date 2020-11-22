@@ -13,12 +13,10 @@ namespace Puns.Test
         public WordFixture()
         {
             WordNetEngine = new WordNetEngine();
-
-            Lookup = WordHelper.TryCreateLookup().Value;
+            PronunciationEngine = new PronunciationEngine();
         }
 
-        public ILookup<string, Word> Lookup { get; }
-
+        public PronunciationEngine PronunciationEngine { get; }
         public WordNetEngine WordNetEngine { get; }
     }
 
@@ -34,7 +32,7 @@ namespace Puns.Test
         public ITestOutputHelper TestOutputHelper { get; }
         public WordFixture WordFixture { get; }
 
-        public ILookup<string, Word> Lookup => WordFixture.Lookup;
+        public PronunciationEngine PronunciationEngine => WordFixture.PronunciationEngine;
 
         public WordNetEngine WordNetEngine => WordFixture.WordNetEngine;
 
@@ -53,10 +51,8 @@ namespace Puns.Test
         [Fact]
         public void TestPronunciation()
         {
-
-            Lookup["fish"].Should().NotBeEmpty();
-
-            Lookup["fish"].First().Symbols.Should().NotBeEmpty();
+            PronunciationEngine.GetPhoneticsWords("fish").Should().NotBeEmpty();
+            PronunciationEngine.GetPhoneticsWords("fish").First().Symbols.Should().NotBeEmpty();
         }
 
         [Theory]
@@ -85,7 +81,7 @@ namespace Puns.Test
 
             var synSets = WordNetEngine.GetSynSets(theme).ToList();
 
-            var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet, WordNetEngine, Lookup)).ToList();
+            var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet, WordNetEngine, PronunciationEngine)).ToList();
 
             puns.Should().HaveCountGreaterThan(2);
 

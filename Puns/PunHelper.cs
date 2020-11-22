@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using CMU;
 using MoreLinq;
 using WordNet;
@@ -10,28 +9,28 @@ namespace Puns
 {
     public static class PunHelper
     {
-        public static bool IsPun(Word originalWord, Word replacementWord)
+        public static bool IsPun(PhoneticsWord originalPhoneticsWord, PhoneticsWord replacementPhoneticsWord)
         {
-            if (IsSameWord(originalWord.Text, replacementWord.Text))
+            if (IsSameWord(originalPhoneticsWord.Text, replacementPhoneticsWord.Text))
                 return false;
 
-            if (originalWord.Symbols.Count < 2 || replacementWord.Symbols.Count < 2)
+            if (originalPhoneticsWord.Symbols.Count < 2 || replacementPhoneticsWord.Symbols.Count < 2)
                 return false;
 
-            if (originalWord.Symbols.Count == replacementWord.Symbols.Count) //same number of syllables
+            if (originalPhoneticsWord.Symbols.Count == replacementPhoneticsWord.Symbols.Count) //same number of syllables
             {
-                if (originalWord.Symbols[0] != replacementWord.Symbols[0] && originalWord.Symbols[^1] != replacementWord.Symbols[^1])
+                if (originalPhoneticsWord.Symbols[0] != replacementPhoneticsWord.Symbols[0] && originalPhoneticsWord.Symbols[^1] != replacementPhoneticsWord.Symbols[^1])
                     return false;
 
-                return originalWord.Symbols.Select(x => x.GetSyllableType())
-                    .SequenceEqual(replacementWord.Symbols.Select(x => x.GetSyllableType()));
+                return originalPhoneticsWord.Symbols.Select(x => x.GetSyllableType())
+                    .SequenceEqual(replacementPhoneticsWord.Symbols.Select(x => x.GetSyllableType()));
             }
             else
             {
-                if (replacementWord.Symbols.StartsWith(originalWord.Symbols))
+                if (replacementPhoneticsWord.Symbols.StartsWith(originalPhoneticsWord.Symbols))
                     return true;
 
-                if (originalWord.Symbols.StartsWith(replacementWord.Symbols))
+                if (originalPhoneticsWord.Symbols.StartsWith(replacementPhoneticsWord.Symbols))
                     return true;
 
                 return false;
@@ -42,7 +41,7 @@ namespace Puns
             string theme,
             SynSet synSet,
             WordNetEngine wordNetEngine,
-            ILookup<string, Word> cmuLookup)
+            PronunciationEngine pronunciationEngine)
         {
             var phrases = GetPhrases(category);
 
@@ -50,11 +49,11 @@ namespace Puns
                 .Select(x=>x.Word).Prepend(theme)
 
                 .Distinct(StringComparer.OrdinalIgnoreCase)
-                .SelectMany(x=> cmuLookup[x])
+                .SelectMany(pronunciationEngine.GetPhoneticsWords)
                 .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
 
-            var cache = new Dictionary<Word, IReadOnlyCollection<Word>>();
+            var cache = new Dictionary<PhoneticsWord, IReadOnlyCollection<PhoneticsWord>>();
 
             var puns = new List<Pun>();
 
@@ -67,7 +66,7 @@ namespace Puns
 
                 foreach (var word in words)
                 {
-                    var cmuWord = cmuLookup[word].FirstOrDefault();
+                    var cmuWord = pronunciationEngine.GetPhoneticsWords(word).FirstOrDefault();
                     if (cmuWord is null) continue;
 
                     var casing = DetectCasing(word);

@@ -11,10 +11,9 @@ namespace Puns.Blazor.Pages
     {
         public PunState()
         {
-            WordNetEngine = new Lazy<WordNetEngine>(()=>
-                new WordNetEngine());
+            WordNetEngine = new Lazy<WordNetEngine>(()=> new WordNetEngine());
 
-            WordLookup = new Lazy<ILookup<string, Word>>(()=> WordHelper.TryCreateLookup().Value);
+            PronunciationEngine = new Lazy<PronunciationEngine>(()=> new PronunciationEngine());
         }
 
 
@@ -36,7 +35,7 @@ namespace Puns.Blazor.Pages
 
         public Lazy<WordNetEngine> WordNetEngine { get; }
 
-        public Lazy<ILookup<string, Word>> WordLookup { get; }
+        public Lazy<PronunciationEngine> PronunciationEngine { get; }
 
         private static IEnumerable<SynSet> GetSynSets(string? theme, WordNetEngine wordNetEngine)
         {
@@ -64,7 +63,7 @@ namespace Puns.Blazor.Pages
             Console.WriteLine(@"Getting Puns");
 
             var puns = SynSets.Except(CrossedOffSynsets)
-                .SelectMany(synSet => PunHelper.GetPuns(PunCategory, Theme, synSet, WordNetEngine.Value, WordLookup.Value));
+                .SelectMany(synSet => PunHelper.GetPuns(PunCategory, Theme, synSet, WordNetEngine.Value, PronunciationEngine.Value));
 
             PunList = puns
                 .Distinct()

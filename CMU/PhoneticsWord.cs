@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace CMU
 {
-    public sealed class Word : IEquatable<Word>
+    public sealed class PhoneticsWord : IEquatable<PhoneticsWord>
     {
 
-        public Word(string text, int variant, IReadOnlyList<Symbol> symbols)
+        public PhoneticsWord(string text, int variant, IReadOnlyList<Symbol> symbols)
         {
             Text = text;
             Variant = variant;
@@ -23,7 +23,7 @@ namespace CMU
         public IReadOnlyList<Symbol> Symbols { get; }
 
         /// <inheritdoc />
-        public bool Equals(Word other)
+        public bool Equals(PhoneticsWord other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -36,14 +36,14 @@ namespace CMU
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((Word) obj);
+            return Equals((PhoneticsWord) obj);
         }
 
         /// <inheritdoc />
         public override int GetHashCode() => HashCode.Combine(Text, Variant);
 
-        public static bool operator ==(Word left, Word right) => Equals(left, right);
+        public static bool operator ==(PhoneticsWord left, PhoneticsWord right) => Equals(left, right);
 
-        public static bool operator !=(Word left, Word right) => !Equals(left, right);
+        public static bool operator !=(PhoneticsWord left, PhoneticsWord right) => !Equals(left, right);
     }
 }
