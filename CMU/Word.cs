@@ -15,7 +15,7 @@ namespace CMU
             Console.WriteLine(@"Creating Phonetics Lookup");
 
             var text = Resource.Dict;
-            var lines = text.Split("\r\n");
+            var lines = text.Split("\n");
             var results = new List<Word>();
 
             foreach (var  line in lines.Where(line=> !line.StartsWith(";;;")))

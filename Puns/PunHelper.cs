@@ -93,10 +93,10 @@ namespace Puns
             return category switch
             {
 
-                PunCategory.Movies => CategoryLists.Movies.Split("\r\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Idiom => CategoryLists.Idioms.Split("\r\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Bands => CategoryLists.Bands.Split("\r\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Books => CategoryLists.Books.Split("\r\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Movies => CategoryLists.Movies.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Idiom => CategoryLists.Idioms.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Bands => CategoryLists.Bands.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Books => CategoryLists.Books.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
             };
         }
