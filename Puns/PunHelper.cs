@@ -9,34 +9,80 @@ namespace Puns
 {
     public static class PunHelper
     {
-        public static bool IsPun(PhoneticsWord originalPhoneticsWord, PhoneticsWord replacementPhoneticsWord)
+        public static int? GetPunScore(PhoneticsWord originalPhoneticsWord, PhoneticsWord replacementPhoneticsWord)
         {
             if (IsSameWord(originalPhoneticsWord.Text, replacementPhoneticsWord.Text))
-                return false;
+                return null;
 
-            if (originalPhoneticsWord.Symbols.Count < 2 || replacementPhoneticsWord.Symbols.Count < 2)
-                return false;
+            var minLength = Math.Min(originalPhoneticsWord.Symbols.Count, replacementPhoneticsWord.Symbols.Count);
 
-            if (originalPhoneticsWord.Symbols.Count == replacementPhoneticsWord.Symbols.Count
-            ) //same number of syllables
+            if (minLength < 3)
+                return null;
+
+
+            var longestStreak = 0;
+            var currentStreak = 0;
+            var unmatchedSymbols = 0;
+            var otherMatches = 0;
+
+            void EndStreak()
             {
-                if (originalPhoneticsWord.Symbols[0] != replacementPhoneticsWord.Symbols[0] &&
-                    originalPhoneticsWord.Symbols[^1] != replacementPhoneticsWord.Symbols[^1])
-                    return false;
+                if (longestStreak < currentStreak)
+                {
+                    otherMatches += longestStreak;
+                    longestStreak = currentStreak;
+                }
+                else
+                    otherMatches += currentStreak;
 
-                return originalPhoneticsWord.Symbols.Select(x => x.GetSyllableType())
-                    .SequenceEqual(replacementPhoneticsWord.Symbols.Select(x => x.GetSyllableType()));
+                currentStreak = 0;
             }
-            else
+
+            for (var i = 0; i < minLength; i++)
             {
-                if (replacementPhoneticsWord.Symbols.StartsWith(originalPhoneticsWord.Symbols))
-                    return true;
-
-                if (originalPhoneticsWord.Symbols.StartsWith(replacementPhoneticsWord.Symbols))
-                    return true;
-
-                return false;
+                if (originalPhoneticsWord.Symbols[i] == replacementPhoneticsWord.Symbols[i])
+                    currentStreak++;
+                else if (originalPhoneticsWord.SyllableTypes.Value[i] == replacementPhoneticsWord.SyllableTypes.Value[i])
+                {
+                    EndStreak();
+                    otherMatches++;
+                }
+                else
+                {
+                    EndStreak();
+                    unmatchedSymbols++;
+                }
             }
+
+            EndStreak();
+
+            //now do the same thing going from the back
+
+            for (var i = 0; i < minLength; i++)
+            {
+                if (originalPhoneticsWord.Symbols[^(1 + i)] == replacementPhoneticsWord.Symbols[^(1 + i)])
+                    currentStreak++;
+                else if (originalPhoneticsWord.SyllableTypes.Value[^(1 + i)] == replacementPhoneticsWord.SyllableTypes.Value[^(1 + i)])
+                {
+                    EndStreak();
+                    otherMatches++;
+                }
+                else
+                {
+                    EndStreak();
+                    unmatchedSymbols++;
+                }
+            }
+
+            EndStreak();
+
+
+
+            var score = Triangle(longestStreak) - Triangle(unmatchedSymbols);
+
+            if (score > 2) return score;
+            return null;
+            static int Triangle(int n) => n * (n + 1) / 2; //returns the nth triangular number
         }
 
         public static IReadOnlyCollection<Pun> GetPuns(PunCategory category,
@@ -52,10 +98,12 @@ namespace Puns
 
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .SelectMany(pronunciationEngine.GetPhoneticsWords)
+                .Where(x=>x.Symbols.Count > 2)
                 .Distinct(WordPronunciationComparer.Instance)
+
                 .ToList();
 
-            var cache = new Dictionary<PhoneticsWord, IReadOnlyCollection<PhoneticsWord>>();
+            var cache = new Dictionary<PhoneticsWord, PhoneticsWord?>();
 
             var puns = new List<Pun>();
 
@@ -70,22 +118,27 @@ namespace Puns
                 {
                     var cmuWord = pronunciationEngine.GetPhoneticsWords(word).FirstOrDefault();
                     if (cmuWord is null) continue;
+                    if (cmuWord.Symbols.Count < 3) continue;
 
                     var casing = DetectCasing(word);
 
-                    if (!cache.TryGetValue(cmuWord, out var punWords))
+                    if (!cache.TryGetValue(cmuWord, out var bestPunWord))
                     {
-                        punWords = themeWords.Where(x => IsPun(x, cmuWord)).ToList();
-                        cache.Add(cmuWord, punWords);
+                        bestPunWord = themeWords.Select(themeWord=> (themeWord, score: GetPunScore(themeWord, cmuWord)))
+                            .Where(x=>x.score.HasValue)
+                            .OrderByDescending(x=>x.score!.Value)
+                            .Select(x=>x.themeWord)
+                            .FirstOrDefault();
+                        cache.Add(cmuWord, bestPunWord);
                     }
 
-                    foreach (var punWord in punWords)
-                    {
-                        var newString = ToCase(punWord.Text, casing);
+                    if (bestPunWord == null) continue;
 
-                        var newPhrase = phrase.Replace(word, newString);
-                        puns.Add(new Pun(newPhrase, phrase, punWord.Text, synSet));
-                    }
+                    var newString = ToCase(bestPunWord.Text, casing);
+
+                    var newPhrase = phrase.Replace(word, newString);
+                    puns.Add(new Pun(newPhrase, phrase, bestPunWord.Text, synSet));
+
                 }
             }
 

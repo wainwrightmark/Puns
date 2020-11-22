@@ -53,6 +53,7 @@ namespace Puns.Test
         [InlineData("food")]
         [InlineData("vegetable")]
         [InlineData("night")]
+        [InlineData("chocolate")]
         public void TestRelatedWords(string word)
         {
             var synSets = WordNetEngine.GetSynSets(word).ToList();
