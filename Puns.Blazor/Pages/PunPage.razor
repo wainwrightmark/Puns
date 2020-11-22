@@ -9,23 +9,26 @@
 </div>
 
 
-@foreach (var synSet in State.SynSets)
+@if (State.EnginesLoaded)
 {
-
-    var changeFunc = new Action<ChangeEventArgs>((e) =>
+    @foreach (var synSet in State.SynSets)
     {
-        if (!State.CrossedOffSynsets.Add(synSet))
-            State.CrossedOffSynsets.Remove(synSet);
-    });
 
-    <div class="synsetBox">
-    <input type="checkbox" checked="@(!State.CrossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
-    <label>@synSet.Gloss</label>
+        var changeFunc = new Action<ChangeEventArgs>((e) =>
+        {
+            if (!State.CrossedOffSynsets.Add(synSet))
+                State.CrossedOffSynsets.Remove(synSet);
+        });
+
+        <div class="synsetBox">
+        <input type="checkbox" checked="@(!State.CrossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
+        <label>@synSet.Gloss</label>
+        <br />
+        </div>
+
+    }
+
     <br />
-    </div>
-
-}
-<br />
 
 <div class="categoryBox">
 <label>Category</label>
@@ -88,7 +91,26 @@
 }
 
 
+}
+else
+{
+    <div class="loadingLabel">
+        <label>Pundering... this takes about 20 seconds</label>
+    </div>
+
+}
+
+
+
+
 @code {
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        State.PageLoaded += (sender, args) => StateHasChanged();
+        base.OnInitialized();
+    }
 
     public PunState State { get; } = new PunState();
 
