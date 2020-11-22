@@ -55,8 +55,11 @@
 
 @if(State.PunList != null)
 {
+    var totalResults = State.PunList.Select(x => x.Count()).Prepend(0).Sum();
+
     @foreach (var grouping in State.PunList)
-{
+    {
+        var isSmallGroup = grouping.Count() < 4 || totalResults < 20;
 
         var collapsed = !State.RevealedWords.Contains(grouping.Key);
 
@@ -66,16 +69,16 @@
                 State.RevealedWords.Remove(grouping.Key);
         };
 
-    <div class="punHeader">
-        <h1>
+    <div hidden="@isSmallGroup" class="punHeader">
+        <h2>
         @grouping.Key (@grouping.Count())
         <button @onclick="toggle">@(collapsed?"+":"-")</button>
-    </h1>
+        </h2>
     </div>
 
 
 
-    <div hidden="@collapsed" class="punGroup">
+    <div hidden="@(collapsed && !isSmallGroup)" class="punGroup">
         @foreach (var pun in grouping)
     {
         <br/>
