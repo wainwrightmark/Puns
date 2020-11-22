@@ -17,9 +17,11 @@ namespace Puns
             if (originalPhoneticsWord.Symbols.Count < 2 || replacementPhoneticsWord.Symbols.Count < 2)
                 return false;
 
-            if (originalPhoneticsWord.Symbols.Count == replacementPhoneticsWord.Symbols.Count) //same number of syllables
+            if (originalPhoneticsWord.Symbols.Count == replacementPhoneticsWord.Symbols.Count
+            ) //same number of syllables
             {
-                if (originalPhoneticsWord.Symbols[0] != replacementPhoneticsWord.Symbols[0] && originalPhoneticsWord.Symbols[^1] != replacementPhoneticsWord.Symbols[^1])
+                if (originalPhoneticsWord.Symbols[0] != replacementPhoneticsWord.Symbols[0] &&
+                    originalPhoneticsWord.Symbols[^1] != replacementPhoneticsWord.Symbols[^1])
                     return false;
 
                 return originalPhoneticsWord.Symbols.Select(x => x.GetSyllableType())
@@ -46,7 +48,7 @@ namespace Puns
             var phrases = GetPhrases(category);
 
             var themeWords = GetRelatedWords(theme, synSet, wordNetEngine)
-                .Select(x=>x.Word).Prepend(theme)
+                .Select(x => x.Word).Prepend(theme)
 
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .SelectMany(pronunciationEngine.GetPhoneticsWords)
@@ -61,7 +63,7 @@ namespace Puns
             {
                 var words = phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-                if(words.Length == 1)
+                if (words.Length == 1)
                     continue;
 
                 foreach (var word in words)
@@ -96,10 +98,14 @@ namespace Puns
             return category switch
             {
 
-                PunCategory.Movies => CategoryLists.Movies.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Idiom => CategoryLists.Idioms.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Bands => CategoryLists.Bands.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Books => CategoryLists.Books.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Movies => CategoryLists.Movies.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Idiom => CategoryLists.Idioms.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Bands => CategoryLists.Bands.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Books => CategoryLists.Books.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
             };
         }
@@ -140,29 +146,67 @@ namespace Puns
             SynSetRelation.TopicDomainMember
         };
 
-        public static IEnumerable<RelatedWord> GetRelatedWords(string relatedToWord, SynSet synSet, WordNetEngine wordNetEngine)
+        public static IEnumerable<RelatedWord> GetRelatedWords(string relatedToWord, SynSet synSet,
+            WordNetEngine wordNetEngine)
         {
-            var synSets = synSet.GetRelatedSynSets(Relations, true, wordNetEngine).Prepend(synSet);
+            var synSets = GetPunSynSets(synSet, wordNetEngine);
 
             foreach (var set in synSets)
-                foreach (var word in set.Words)
-                    yield return new RelatedWord(word, relatedToWord, "...", set.Gloss);
+            foreach (var word in set.Words)
+                yield return new RelatedWord(word, relatedToWord, "...", set.Gloss);
         }
 
-    }
+        public static IEnumerable<SynSet> GetPunSynSets(SynSet synSet, WordNetEngine engine)
+        {
 
-    public enum Casing
-    {
-        Lower,
-        Upper,
-        Title
-    }
+            var oneStepSets = synSet.GetRelatedSynSets(SingleStepRelations, false, engine);
+            var multiStepSets = synSet.GetRelatedSynSets(RecursiveRelations, true, engine);
 
-    public enum PunCategory
-    {
-        Idiom,
-        Movies,
-        Bands,
-        Books
+
+
+            return oneStepSets.Concat(multiStepSets).Prepend(synSet).Distinct();
+
+        }
+
+        /// <summary>
+        /// Relations that can be followed recursively
+        /// </summary>
+        private static readonly IReadOnlySet<SynSetRelation> RecursiveRelations = new HashSet<SynSetRelation>()
+        {
+            SynSetRelation.Hyponym,
+            SynSetRelation.InstanceHyponym,
+
+            SynSetRelation.RegionDomainMember,
+            SynSetRelation.TopicDomainMember,
+            SynSetRelation.UsageDomainMember,
+        };
+
+        /// <summary>
+        /// Relations that should only be followed a single step
+        /// </summary>
+        private static readonly IReadOnlySet<SynSetRelation> SingleStepRelations = new HashSet<SynSetRelation>()
+        {
+            SynSetRelation.Hypernym,
+                SynSetRelation.SimilarTo,
+
+                SynSetRelation.MemberMeronym,
+                SynSetRelation.SubstanceHolonym,
+                SynSetRelation.PartMeronym,
+
+                SynSetRelation.PartHolonym,
+                SynSetRelation.SubstanceHolonym,
+                SynSetRelation.MemberHolonym,
+
+                SynSetRelation.RegionDomain,
+                SynSetRelation.TopicDomain,
+                SynSetRelation.UsageDomain,
+
+                SynSetRelation.AlsoSee,
+                SynSetRelation.Cause,
+                SynSetRelation.Attribute,
+                SynSetRelation.Entailment,
+                SynSetRelation.DerivedFromAdjective,
+                SynSetRelation.ParticipleOfVerb,
+        };
     }
 }

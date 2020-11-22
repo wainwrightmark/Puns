@@ -303,6 +303,12 @@ namespace WordNet
         /// <returns>Synsets related to the given one by the given relations</returns>
         public IEnumerable<SynSet> GetRelatedSynSets(IReadOnlyCollection<SynSetRelation> relations, bool recursive, WordNetEngine engine)
         {
+            if (relations.Count == 0)
+            {
+                relations = Enum.GetValues<SynSetRelation>();
+                recursive = false; //Don't allow recursion for all relations
+            }
+
             var visited = new HashSet<SynsetId>{Id};
             var toDo = new Stack<SynSet>();
             toDo.Push(this);
@@ -322,6 +328,7 @@ namespace WordNet
                         }
             }
         }
+
 
 
         ///// <summary>

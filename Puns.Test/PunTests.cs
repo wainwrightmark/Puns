@@ -48,6 +48,25 @@ namespace Puns.Test
 
         }
 
+        [Theory]
+        [InlineData("fish")]
+        [InlineData("food")]
+        [InlineData("vegetable")]
+        [InlineData("night")]
+        public void TestRelatedWords(string word)
+        {
+            var synSets = WordNetEngine.GetSynSets(word).ToList();
+
+
+            foreach (var synSet in synSets)
+            foreach (var relatedSynSet in PunHelper.GetRelatedSynSets(synSet, WordNetEngine))
+            foreach (var word1 in relatedSynSet.Words)
+                TestOutputHelper.WriteLine((word1, synSet.Gloss, relatedSynSet.Gloss).ToString());
+
+        }
+
+
+
         [Fact]
         public void TestPronunciation()
         {

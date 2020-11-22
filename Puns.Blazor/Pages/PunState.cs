@@ -10,7 +10,9 @@ namespace Puns.Blazor.Pages
 {
     public class PunState
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public PunState()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             WordNetEngine = new Lazy<WordNetEngine>(()=> new WordNetEngine());
 
@@ -22,11 +24,11 @@ namespace Puns.Blazor.Pages
                 Task.Factory.StartNew(() => PronunciationEngine.Value)
             };
 
-            Task.WhenAll(tasks).ContinueWith(x =>
-            {
-                EnginesLoaded = true;
-                PageLoaded(null, EventArgs.Empty);
-            });
+            _ = Task.WhenAll(tasks).ContinueWith(x =>
+              {
+                  EnginesLoaded = true;
+                  PageLoaded?.Invoke(null, EventArgs.Empty);
+              });
 
 
         }
@@ -41,7 +43,7 @@ namespace Puns.Blazor.Pages
 
         public HashSet<SynSet> CrossedOffSynsets { get; } = new HashSet<SynSet>();
 
-        public event EventHandler PageLoaded;
+        public event EventHandler? PageLoaded;
 
         public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
 
