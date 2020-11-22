@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace CMU
+namespace Pronunciation
 {
     public class PronunciationEngine
     {
@@ -19,7 +19,7 @@ namespace CMU
             var sw = Stopwatch.StartNew();
             Console.WriteLine(@"Creating Phonetics Lookup");
 
-            var text = Resource.Dict;
+            var text = PhoeneticsFiles.Dict;
             var lines = text.Split("\n");
             var results = new List<(string text, Lazy<PhoneticsWord> word)>();
 

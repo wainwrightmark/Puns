@@ -1,6 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 
-namespace CMU
+namespace Pronunciation
 {
     public enum SyllableType
     {

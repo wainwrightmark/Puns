@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CMU
+namespace Pronunciation
 {
     public sealed class PhoneticsWord : IEquatable<PhoneticsWord>
     {

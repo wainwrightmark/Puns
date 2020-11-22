@@ -1,6 +1,6 @@
 using System.Linq;
-using CMU;
 using FluentAssertions;
+using Pronunciation;
 using WordNet;
 using Xunit;
 using Xunit.Abstractions;

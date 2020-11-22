@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puns.Blazor", "Puns.Blazor\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puns.Test", "Puns.Test\Puns.Test.csproj", "{55169E97-C97F-4013-A26B-55BD1B5DCEB1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMU", "CMU\CMU.csproj", "{75581EC9-84E0-426D-96FF-C143E3B04D82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pronunciation", "Pronunciation\Pronunciation.csproj", "{75581EC9-84E0-426D-96FF-C143E3B04D82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordNet", "WordNet\WordNet.csproj", "{C57B800E-DAA3-4E1F-AA05-A5E495588076}"
 EndProject

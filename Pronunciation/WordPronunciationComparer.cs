@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CMU
+namespace Pronunciation
 {
     public sealed class WordPronunciationComparer : IEqualityComparer<PhoneticsWord>
     {

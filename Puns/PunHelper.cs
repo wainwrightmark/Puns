@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CMU;
 using MoreLinq;
+using Pronunciation;
 using WordNet;
 
 namespace Puns
