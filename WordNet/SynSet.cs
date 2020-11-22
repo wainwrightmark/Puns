@@ -223,38 +223,47 @@ namespace WordNet
         /// <returns>Field value</returns>
         private static string GetField(string line, int fieldNum, out int startIndex)
         {
-            if (fieldNum < 0)
-                throw new Exception("Invalid field number:  " + fieldNum);
-
-            // scan fields until we hit the one we want
-            var currField = 0;
-            startIndex = 0;
-            while (true)
+            try
             {
-                if (currField == fieldNum)
+                if (fieldNum < 0)
+                    throw new Exception("Invalid field number:  " + fieldNum);
+
+                // scan fields until we hit the one we want
+                var currField = 0;
+                startIndex = 0;
+                while (true)
                 {
-                    // get the end of the field
-                    var endIndex = line.IndexOf(' ', startIndex + 1) - 1;
+                    if (currField == fieldNum)
+                    {
+                        // get the end of the field
+                        var endIndex = line.IndexOf(' ', startIndex + 1) - 1;
 
-                    // watch out for end of line
-                    if (endIndex < 0)
-                        endIndex = line.Length - 1;
+                        // watch out for end of line
+                        if (endIndex < 0)
+                            endIndex = line.Length - 1;
 
-                    // get length of field
-                    var fieldLen = endIndex - startIndex + 1;
+                        // get length of field
+                        var fieldLen = endIndex - startIndex + 1;
 
-                    // return field value
-                    return line.Substring(startIndex, fieldLen);
+                        // return field value
+                        return line.Substring(startIndex, fieldLen);
+                    }
+
+                    // move to start of next field (one beyond next space)
+                    startIndex = line.IndexOf(' ', startIndex) + 1;
+
+                    // if there are no more spaces and we haven't found the field, the caller requested an invalid field
+                    if (startIndex == 0)
+                        throw new Exception("Failed to get field number:  " + fieldNum);
+
+                    ++currField;
                 }
-
-                // move to start of next field (one beyond next space)
-                startIndex = line.IndexOf(' ', startIndex) + 1;
-
-                // if there are no more spaces and we haven't found the field, the caller requested an invalid field
-                if (startIndex == 0)
-                    throw new Exception("Failed to get field number:  " + fieldNum);
-
-                ++currField;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.WriteLine(@$"Error in GetField('{line}', '{fieldNum}')");
+                throw;
             }
         }
 
