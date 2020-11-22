@@ -2,6 +2,7 @@ using System.Linq;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Puns.Test
 {
@@ -14,15 +15,26 @@ namespace Puns.Test
         [Fact]
         public void TestSynSets()
         {
-            var synSets = WordData.GetSynsets("Fish").ToList();
+            var engine = new WordNet.WordNetEngine();
+            var synSets = engine.GetSynSets("Fish").ToList();
 
             synSets.Should().HaveCountGreaterThan(2);
 
             foreach (var synSet in synSets)
-            {
                 TestOutputHelper.WriteLine(synSet.Gloss);
-            }
 
+        }
+
+        [Fact]
+        public void TestPronunciation()
+        {
+            var lookup = CMU.WordHelper.TryCreateLookup();
+
+            if(lookup.IsFailure) throw new XunitException(lookup.Error);
+
+            lookup.Value["fish"].Should().NotBeEmpty();
+
+            lookup.Value["fish"].First().Symbols.Should().NotBeEmpty();
         }
 
         [Theory]
@@ -48,10 +60,13 @@ namespace Puns.Test
         [InlineData("animal", PunCategory.Books)]
         public void TestPunHelper(string theme, PunCategory category)
         {
+            var engine = new WordNet.WordNetEngine();
+            var lookupResult = CMU.WordHelper.TryCreateLookup();
+            if(lookupResult.IsFailure) throw new XunitException(lookupResult.Error);
 
-            var synSets = WordData.GetSynsets(theme).ToList();
+            var synSets = engine.GetSynSets(theme).ToList();
 
-            var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet)).ToList();
+            var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet, engine, lookupResult.Value)).ToList();
 
             puns.Should().HaveCountGreaterThan(2);
 

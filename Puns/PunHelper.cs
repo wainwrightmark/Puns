@@ -11,7 +11,7 @@ namespace Puns
     {
         public static bool IsPun(Word originalWord, Word replacementWord)
         {
-            if (WordData.IsSameWord(originalWord.Text, replacementWord.Text))
+            if (IsSameWord(originalWord.Text, replacementWord.Text))
                 return false;
 
             if (originalWord.Symbols.Count < 2 || replacementWord.Symbols.Count < 2)
@@ -35,21 +35,22 @@ namespace Puns
 
                 return false;
             }
-
-
-
         }
 
-        public static IReadOnlyCollection<Pun> GetPuns(PunCategory category, string theme, SynSet synSet)
+        public static IReadOnlyCollection<Pun> GetPuns(PunCategory category,
+            string theme,
+            SynSet synSet,
+            WordNetEngine wordNetEngine,
+            ILookup<string, Word> cmuLookup)
         {
-            var phrases =  GetPhrases(category);
+            var phrases = GetPhrases(category);
 
-            var themeWords = Enumerable.Prepend(WordData.GetRelatedWords2(theme, synSet)
-                    .Select(x=>x.Word)
-                    .Where(WordData.IsGoodWord), theme)
+            var themeWords = GetRelatedWords(theme, synSet, wordNetEngine)
+                .Select(x=>x.Word).Prepend(theme)
+
                 .Distinct(StringComparer.OrdinalIgnoreCase)
-                .SelectMany(x=> WordLookup.Value[x])
-                .Distinct()
+                .SelectMany(x=> cmuLookup[x])
+                .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
 
             var puns = new List<Pun>();
@@ -65,9 +66,9 @@ namespace Puns
                 {
                     var casing = DetectCasing(word);
 
-                    if (!WordData.IsGoodWord(word)) continue;
+                    //if (!wordNetEngine.WordLookup.Contains(word)) continue;
 
-                    var cmuWord = WordLookup.Value[word].FirstOrDefault();
+                    var cmuWord = cmuLookup[word].FirstOrDefault();
 
                     if (cmuWord is null) continue;
 
@@ -85,8 +86,6 @@ namespace Puns
 
             return puns;
         }
-
-        public static readonly Lazy<ILookup<string, Word>> WordLookup = new Lazy<ILookup<string, Word>>(()=> Word.TryCreateLookup().Value);
 
         public static IReadOnlyCollection<string>  GetPhrases(PunCategory category)
         {
@@ -121,6 +120,29 @@ namespace Puns
                 Casing.Title => System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(s.ToLower()),
                 _ => throw new ArgumentOutOfRangeException(nameof(casing), casing, null)
             };
+        }
+
+        public static bool IsSameWord(string s1, string s2)
+        {
+            //TODO improve
+            return s1.Equals(s2, StringComparison.OrdinalIgnoreCase) ||
+                   (s1 + "s").Equals(s2, StringComparison.OrdinalIgnoreCase) ||
+                   (s2 + "s").Equals(s1, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static readonly List<SynSetRelation> Relations = new List<SynSetRelation>()
+        {
+            SynSetRelation.Hyponym,
+            SynSetRelation.TopicDomainMember
+        };
+
+        public static IEnumerable<RelatedWord> GetRelatedWords(string relatedToWord, SynSet synSet, WordNetEngine wordNetEngine)
+        {
+            var synSets = synSet.GetRelatedSynSets(Relations, true, wordNetEngine).Prepend(synSet);
+
+            foreach (var set in synSets)
+                foreach (var word in set.Words)
+                    yield return new RelatedWord(word, relatedToWord, "...", set.Gloss);
         }
 
     }

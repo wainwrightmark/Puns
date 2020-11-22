@@ -1,25 +1,25 @@
 ﻿@page "/puns"
-@using WordNet
+@using System.Linq
 
 <div class="themeBox">
 <br/>
 <label>Theme</label>
-<input type="text" style="width: 100%" @bind="Theme"/>
+<input type="text" style="width: 100%" @bind="State.Theme"/>
 <br/>
 </div>
 
 
-@foreach (var synSet in SynSets)
+@foreach (var synSet in State.SynSets)
 {
 
     var changeFunc = new Action<ChangeEventArgs>((e) =>
     {
-        if (!_crossedOffSynsets.Add(synSet))
-            _crossedOffSynsets.Remove(synSet);
+        if (!State.CrossedOffSynsets.Add(synSet))
+            State.CrossedOffSynsets.Remove(synSet);
     });
 
     <div class="synsetBox">
-    <input type="checkbox" checked="@(!_crossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
+    <input type="checkbox" checked="@(!State.CrossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
     <label>@synSet.Gloss</label>
     <br />
     </div>
@@ -29,7 +29,7 @@
 
 <div class="categoryBox">
 <label>Category</label>
-<select @bind="PunCategory">
+<select @bind="State.PunCategory">
     @foreach (var c in Enum.GetValues<PunCategory>())
     {
         <option value="@c">@c</option>
@@ -41,8 +41,8 @@
 <br/>
 
 <div class="GenerateButton">
-    <button disabled="@(IsGenerating || !Enabled)" class="btn btn-primary" @onclick="Find">
-    @(IsGenerating? "Generating Puns" :(Enabled?"Pun!":"Loading Pun Data") )
+    <button disabled="@State.IsGenerating" class="btn btn-primary" @onclick="State.Find">
+    @(State.IsGenerating? "Pundering" :("Pun!") )
     </button>
 </div>
 
@@ -50,17 +50,17 @@
 <br/>
 <hr/>
 
-@if(PunList != null)
+@if(State.PunList != null)
 {
-    @foreach (var grouping in PunList)
+    @foreach (var grouping in State.PunList)
 {
 
-        var collapsed = !RevealedWords.Contains(grouping.Key);
+        var collapsed = !State.RevealedWords.Contains(grouping.Key);
 
         Action toggle = () =>
         {
-            if (!RevealedWords.Add(grouping.Key))
-                RevealedWords.Remove(grouping.Key);
+            if (!State.RevealedWords.Add(grouping.Key))
+                State.RevealedWords.Remove(grouping.Key);
         };
 
     <div class="punHeader">
@@ -90,63 +90,6 @@
 
 @code {
 
+    public PunState State { get; } = new PunState();
 
-    public PunCategory PunCategory { get; set; } = PunCategory.Idiom;
-
-    public string? Theme { get; set; }// = "Fish";
-
-    public IEnumerable<SynSet> SynSets => GetSynSets(Theme);
-
-
-    private readonly HashSet<SynSet> _crossedOffSynsets = new HashSet<SynSet>();
-
-    public bool Enabled { get; private set; } = true;
-
-    public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
-
-    private HashSet<string> RevealedWords { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-    public bool IsGenerating { get; set; } = false;
-
-    private IEnumerable<SynSet> GetSynSets(string theme)
-    {
-        if(string.IsNullOrWhiteSpace(Theme))
-            return Enumerable.Empty<SynSet>();
-        else
-        {
-            var sets = WordData.GetSynsets(Theme).ToList();
-            return sets;
-        }
-    }
-
-
-    private void Find()
-    {
-        if (string.IsNullOrWhiteSpace(Theme))
-        {
-            IsGenerating = false;
-            return;
-        }
-
-        IsGenerating = true;
-
-        PunList = null;
-        RevealedWords.Clear();
-
-        Console.WriteLine(@"Getting Puns");
-
-        var puns = SynSets.Except(_crossedOffSynsets)
-            .SelectMany(synSet => PunHelper.GetPuns(PunCategory, Theme, synSet));
-
-        PunList = puns
-            .Distinct()
-            .GroupBy(x=>x.Word, StringComparer.OrdinalIgnoreCase)
-            .OrderByDescending(x=>x.Count())
-            .ToList();
-
-        Console.WriteLine($@"{PunList.Count} Puns Got");
-
-        IsGenerating = false;
-        this.StateHasChanged();
-    }
 }
