@@ -59,7 +59,7 @@ namespace Puns.Test
 
 
             foreach (var synSet in synSets)
-            foreach (var relatedSynSet in PunHelper.GetRelatedSynSets(synSet, WordNetEngine))
+            foreach (var relatedSynSet in PunHelper.GetPunSynSets(synSet, WordNetEngine))
             foreach (var word1 in relatedSynSet.Words)
                 TestOutputHelper.WriteLine((word1, synSet.Gloss, relatedSynSet.Gloss).ToString());
 
