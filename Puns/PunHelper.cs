@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using CMU;
 using MoreLinq;
 using WordNet;
@@ -53,6 +54,8 @@ namespace Puns
                 .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
 
+            var cache = new Dictionary<Word, IReadOnlyCollection<Word>>();
+
             var puns = new List<Pun>();
 
             foreach (var phrase in phrases)
@@ -64,15 +67,16 @@ namespace Puns
 
                 foreach (var word in words)
                 {
-                    var casing = DetectCasing(word);
-
-                    //if (!wordNetEngine.WordLookup.Contains(word)) continue;
-
                     var cmuWord = cmuLookup[word].FirstOrDefault();
-
                     if (cmuWord is null) continue;
 
-                    var punWords = themeWords.Where(x => IsPun(x, cmuWord));
+                    var casing = DetectCasing(word);
+
+                    if (!cache.TryGetValue(cmuWord, out var punWords))
+                    {
+                        punWords = themeWords.Where(x => IsPun(x, cmuWord)).ToList();
+                        cache.Add(cmuWord, punWords);
+                    }
 
                     foreach (var punWord in punWords)
                     {
@@ -87,7 +91,8 @@ namespace Puns
             return puns;
         }
 
-        public static IReadOnlyCollection<string>  GetPhrases(PunCategory category)
+
+        public static IReadOnlyCollection<string> GetPhrases(PunCategory category)
         {
             return category switch
             {

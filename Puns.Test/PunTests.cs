@@ -1,22 +1,47 @@
 using System.Linq;
+using CMU;
 using FluentAssertions;
+using WordNet;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Puns.Test
 {
-    public class PunTests
+
+    public class WordFixture
     {
-        public PunTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
+        public WordFixture()
+        {
+            WordNetEngine = new WordNetEngine();
+
+            Lookup = WordHelper.TryCreateLookup().Value;
+        }
+
+        public ILookup<string, Word> Lookup { get; }
+
+        public WordNetEngine WordNetEngine { get; }
+    }
+
+
+    public class PunTests : IClassFixture<WordFixture>
+    {
+        public PunTests(ITestOutputHelper testOutputHelper, WordFixture wordFixture)
+        {
+            TestOutputHelper = testOutputHelper;
+            WordFixture = wordFixture;
+        }
 
         public ITestOutputHelper TestOutputHelper { get; }
+        public WordFixture WordFixture { get; }
+
+        public ILookup<string, Word> Lookup => WordFixture.Lookup;
+
+        public WordNetEngine WordNetEngine => WordFixture.WordNetEngine;
 
         [Fact]
         public void TestSynSets()
         {
-            var engine = new WordNet.WordNetEngine();
-            var synSets = engine.GetSynSets("Fish").ToList();
+            var synSets = WordNetEngine.GetSynSets("Fish").ToList();
 
             synSets.Should().HaveCountGreaterThan(2);
 
@@ -28,13 +53,10 @@ namespace Puns.Test
         [Fact]
         public void TestPronunciation()
         {
-            var lookup = CMU.WordHelper.TryCreateLookup();
 
-            if(lookup.IsFailure) throw new XunitException(lookup.Error);
+            Lookup["fish"].Should().NotBeEmpty();
 
-            lookup.Value["fish"].Should().NotBeEmpty();
-
-            lookup.Value["fish"].First().Symbols.Should().NotBeEmpty();
+            Lookup["fish"].First().Symbols.Should().NotBeEmpty();
         }
 
         [Theory]
@@ -60,13 +82,10 @@ namespace Puns.Test
         [InlineData("animal", PunCategory.Books)]
         public void TestPunHelper(string theme, PunCategory category)
         {
-            var engine = new WordNet.WordNetEngine();
-            var lookupResult = CMU.WordHelper.TryCreateLookup();
-            if(lookupResult.IsFailure) throw new XunitException(lookupResult.Error);
 
-            var synSets = engine.GetSynSets(theme).ToList();
+            var synSets = WordNetEngine.GetSynSets(theme).ToList();
 
-            var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet, engine, lookupResult.Value)).ToList();
+            var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet, WordNetEngine, Lookup)).ToList();
 
             puns.Should().HaveCountGreaterThan(2);
 

@@ -288,13 +288,14 @@ namespace WordNet
         /// </summary>
         /// <param name="relation">Relation to check</param>
         /// <returns>Number of synset related to the current one by the given relation</returns>
-        public int GetRelatedSynSetCount(SynSetRelation relation, WordNetEngine engine) => _relationSynSets[relation].Count();
+        public int GetRelatedSynSetCount(SynSetRelation relation) => _relationSynSets[relation].Count();
 
         /// <summary>
         /// Gets synsets related to the current synset
         /// </summary>
         /// <param name="relation">Synset relation to follow</param>
         /// <param name="recursive">Whether or not to follow the relation recursively for all related synsets</param>
+        /// <param name="engine">Word net engine</param>
         /// <returns>Synsets related to the given one by the given relation</returns>
         public IEnumerable<SynSet> GetRelatedSynSets(SynSetRelation relation, bool recursive, WordNetEngine engine) => GetRelatedSynSets(new[] { relation }, recursive, engine);
 
@@ -303,6 +304,7 @@ namespace WordNet
         /// </summary>
         /// <param name="relations">Synset relations to follow</param>
         /// <param name="recursive">Whether or not to follow the relations recursively for all related synsets</param>
+        /// <param name="engine">Word net engine</param>
         /// <returns>Synsets related to the given one by the given relations</returns>
         public IEnumerable<SynSet> GetRelatedSynSets(IReadOnlyCollection<SynSetRelation> relations, bool recursive, WordNetEngine engine)
         {
@@ -434,6 +436,7 @@ namespace WordNet
         /// have a depth of zero.
         /// </summary>
         /// <param name="relations">Relations to follow</param>
+        /// <param name="engine">Word net engine</param>
         /// <returns>Depth of current SynSet</returns>
         public int GetDepth(IReadOnlyCollection<SynSetRelation> relations, WordNetEngine engine)
         {
@@ -448,6 +451,7 @@ namespace WordNet
         /// </summary>
         /// <param name="relations">Relations to follow</param>
         /// <param name="synsetsEncountered">Synsets that have already been encountered. Prevents cycles from being entered.</param>
+        /// <param name="engine">Word net engine</param>
         /// <returns>Depth of current SynSet</returns>
         private int GetDepth(IReadOnlyCollection<SynSetRelation> relations, ref HashSet<SynSet> synsetsEncountered, WordNetEngine engine)
         {
@@ -536,7 +540,7 @@ namespace WordNet
         {
             var desc = new StringBuilder();
 
-            desc.Append("{");
+            desc.Append('{');
             var prependComma = false;
             foreach (var word in Words)
             {
