@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Pronunciation
 {
@@ -12,7 +11,7 @@ namespace Pronunciation
             Text = text;
             Variant = variant;
             Symbols = symbols;
-            SyllableTypes= new Lazy<IReadOnlyList<SyllableType>>(()=> Symbols.Select(x=>x.GetSyllableType()).ToList());
+            //SyllableTypes= new Lazy<IReadOnlyList<SyllableType>>(()=> Symbols.Select(x=>x.GetSyllableType()).ToList());
         }
 
         public string Text { get; }
@@ -24,7 +23,7 @@ namespace Pronunciation
 
         public IReadOnlyList<Symbol> Symbols { get; }
 
-        public Lazy<IReadOnlyList<SyllableType>> SyllableTypes { get; }
+        //public Lazy<IReadOnlyList<SyllableType>> SyllableTypes { get; }
 
         /// <inheritdoc />
         public bool Equals(PhoneticsWord other)

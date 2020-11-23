@@ -76,6 +76,27 @@ namespace Puns.Test
         }
 
         [Theory]
+        [InlineData("colt", "bolt", PunType.PerfectRhyme)]
+        [InlineData("smelt", "bolt", PunType.ImperfectRhyme)]
+        [InlineData("car", "carnage", PunType.Prefix)]
+        [InlineData("car", "incarcerate", PunType.Infix)]
+        [InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
+        [InlineData("curious", "notorious", PunType.RichRhyme)]
+        [InlineData("bear", "bare", PunType.Identity)]
+        public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
+
+        {
+            var theme = PronunciationEngine.GetPhoneticsWords(themeWord).First();
+            var replacementWord = PronunciationEngine.GetPhoneticsWords(wordToReplace).First();
+
+
+            var realPunType = PunClassifier.Classify(theme, replacementWord);
+
+            realPunType.Should().Be(expectedPunType);
+
+        }
+
+        [Theory]
         [InlineData("vegetable", PunCategory.Idiom)]
         [InlineData("vegetable", PunCategory.Bands)]
         [InlineData("vegetable", PunCategory.Movies)]

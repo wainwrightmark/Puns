@@ -52,6 +52,8 @@ namespace Pronunciation
 
         };
 
+        public static bool IsVowel(this SyllableType st) => st == SyllableType.Vowel || st == SyllableType.Semivowel;
+
         private static SyllableType GetSyllableType1(Symbol s)
         {
             if (s.ToString().Length > 1 && TextToSyllableTypeDictionary.TryGetValue(s.ToString().Substring(0, 2), out var st))

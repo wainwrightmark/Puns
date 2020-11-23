@@ -22,14 +22,14 @@ namespace Puns {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class CategoryLists {
+    internal class WordData {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal CategoryLists() {
+        internal WordData() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Puns {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Puns.CategoryLists", typeof(CategoryLists).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Puns.WordData", typeof(WordData).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -106,36 +106,80 @@ namespace Puns {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Reluctant Orphan
-        ///Manon Lescaut
-        ///England, Their England
-        ///And Then There Were None
-        ///The Mysterious Affair at Styles
-        ///The Murder of Roger Ackroyd
-        ///The Murder at the Vicarage
-        ///The Secret Adversary
-        ///The Map of Love
-        ///Day
-        ///The Uncommon Reader
-        ///Red Shift
-        ///The Swimming-Pool Library
-        ///The Line of Beauty
-        ///Cry, the Beloved Country
-        ///Saturday Night and Sunday Morning
-        ///Morvern Callar
-        ///Lanark
-        ///Revelation Space
-        ///The Outsider
-        ///The Plague
-        ///The Time of Indifference
-        ///Crome Yellow
-        ///Brave New World
-        ///The Kingdom of this World
-        /// [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Harry Potter and the Philosopher&apos;s Stone
+        ///The Hunger Games
+        ///Twilight
+        ///To Kill a Mockingbird
+        ///The Great Gatsby
+        ///The Fault in Our Stars
+        ///1984
+        ///Pride and Prejudice
+        ///Divergent
+        ///The Hobbit
+        ///The Catcher in the Rye
+        ///The Diary of a Young Girl
+        ///Angels and Demons
+        ///Animal Farm
+        ///The Girl With the Dragon Tatoo
+        ///The Kite Runner
+        ///The Fellowship of the Ring
+        ///Gone Girl
+        ///Lord of the Flies
+        ///The Help
+        ///The Lion, the Witch and the Wardrobe
+        ///Romeo and Juliet
+        ///The Lovely Bones
+        ///The Alchemist
+        ///The Girl on the Train
+        ///A Game of Thron [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Books {
             get {
                 return ResourceManager.GetString("Books", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to the
+        ///be
+        ///and
+        ///of
+        ///a
+        ///in
+        ///to
+        ///have
+        ///to
+        ///it
+        ///I
+        ///that
+        ///for
+        ///you
+        ///he
+        ///with
+        ///on
+        ///do
+        ///say
+        ///this
+        ///they
+        ///at
+        ///but
+        ///we
+        ///his
+        ///from
+        ///that
+        ///not
+        ///n&apos;t
+        ///by
+        ///she
+        ///or
+        ///as
+        ///what
+        ///go
+        ///their.
+        /// </summary>
+        internal static string CommonWords {
+            get {
+                return ResourceManager.GetString("CommonWords", resourceCulture);
             }
         }
         

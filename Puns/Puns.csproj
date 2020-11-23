@@ -10,27 +10,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="CategoryLists.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CategoryLists.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="CategoryLists.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>CategoryLists.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Remove="C:\Users\wainw\.nuget\packages\microsoft.phoneticmatching\0.0.7\build\..\runtimes\win-x64\native\maluubaspeech-csharp.dll" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Pronunciation\Pronunciation.csproj" />
     <ProjectReference Include="..\WordNet\WordNet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="WordData.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WordData.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="WordData.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>WordData.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

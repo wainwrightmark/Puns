@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MoreLinq;
 using Pronunciation;
 using WordNet;
 
@@ -9,10 +8,55 @@ namespace Puns
 {
     public static class PunHelper
     {
+        /*
         public static int? GetPunScore(PhoneticsWord originalPhoneticsWord, PhoneticsWord replacementPhoneticsWord)
         {
             if (IsSameWord(originalPhoneticsWord.Text, replacementPhoneticsWord.Text))
                 return null;
+
+            static int GetScore(PhoneticsWord shortWord, PhoneticsWord longWord, int offSet)
+            {
+                var longestStreak = 0;
+                var currentStreak = 0;
+                var unmatchedSymbols = 0;
+                var otherMatches = 0;
+
+                void EndStreak()
+                {
+                    if (longestStreak < currentStreak)
+                    {
+                        otherMatches += longestStreak;
+                        longestStreak = currentStreak;
+                    }
+                    else
+                        otherMatches += currentStreak;
+
+                    currentStreak = 0;
+                }
+
+                for (var i = 0; i < shortWord.Symbols.Count; i++)
+                {
+                    if (shortWord.Symbols[i] == longWord.Symbols[i + offSet])
+                        currentStreak++;
+                    else if (shortWord.SyllableTypes.Value[i] == longWord.SyllableTypes.Value[i + offSet])
+                    {
+                        EndStreak();
+                        otherMatches++;
+                    }
+                    else
+                    {
+                        EndStreak();
+                        unmatchedSymbols++;
+                    }
+                }
+
+                EndStreak();
+
+                var score = 2 *(Triangle(longestStreak) - Triangle(unmatchedSymbols))  ;
+
+                return score;
+            }
+
 
             var minLength = Math.Min(originalPhoneticsWord.Symbols.Count, replacementPhoneticsWord.Symbols.Count);
 
@@ -20,70 +64,28 @@ namespace Puns
                 return null;
 
 
-            var longestStreak = 0;
-            var currentStreak = 0;
-            var unmatchedSymbols = 0;
-            var otherMatches = 0;
 
-            void EndStreak()
+
+            var (shortWord, longWord) = originalPhoneticsWord.Symbols.Count <= replacementPhoneticsWord.Symbols.Count
+                ? (originalPhoneticsWord, replacementPhoneticsWord)
+                : (replacementPhoneticsWord, originalPhoneticsWord);
+
+            var bestScoreSoFar = 0;
+
+            for (var offset = 0; offset <= longWord.Symbols.Count - shortWord.Symbols.Count; offset++)
             {
-                if (longestStreak < currentStreak)
-                {
-                    otherMatches += longestStreak;
-                    longestStreak = currentStreak;
-                }
-                else
-                    otherMatches += currentStreak;
-
-                currentStreak = 0;
+                var score = GetScore(shortWord, longWord, offset);
+                if (score > bestScoreSoFar) bestScoreSoFar = score;
             }
 
-            for (var i = 0; i < minLength; i++)
-            {
-                if (originalPhoneticsWord.Symbols[i] == replacementPhoneticsWord.Symbols[i])
-                    currentStreak++;
-                else if (originalPhoneticsWord.SyllableTypes.Value[i] == replacementPhoneticsWord.SyllableTypes.Value[i])
-                {
-                    EndStreak();
-                    otherMatches++;
-                }
-                else
-                {
-                    EndStreak();
-                    unmatchedSymbols++;
-                }
-            }
-
-            EndStreak();
-
-            //now do the same thing going from the back
-
-            for (var i = 0; i < minLength; i++)
-            {
-                if (originalPhoneticsWord.Symbols[^(1 + i)] == replacementPhoneticsWord.Symbols[^(1 + i)])
-                    currentStreak++;
-                else if (originalPhoneticsWord.SyllableTypes.Value[^(1 + i)] == replacementPhoneticsWord.SyllableTypes.Value[^(1 + i)])
-                {
-                    EndStreak();
-                    otherMatches++;
-                }
-                else
-                {
-                    EndStreak();
-                    unmatchedSymbols++;
-                }
-            }
-
-            EndStreak();
 
 
-
-            var score = Triangle(longestStreak) - Triangle(unmatchedSymbols);
-
-            if (score > 2) return score;
+            if (bestScoreSoFar > 2) return bestScoreSoFar;
             return null;
             static int Triangle(int n) => n * (n + 1) / 2; //returns the nth triangular number
         }
+        */
+
 
         public static IReadOnlyCollection<Pun> GetPuns(PunCategory category,
             string theme,
@@ -95,7 +97,7 @@ namespace Puns
 
             var themeWords = GetRelatedWords(theme, synSet, wordNetEngine)
                 .Select(x => x.Word).Prepend(theme)
-
+                .Except(CommonWords.Value, StringComparer.OrdinalIgnoreCase)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .SelectMany(pronunciationEngine.GetPhoneticsWords)
                 .Where(x=>x.Symbols.Count > 2)
@@ -109,13 +111,15 @@ namespace Puns
 
             foreach (var phrase in phrases)
             {
-                var words = phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var words = phrase
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 if (words.Length == 1)
                     continue;
 
                 foreach (var word in words)
                 {
+                    if(CommonWords.Value.Contains(word)) continue;
                     var cmuWord = pronunciationEngine.GetPhoneticsWords(word).FirstOrDefault();
                     if (cmuWord is null) continue;
                     if (cmuWord.Symbols.Count < 3) continue;
@@ -124,11 +128,13 @@ namespace Puns
 
                     if (!cache.TryGetValue(cmuWord, out var bestPunWord))
                     {
-                        bestPunWord = themeWords.Select(themeWord=> (themeWord, score: GetPunScore(themeWord, cmuWord)))
-                            .Where(x=>x.score.HasValue)
-                            .OrderByDescending(x=>x.score!.Value)
-                            .Select(x=>x.themeWord)
-                            .FirstOrDefault();
+                        var bestPuns = themeWords.Select(themeWord =>
+                                (themeWord, score: PunClassifier.Classify(themeWord, cmuWord)?.GetPunScore()))
+                            .Where(x => x.score.HasValue)
+                            .OrderByDescending(x => x.score!.Value)
+                            .ThenBy(x => x.themeWord.Text.Length);//Shorter words better
+
+                        bestPunWord = bestPuns.Select(x=>x.themeWord).FirstOrDefault();
                         cache.Add(cmuWord, bestPunWord);
                     }
 
@@ -145,19 +151,23 @@ namespace Puns
             return puns;
         }
 
+        private static readonly Lazy<IReadOnlySet<string>> CommonWords = new Lazy<IReadOnlySet<string>>(
+            ()=> WordData.CommonWords.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase));
+
 
         public static IReadOnlyCollection<string> GetPhrases(PunCategory category)
         {
             return category switch
             {
 
-                PunCategory.Movies => CategoryLists.Movies.Split("\n",
+                PunCategory.Movies => WordData.Movies.Split("\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Idiom => CategoryLists.Idioms.Split("\n",
+                PunCategory.Idiom => WordData.Idioms.Split("\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Bands => CategoryLists.Bands.Split("\n",
+                PunCategory.Bands => WordData.Bands.Split("\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                PunCategory.Books => CategoryLists.Books.Split("\n",
+                PunCategory.Books => WordData.Books.Split("\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
             };
@@ -193,11 +203,6 @@ namespace Puns
                    (s2 + "s").Equals(s1, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static readonly List<SynSetRelation> Relations = new List<SynSetRelation>()
-        {
-            SynSetRelation.Hyponym,
-            SynSetRelation.TopicDomainMember
-        };
 
         public static IEnumerable<RelatedWord> GetRelatedWords(string relatedToWord, SynSet synSet,
             WordNetEngine wordNetEngine)
