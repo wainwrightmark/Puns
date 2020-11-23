@@ -6,15 +6,20 @@ namespace Pronunciation
     public sealed class PhoneticsWord : IEquatable<PhoneticsWord>
     {
 
-        public PhoneticsWord(string text, int variant, IReadOnlyList<Symbol> symbols)
+        public PhoneticsWord(string text, int variant, bool isCompound, IReadOnlyList<Symbol> symbols)
         {
             Text = text;
             Variant = variant;
             Symbols = symbols;
-            //SyllableTypes= new Lazy<IReadOnlyList<SyllableType>>(()=> Symbols.Select(x=>x.GetSyllableType()).ToList());
+            IsCompound = isCompound;
         }
 
         public string Text { get; }
+
+        /// <summary>
+        /// Is this a compound word
+        /// </summary>
+        public bool IsCompound { get; }
 
         /// <inheritdoc />
         public override string ToString() => Text;

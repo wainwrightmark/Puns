@@ -52,6 +52,12 @@ namespace Pronunciation
 
         };
 
+
+        public static bool IsStressedVowel(this Symbol symbol) => StressedVowels.Contains(symbol);
+
+        private static readonly IReadOnlySet<Symbol> StressedVowels = Enum.GetValues<Symbol>().Where(x => x.ToString().Contains('1') || x.ToString().Contains('2')).ToHashSet();
+
+
         public static bool IsVowel(this SyllableType st) => st == SyllableType.Vowel || st == SyllableType.Semivowel;
 
         private static SyllableType GetSyllableType1(Symbol s)

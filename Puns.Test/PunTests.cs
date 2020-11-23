@@ -81,7 +81,6 @@ namespace Puns.Test
         [InlineData("car", "carnage", PunType.Prefix)]
         [InlineData("car", "incarcerate", PunType.Infix)]
         [InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
-        [InlineData("curious", "notorious", PunType.RichRhyme)]
         [InlineData("bear", "bare", PunType.Identity)]
         public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
 

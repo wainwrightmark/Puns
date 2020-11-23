@@ -129,8 +129,14 @@ namespace Puns
                     if (!cache.TryGetValue(cmuWord, out var bestPunWord))
                     {
                         var bestPuns = themeWords.Select(themeWord =>
-                                (themeWord, score: PunClassifier.Classify(themeWord, cmuWord)?.GetPunScore()))
+                            {
+                                var punClass = PunClassifier.Classify(themeWord, cmuWord);
+                                var score = punClass?.GetPunScore();
+
+                                return (themeWord, punClass, score );
+                            })
                             .Where(x => x.score.HasValue)
+                            .Where(x=> !(x.themeWord.IsCompound && (x.punClass == PunType.Infix || x.punClass == PunType.Prefix))) //prevent compound word prefix / infix
                             .OrderByDescending(x => x.score!.Value)
                             .ThenBy(x => x.themeWord.Text.Length);//Shorter words better
 

@@ -25,7 +25,7 @@ namespace Pronunciation
                 words.Add(word);
             }
 
-            var newPhoneticsWord = new PhoneticsWord(text, 0, words.SelectMany(x => x.Symbols).ToList());
+            var newPhoneticsWord = new PhoneticsWord(text, 0, true, words.SelectMany(x => x.Symbols).ToList());
 
             return new[] {newPhoneticsWord};
         }
@@ -93,7 +93,7 @@ namespace Pronunciation
                         throw new ArgumentException($"Could not parse symbol {symbolString}");
                 }
 
-                return new PhoneticsWord(word, number, symbols);
+                return new PhoneticsWord(word, number, false, symbols);
             }
         }
 

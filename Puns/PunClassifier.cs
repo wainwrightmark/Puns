@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MoreLinq;
 using Pronunciation;
@@ -53,44 +54,42 @@ namespace Puns
 
             static PunType? GetRhymeType(PhoneticsWord shortWord, PhoneticsWord longWord)
             {
-                var matchingConsonants = 0;
-                var matchingVowels = 0;
 
-                for (var i = 0; i < shortWord.Symbols.Count; i++)
+                var shortLastStressedVowel = shortWord.Symbols.LastIndexOf(x => x.IsStressedVowel());
+                if (shortLastStressedVowel < 0)
+                    return null;
+
+                var longLastStressedVowel = longWord.Symbols.LastIndexOf(x => x.IsStressedVowel());
+                if (longLastStressedVowel < 1)
+                    return null;
+
+                var shortSymbolsLeft = shortWord.Symbols.Count - shortLastStressedVowel;
+                var longSymbolsLeft = longWord.Symbols.Count - longLastStressedVowel;
+
+                if (shortSymbolsLeft != longSymbolsLeft)
+                    return null;
+
+
+                var imperfects = 0;
+                for (var i = 0; i < shortSymbolsLeft; i++)
                 {
-                    var sSyllable = shortWord.Symbols[^(1+i)];
-                    var lSyllable = longWord.Symbols[^(1+i)];
+                    var s = shortWord.Symbols[i + shortLastStressedVowel];
+                    var l = longWord.Symbols[i + longLastStressedVowel];
 
-                    if (sSyllable == lSyllable)
-                    {
-                        if (sSyllable.GetSyllableType().IsVowel())
-                            matchingVowels++;
-                        else matchingConsonants++;
+                    if(s == l) continue;
 
-                        if (matchingConsonants >= 2 && matchingVowels >= 2)
-                            return PunType.RichRhyme;
-                    }
-                    else if (matchingConsonants >= 1 && matchingVowels >= 1 && matchingConsonants + matchingVowels >= 3)
-                        return PunType.PerfectRhyme;
+                    if (imperfects > 0) return null; //give up
 
-                    else if (sSyllable.GetSyllableType() == lSyllable.GetSyllableType())
-                    {
-
-                        if (sSyllable.GetSyllableType().IsVowel())
-                            matchingVowels++;
-                        else matchingConsonants++;
-
-                        if (matchingConsonants >= 1 && matchingVowels >= 1 && matchingConsonants + matchingVowels >= 3)
-                            return PunType.ImperfectRhyme;
-
-                        return null;
-                    }
-                    else
-                        return null;
+                    if (s.GetSyllableType() == l.GetSyllableType())
+                        imperfects++;
+                    else return null;
                 }
 
-                return null;
+                if (imperfects > 0) return PunType.ImperfectRhyme;
 
+                else return PunType.PerfectRhyme;
+
+                //TODO rich rhyme
             }
         }
 
@@ -110,8 +109,19 @@ namespace Puns
             };
         }
 
+        public static int LastIndexOf<T>(this IReadOnlyList<T> source, Func<T, bool> predicate)
+        {
+            for (var i = source.Count - 1; i >= 0; i--)
+            {
+                if (predicate(source[i]))
+                    return i;
+            }
 
+            return -1;
+        }
     }
+
+
 
 
     public enum PunType
