@@ -37,15 +37,18 @@ namespace Puns
                 return rhymeType;
 
 
-            if (longWord.Symbols.StartsWith(shortWord.Symbols))
-                return PunType.Prefix;
+            var firstSymbol = shortWord.Symbols.First();
 
+            var matchingIndexes =
+                longWord.Symbols.Index().Where(x => x.Value.Equals(firstSymbol))
+                .Select(x => x.Key);
 
-            for (var skip = 1; skip < longWord.Symbols.Count - shortWord.Symbols.Count; skip++)
+            foreach (var matchingIndex in matchingIndexes)
             {
-                if (longWord.Symbols.Skip(skip).StartsWith(shortWord.Symbols))
-                    return PunType.Infix;
+                if (longWord.Symbols.Skip(matchingIndex + 1).StartsWith(shortWord.Symbols.Skip(1)))
+                    return matchingIndex == 0? PunType.Prefix : PunType.Infix;
             }
+
 
             if (shortWord.Symbols.Count >= 4 && longWord.Symbols.StartsWith(shortWord.Symbols.Take(4)))
                 return PunType.SharedPrefix;
