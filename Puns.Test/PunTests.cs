@@ -121,7 +121,7 @@ namespace Puns.Test
 
             var synSets = WordNetEngine.GetSynSets(theme).ToList();
 
-            var puns = synSets.SelectMany(synSet=> PunHelper.GetPuns(category, theme, synSet, WordNetEngine, PronunciationEngine)).ToList();
+            var puns =  PunHelper.GetPuns(category, theme, synSets, WordNetEngine, PronunciationEngine);
 
             puns.Should().HaveCountGreaterThan(2);
 

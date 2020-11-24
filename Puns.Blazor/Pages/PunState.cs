@@ -82,8 +82,9 @@ namespace Puns.Blazor.Pages
 
             Console.WriteLine(@"Getting Puns");
 
-            var puns = SynSets.Except(CrossedOffSynsets)
-                .SelectMany(synSet => PunHelper.GetPuns(PunCategory, Theme, synSet, WordNetEngine.Value, PronunciationEngine.Value));
+            var synSets = SynSets.Except(CrossedOffSynsets).ToList();
+
+            var puns =  PunHelper.GetPuns(PunCategory, Theme, synSets, WordNetEngine.Value, PronunciationEngine.Value);
 
             PunList = puns
                 .Distinct()
@@ -91,7 +92,7 @@ namespace Puns.Blazor.Pages
                 .OrderByDescending(x => x.Count())
                 .ToList();
 
-            Console.WriteLine($@"{PunList.Count} Puns Got");
+            Console.WriteLine($@"{puns.Count} Puns Got");
 
             IsGenerating = false;
         }

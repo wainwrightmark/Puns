@@ -89,23 +89,24 @@ namespace Puns
 
         public static IReadOnlyCollection<Pun> GetPuns(PunCategory category,
             string theme,
-            SynSet synSet,
+            IReadOnlyCollection<SynSet> synSets,
             WordNetEngine wordNetEngine,
             PronunciationEngine pronunciationEngine)
         {
             var phrases = GetPhrases(category);
 
-            var themeWords = GetRelatedWords(theme, synSet, wordNetEngine)
-                .Select(x => x.Word).Prepend(theme)
-                .Except(CommonWords.Value, StringComparer.OrdinalIgnoreCase)
+            var themeWords =
+                synSets.SelectMany(synSet => GetRelatedWords(theme, synSet, wordNetEngine)
+                .Select(x => x.Word))
+                .Prepend(theme)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Except(CommonWords.Value, StringComparer.OrdinalIgnoreCase)
                 .SelectMany(pronunciationEngine.GetPhoneticsWords)
                 .Where(x=>x.Symbols.Count > 2)
                 .Distinct(WordPronunciationComparer.Instance)
-
                 .ToList();
 
-            var cache = new Dictionary<PhoneticsWord, PhoneticsWord?>();
+            var cache = new Dictionary<PhoneticsWord, (PhoneticsWord word, PunType type)>();
 
             var puns = new List<Pun>();
 
@@ -130,26 +131,26 @@ namespace Puns
                     {
                         var bestPuns = themeWords.Select(themeWord =>
                             {
-                                var punClass = PunClassifier.Classify(themeWord, cmuWord);
-                                var score = punClass?.GetPunScore();
+                                var punType = PunClassifier.Classify(themeWord, cmuWord);
+                                var score = punType?.GetPunScore();
 
-                                return (themeWord, punClass, score );
+                                return (themeWord, punType, score );
                             })
                             .Where(x => x.score.HasValue)
-                            .Where(x=> !(x.themeWord.IsCompound && (x.punClass == PunType.Infix || x.punClass == PunType.Prefix))) //prevent compound word prefix / infix
+                            .Where(x=> !(x.themeWord.IsCompound && (x.punType == PunType.Infix || x.punType == PunType.Prefix))) //prevent compound word prefix / infix
                             .OrderByDescending(x => x.score!.Value)
                             .ThenBy(x => x.themeWord.Text.Length);//Shorter words better
 
-                        bestPunWord = bestPuns.Select(x=>x.themeWord).FirstOrDefault();
+                        bestPunWord = bestPuns.Select(x=>(x.themeWord,x.punType!.Value)).FirstOrDefault();
                         cache.Add(cmuWord, bestPunWord);
                     }
 
-                    if (bestPunWord == null) continue;
+                    if (bestPunWord == default) continue;
 
-                    var newString = ToCase(bestPunWord.Text, casing);
+                    var newString = ToCase(bestPunWord.word.Text, casing);
 
                     var newPhrase = phrase.Replace(word, newString);
-                    puns.Add(new Pun(newPhrase, phrase, bestPunWord.Text, synSet));
+                    puns.Add(new Pun(newPhrase, phrase, bestPunWord.word.Text, bestPunWord.type));
 
                 }
             }

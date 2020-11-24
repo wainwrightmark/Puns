@@ -1,25 +1,23 @@
 ﻿using System;
-using WordNet;
 
 namespace Puns
 {
     public readonly struct Pun : IEquatable<Pun>
     {
-        public Pun(string newPhrase, string oldPhrase, string word, SynSet synSet)
+        public Pun(string newPhrase, string oldPhrase, string word, PunType type)
         {
 
             NewPhrase = newPhrase;
             OldPhrase = oldPhrase;
             Word = word;
-            SynSet = synSet;
+            Type = type;
         }
 
         public string NewPhrase { get; }
         public string OldPhrase { get; }
 
         public string Word { get; }
-
-        public SynSet SynSet { get; }
+        public PunType Type { get; }
 
         /// <inheritdoc />
         public override string ToString() => NewPhrase;

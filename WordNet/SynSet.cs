@@ -154,8 +154,6 @@ namespace WordNet
 
             // get gloss
             var  gloss = definition[(definition.IndexOf('|') + 1)..].Trim();
-            if (gloss.Contains('|'))
-                throw new Exception("Unexpected pipe in gloss");
 
             // get number and start of relations
             var relationCountField = 3 + (words.Count * 2) + 1;
