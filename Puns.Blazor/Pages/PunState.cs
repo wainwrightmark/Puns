@@ -1,36 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Pronunciation;
 using WordNet;
 
 
 namespace Puns.Blazor.Pages
 {
-    public class PunState
+    public class PunState : IDisposable
     {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public PunState()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            WordNetEngine = new Lazy<WordNetEngine>(()=> new WordNetEngine());
-
-            PronunciationEngine = new Lazy<PronunciationEngine>(()=> new PronunciationEngine());
-
-            var tasks = new List<Task>()
-            {
-                Task.Factory.StartNew(()=>WordNetEngine.Value),
-                Task.Factory.StartNew(() => PronunciationEngine.Value)
-            };
-
-            _ = Task.WhenAll(tasks).ContinueWith(x =>
-              {
-                  EnginesLoaded = true;
-                  PageLoaded?.Invoke(null, EventArgs.Empty);
-              });
-
-
+            WordNetEngine =  new WordNetEngine();
+            PronunciationEngine =  new PronunciationEngine();
         }
 
 
@@ -38,12 +20,10 @@ namespace Puns.Blazor.Pages
 
         public string? Theme { get; set; } = "Fish";
 
-        public IEnumerable<SynSet> SynSets => GetSynSets(Theme, WordNetEngine.Value);
+        public IEnumerable<SynSet> SynSets => GetSynSets(Theme, WordNetEngine);
 
 
         public HashSet<SynSet> CrossedOffSynsets { get; } = new HashSet<SynSet>();
-
-        public event EventHandler? PageLoaded;
 
         public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
 
@@ -51,11 +31,9 @@ namespace Puns.Blazor.Pages
 
         public bool IsGenerating { get; set; } = false;
 
-        public bool EnginesLoaded { get; private set; } = false;
+        public WordNetEngine WordNetEngine { get; }
 
-        public Lazy<WordNetEngine> WordNetEngine { get; }
-
-        public Lazy<PronunciationEngine> PronunciationEngine { get; }
+        public PronunciationEngine PronunciationEngine { get; }
 
         private static IEnumerable<SynSet> GetSynSets(string? theme, WordNetEngine wordNetEngine)
         {
@@ -84,7 +62,7 @@ namespace Puns.Blazor.Pages
 
             var synSets = SynSets.Except(CrossedOffSynsets).ToList();
 
-            var puns =  PunHelper.GetPuns(PunCategory, Theme, synSets, WordNetEngine.Value, PronunciationEngine.Value);
+            var puns =  PunHelper.GetPuns(PunCategory, Theme, synSets, WordNetEngine, PronunciationEngine);
 
             PunList = puns
                 .Distinct()
@@ -97,5 +75,11 @@ namespace Puns.Blazor.Pages
             IsGenerating = false;
         }
 
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            WordNetEngine.Dispose();
+            PronunciationEngine.Dispose();
+        }
     }
 }

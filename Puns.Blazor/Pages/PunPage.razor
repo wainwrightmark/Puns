@@ -9,7 +9,6 @@
 </div>
 
 
-@if (State.EnginesLoaded)
 {
     @foreach (var synSet in State.SynSets)
     {
@@ -95,13 +94,6 @@
 
 
 }
-else
-{
-    <div class="loadingLabel">
-        <label>Pundering... this takes about 20 seconds</label>
-    </div>
-
-}
 
 
 
@@ -111,7 +103,6 @@ else
     /// <inheritdoc />
     protected override void OnInitialized()
     {
-        State.PageLoaded += (sender, args) => StateHasChanged();
         base.OnInitialized();
     }
 

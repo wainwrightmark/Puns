@@ -38,7 +38,8 @@ namespace WordNet
                 {"-r", SynSetRelation.RegionDomainMember},
                 {";u", SynSetRelation.UsageDomain},
                 {"-u", SynSetRelation.UsageDomainMember},
-                {@"\", SynSetRelation.DerivedFromAdjective}
+                {@"\", SynSetRelation.DerivedFromAdjective},
+                {"^", SynSetRelation.AlsoSee},
             };
             // appears in WordNet 3.1
             dict.Add(PartOfSpeech.Noun, nounSymbolRelation);

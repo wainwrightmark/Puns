@@ -19,14 +19,15 @@ namespace WordNet
         /// <param name="synset1">First synset</param>
         /// <param name="synset2">Second synset</param>
         /// <returns>True if synsets are equal, false otherwise</returns>
-        public static bool operator ==(SynSet synset1, SynSet synset2)
+        public static bool operator ==(SynSet? synset1, SynSet? synset2)
         {
             // check object reference
             if (ReferenceEquals(synset1, synset2))
                 return true;
 
-            // check if either (but not both) are null
-            if (synset2 is null ^ synset1 is null)
+            if (synset1 is null && synset2 is null)
+                return true;
+            if (synset2 is null || synset1 is null)
                 return false;
 
             return synset1.Equals(synset2);
@@ -101,16 +102,16 @@ namespace WordNet
 
         #region construction
 
-        public static (SynsetId id, Lazy<SynSet> lazySet) InstantiateLazy(string definition, PartOfSpeech partOfSpeech)
-        {
-            var offset = uint.Parse(GetField(definition, 0));
+        //public static (SynsetId id, Lazy<SynSet> lazySet) InstantiateLazy(string definition, PartOfSpeech partOfSpeech)
+        //{
+        //    var offset = uint.Parse(GetField(definition, 0));
 
-            var synsetId = new SynsetId(partOfSpeech, offset);
+        //    var synsetId = new SynsetId(partOfSpeech, offset);
 
-            var lazySet = new Lazy<SynSet>(()=> Instantiate(definition, partOfSpeech));
+        //    var lazySet = new Lazy<SynSet>(()=> Instantiate(definition, partOfSpeech));
 
-            return (synsetId, lazySet);
-        }
+        //    return (synsetId, lazySet);
+        //}
 
 
         /// <summary>
@@ -121,7 +122,7 @@ namespace WordNet
         /// <param name="partOfSpeech">Part of speech to use</param>
         public static SynSet Instantiate(string definition, PartOfSpeech partOfSpeech)
         {
-            var offset = uint.Parse(GetField(definition, 0));
+            var offset = int.Parse(GetField(definition, 0));
             var id = new SynsetId(partOfSpeech, offset);
 
             /* get lexicographer file name...the enumeration lines up precisely with the wordnet spec (see the lexnames file) except that
@@ -178,7 +179,7 @@ namespace WordNet
                     return fieldValue;
                 }
                 var relationSymbol = GetNextFieldValue(definition, ref relationFieldStart);
-                var relatedSynSetOffset = uint.Parse(GetNextFieldValue(definition, ref relationFieldStart));
+                var relatedSynSetOffset = int.Parse(GetNextFieldValue(definition, ref relationFieldStart));
                 var relatedSynSetPartOfSpeech = GetPartOfSpeech(GetNextFieldValue(definition, ref relationFieldStart) );
                 var indexes = GetNextFieldValue(definition, ref relationFieldStart);
                 var sourceWordIndex = int.Parse(indexes.Substring(0, 2), NumberStyles.HexNumber);
@@ -532,7 +533,7 @@ namespace WordNet
         /// </summary>
         /// <param name="obj">Other synset</param>
         /// <returns>True if equal, false otherwise</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is SynSet synSet) return Id == synSet.Id;
             return false;

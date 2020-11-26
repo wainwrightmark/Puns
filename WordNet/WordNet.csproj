@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FileDatabase\FileDatabase.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="DictionaryFiles.Designer.cs">
       <DependentUpon>DictionaryFiles.resx</DependentUpon>
       <DesignTime>True</DesignTime>

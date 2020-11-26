@@ -82,6 +82,8 @@ namespace Puns.Test
         [InlineData("car", "incarcerate", PunType.Infix)]
         [InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
         [InlineData("bear", "bare", PunType.Identity)]
+        [InlineData("beard", "weird", PunType.PerfectRhyme)]
+
         public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
 
         {
@@ -119,6 +121,10 @@ namespace Puns.Test
         [InlineData("animal", PunCategory.Bands)]
         [InlineData("animal", PunCategory.Movies)]
         [InlineData("animal", PunCategory.Books)]
+        [InlineData("house", PunCategory.Idiom)]
+        [InlineData("house", PunCategory.Bands)]
+        [InlineData("house", PunCategory.Movies)]
+        [InlineData("house", PunCategory.Books)]
         public void TestPunHelper(string theme, PunCategory category)
         {
 

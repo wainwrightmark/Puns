@@ -8,7 +8,7 @@ using System.Text;
 
 namespace FileDatabase
 {
-    public class Database<T, TKey> : IDisposable
+    public sealed class Database<T, TKey> : IDisposable
         where TKey : struct, IComparable<TKey>
         where T : class
     {
@@ -53,6 +53,18 @@ namespace FileDatabase
                 }
                 else
                 {
+                    if (_list.Keys[lowerIndex].CompareTo(key) == 0)//This is already present
+                    {
+                        var seek = _list.Values[lowerIndex].start;
+                        _streamReader.DiscardBufferedData();
+                        _streamReader.BaseStream.Seek(seek, SeekOrigin.Begin);
+
+                        var line = _streamReader.ReadLine()!;
+                        var newEntity = _deserializeFunc(line);
+                        return newEntity;
+                    }
+
+
                     lowerSeek = _list.Values[lowerIndex].end;
                     var nextIndex = lowerIndex + 1;
 
