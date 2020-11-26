@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Pronunciation;
 using WordNet;
 
@@ -45,7 +47,7 @@ namespace Puns.Blazor.Pages
         }
 
 
-        public void Find()
+        public async Task Find()
         {
             if (string.IsNullOrWhiteSpace(Theme))
             {
@@ -54,25 +56,38 @@ namespace Puns.Blazor.Pages
             }
 
             IsGenerating = true;
-
             PunList = null;
             RevealedWords.Clear();
-
-            Console.WriteLine(@"Getting Puns");
-
             var synSets = SynSets.Except(CrossedOffSynsets).ToList();
 
-            var puns =  PunHelper.GetPuns(PunCategory, Theme, synSets, WordNetEngine, PronunciationEngine);
+            var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>?>(()=>GetPuns(synSets, PunCategory, Theme, WordNetEngine, PronunciationEngine));
+            task.Start();
 
-            PunList = puns
+            PunList = await task;
+
+            IsGenerating = false;
+        }
+
+        private static IReadOnlyCollection<IGrouping<string, Pun>> GetPuns(IReadOnlyCollection<SynSet> synSets,
+            PunCategory punCategory,
+            string theme,
+            WordNetEngine wordNetEngine,
+            PronunciationEngine pronunciationEngine)
+        {
+            var sw = Stopwatch.StartNew();
+            Console.WriteLine(@"Getting Puns");
+
+            var puns = PunHelper.GetPuns(punCategory, theme, synSets, wordNetEngine, pronunciationEngine);
+
+            var punList = puns
                 .Distinct()
                 .GroupBy(x => x.Word, StringComparer.OrdinalIgnoreCase)
                 .OrderByDescending(x => x.Count())
                 .ToList();
 
-            Console.WriteLine($@"{puns.Count} Puns Got");
+            Console.WriteLine($@"{puns.Count} Puns Got ({sw.Elapsed.ToString()})");
 
-            IsGenerating = false;
+            return punList;
         }
 
         /// <inheritdoc />
