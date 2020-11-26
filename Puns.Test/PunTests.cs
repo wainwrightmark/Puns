@@ -71,8 +71,8 @@ namespace Puns.Test
         [Fact]
         public void TestPronunciation()
         {
-            PronunciationEngine.GetPhoneticsWords("fish").Should().NotBeEmpty();
-            PronunciationEngine.GetPhoneticsWords("fish").First().Symbols.Should().NotBeEmpty();
+            PronunciationEngine.GetPhoneticsWord("fish").Should().NotBeNull();
+            PronunciationEngine.GetPhoneticsWord("fish")!.Symbols.Should().NotBeEmpty();
         }
 
         [Theory]
@@ -85,11 +85,14 @@ namespace Puns.Test
         public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
 
         {
-            var theme = PronunciationEngine.GetPhoneticsWords(themeWord).First();
-            var replacementWord = PronunciationEngine.GetPhoneticsWords(wordToReplace).First();
+            var theme = PronunciationEngine.GetPhoneticsWord(themeWord);
+            var replacementWord = PronunciationEngine.GetPhoneticsWord(wordToReplace);
+
+            theme.Should().NotBeNull();
+            replacementWord.Should().NotBeNull();
 
 
-            var realPunType = PunClassifier.Classify(theme, replacementWord);
+            var realPunType = PunClassifier.Classify(theme!, replacementWord!);
 
             realPunType.Should().Be(expectedPunType);
 

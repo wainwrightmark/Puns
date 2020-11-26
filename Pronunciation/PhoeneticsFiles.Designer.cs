@@ -61,22 +61,12 @@ namespace Pronunciation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ;;; # CMUdict  --  Major Version: 0.07
-        ///;;;
-        ///;;; # $HeadURL$
-        ///;;; # $Date::                                                   $:
-        ///;;; # $Id::                                                     $:
-        ///;;; # $Rev::                                                    $:
-        ///;;; # $Author::                                                 $:
-        ///;;;
-        ///;;; #
-        ///;;; # ========================================================================
-        ///;;; # Copyright (C) 1993-2015 Carnegie Mellon University. All rights reserved.
-        ///;;; #        /// [rest of string was truncated]&quot;;.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static string Dict {
+        internal static byte[] Pronunciation {
             get {
-                return ResourceManager.GetString("Dict", resourceCulture);
+                object obj = ResourceManager.GetObject("Pronunciation", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

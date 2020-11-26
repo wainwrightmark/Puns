@@ -101,7 +101,9 @@ namespace Puns
                 .Prepend(theme)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Except(CommonWords.Value, StringComparer.OrdinalIgnoreCase)
-                .SelectMany(pronunciationEngine.GetPhoneticsWords)
+                .Select(pronunciationEngine.GetPhoneticsWord)
+                .Where(x=>x is not null)
+                .Cast<PhoneticsWord>()
                 .Where(x=>x.Symbols.Count > 2)
                 .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
@@ -121,7 +123,7 @@ namespace Puns
                 foreach (var word in words)
                 {
                     if(CommonWords.Value.Contains(word)) continue;
-                    var cmuWord = pronunciationEngine.GetPhoneticsWords(word).FirstOrDefault();
+                    var cmuWord = pronunciationEngine.GetPhoneticsWord(word);
                     if (cmuWord is null) continue;
                     if (cmuWord.Symbols.Count < 3) continue;
 

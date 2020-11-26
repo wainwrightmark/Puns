@@ -28,10 +28,8 @@ namespace Pronunciation
 
         public IReadOnlyList<Symbol> Symbols { get; }
 
-        //public Lazy<IReadOnlyList<SyllableType>> SyllableTypes { get; }
-
         /// <inheritdoc />
-        public bool Equals(PhoneticsWord other)
+        public bool Equals(PhoneticsWord? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -39,7 +37,7 @@ namespace Pronunciation
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;

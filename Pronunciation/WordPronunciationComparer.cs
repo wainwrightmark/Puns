@@ -10,7 +10,7 @@ namespace Pronunciation
 
         public static IEqualityComparer<PhoneticsWord> Instance { get; } = new WordPronunciationComparer();
 
-        public bool Equals(PhoneticsWord x, PhoneticsWord y)
+        public bool Equals(PhoneticsWord? x, PhoneticsWord? y)
         {
             if (ReferenceEquals(x, y)) return true;
             if (x is null || y is null) return false;

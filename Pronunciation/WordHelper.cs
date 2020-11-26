@@ -1,102 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using FileDatabase;
 
 namespace Pronunciation
 {
-    public class PronunciationEngine
+
+    public sealed class PronunciationEngine : IDisposable
     {
-        public IEnumerable<PhoneticsWord> GetPhoneticsWords(string text)
+        public PhoneticsWord? GetPhoneticsWord(string text)//todo multiple pronunciations
         {
             var splits = text.Split('_', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             if(splits.Length == 1)
-                return Lookup[splits.Single()].Select(x => x.Value);
+                return GetSinglePhoneticsWord(text);
 
             var words = new List<PhoneticsWord>();
 
             foreach (var split in splits)
             {
-                var word = Lookup[split].Select(x=>x.Value).FirstOrDefault(); //todo multiple pronunciations
-                if(word == default)
-                    return Enumerable.Empty<PhoneticsWord>();
+                var word = GetSinglePhoneticsWord(split);
+                if(word is null)
+                    return null;
 
                 words.Add(word);
             }
 
             var newPhoneticsWord = new PhoneticsWord(text, 0, true, words.SelectMany(x => x.Symbols).ToList());
 
-            return new[] {newPhoneticsWord};
+            return newPhoneticsWord;
         }
 
-        public PronunciationEngine() => Lookup = TryCreateLookup();
-
-        private ILookup<string, Lazy<PhoneticsWord>> Lookup { get; }
-
-        private static ILookup<string, Lazy<PhoneticsWord>> TryCreateLookup()
+        private PhoneticsWord? GetSinglePhoneticsWord(string text)
         {
-            var sw = Stopwatch.StartNew();
-            Console.WriteLine(@"Creating Phonetics Lookup");
-
-            var text = PhoeneticsFiles.Dict;
-            var lines = text.Split("\n");
-            var results = new List<(string text, Lazy<PhoneticsWord> word)>();
-
-            foreach (var line in lines.Where(line => !line.StartsWith(";;;")))
-            {
-                var r = TryCreateFromLine(line);
-                results.Add(r);
-            }
-
-            var lookup = results.ToLookup(x => x.text, x=>x.word, StringComparer.OrdinalIgnoreCase);
-            Console.WriteLine($@"Phonetics Lookup Created ({sw.ElapsedMilliseconds}ms) ({lookup.Count} rows)");
-
-            return lookup;
+            var key = (text.ToUpperInvariant().Trim(), 0);
+            var r = _database[key];
+            return r;
         }
 
+        public PronunciationEngine() =>
+            _database = new Database<PhoneticsWord, (string, int)>(
+                PhoeneticsFiles.Pronunciation, Encoding.UTF8, x=> (x.Text, x.Variant), CreateFromLine );
 
-        private static (string text, Lazy<PhoneticsWord> word) TryCreateFromLine(string s)
+        private readonly Database<PhoneticsWord, (string, int)> _database;
+
+        private static PhoneticsWord CreateFromLine(string s)
         {
-            var spaceIndex = s.IndexOf(' ');
+            var terms = s.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-            if(spaceIndex == -1) throw new ArgumentException($"Not enough terms in '{s}'");
+            if (terms.Length < 2)
+                throw new ArgumentException($"Not enough terms in '{s}'");
 
-            var text = s.Substring(0, spaceIndex);
+            var match = VariantRegex.Match(terms[0]);
+            if (!match.Success)
+                throw new ArgumentException($"Could not match '{terms[0]}'");
 
-            var lazyWord = new Lazy<PhoneticsWord>(()=> CreateFromLine(s));
+            var word = match.Groups["word"].Value;
 
-            return (text, lazyWord);
+            var number = match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 0;
 
-            static PhoneticsWord CreateFromLine(string s)
+            var symbols = new List<Symbol>();
+
+            foreach (var symbolString in terms.Skip(1))
             {
-                var terms = s.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                if (terms.Length < 2)
-                    throw new ArgumentException($"Not enough terms in '{s}'");
-
-                var match = VariantRegex.Match(terms[0]);
-                if (!match.Success)
-                    throw new ArgumentException($"Could not match '{terms[0]}'");
-
-                var word = match.Groups["word"].Value;
-
-                var number = match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 0;
-
-                var symbols = new List<Symbol>();
-
-                foreach (var symbolString in terms.Skip(1))
-                {
-                    if (Enum.TryParse(symbolString, out Symbol symbol))
-                        symbols.Add(symbol);
-                    else
-                        throw new ArgumentException($"Could not parse symbol {symbolString}");
-                }
-
-                return new PhoneticsWord(word, number, false, symbols);
+                if (Enum.TryParse(symbolString, out Symbol symbol))
+                    symbols.Add(symbol);
+                else
+                    throw new ArgumentException($"Could not parse symbol {symbolString}");
             }
+
+            return new PhoneticsWord(word, number, false, symbols);
         }
 
         private static readonly Regex VariantRegex = new Regex(@"\A(?<word>.+?)(?:\((?<number>\d+)\))?\Z", RegexOptions.Compiled);
+
+        /// <inheritdoc />
+        public void Dispose() => _database.Dispose();
     }
 }
