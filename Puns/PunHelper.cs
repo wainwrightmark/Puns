@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using MoreLinq;
 using Pronunciation;
 using WordNet;
 
@@ -125,52 +127,53 @@ namespace Puns
                 var words = phrase
                     .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-                if (words.Length == 1)
-                    continue;
+                var wordList = new List<string>();
+                var containsOriginal = false;
+                var containsPun = false;
 
                 foreach (var word in words)
                 {
-                    if(CommonWords.Value.Contains(word)) continue;
-                    var cmuWord = pronunciationEngine.GetPhoneticsWord(word);
-                    if (cmuWord is null) continue;
-                    if (cmuWord.Symbols.Count < 3) continue;
-
-                    var casing = DetectCasing(word);
-
-                    if (!cache.TryGetValue(cmuWord, out var bestReplacement))
-                    {
-                        bestReplacement = punStrategies.SelectMany(x => x.GetPossibleReplacements(cmuWord))
-                            .FirstOrDefault();
-
-                        cache.Add(cmuWord, bestReplacement);
-
-
-                        //var bestPuns = themeWords.Select(themeWord =>
-                        //    {
-                        //        var punType = PunClassifier.Classify(themeWord, cmuWord);
-                        //        var score = punType?.GetPunScore();
-
-                        //        return (themeWord, punType, score );
-                        //    })
-                        //    .Where(x => x.score.HasValue)
-                        //    .Where(x=> !(x.themeWord.IsCompound && (x.punType == PunType.Infix || x.punType == PunType.Prefix))) //prevent compound word prefix / infix
-                        //    .OrderByDescending(x => x.score!.Value)
-                        //    .ThenBy(x => x.themeWord.Text.Length);//Shorter words better
-
-                        //bestPunWord = bestPuns.Select(x=>(x.themeWord,x.punType!.Value)).FirstOrDefault();
-                    }
-
-                    if (string.IsNullOrWhiteSpace(bestReplacement.ReplacementString)) continue;
-
-                    var newString = ToCase(bestReplacement.ReplacementString, casing);
-
-                    var newPhrase = phrase.Replace(word, newString);
-                    puns.Add(new Pun(newPhrase, phrase, bestReplacement.ReplacementString, bestReplacement.PunType));
-
+                    var bestReplacement = GetBestWord(word, pronunciationEngine, cache, punStrategies);
+                    wordList.Add(bestReplacement.word);
+                    containsOriginal |= bestReplacement.containsOriginal;
+                    containsPun |= bestReplacement.containsPun;
                 }
+
+                if(containsPun && containsOriginal)
+                    puns.Add(new Pun(wordList.ToDelimitedString(" "), phrase, "blah", PunType.PerfectRhyme));//TODO fix
             }
 
             return puns;
+
+            static (string word, bool containsPun, bool containsOriginal) GetBestWord(string word,
+                PronunciationEngine pronunciationEngine,
+                IDictionary<PhoneticsWord, PunReplacement> cache,
+                IEnumerable<PunStrategy> punStrategies
+                )
+            {
+                if (CommonWords.Value.Contains(word)) return (word, false, true);
+                var cmuWord = pronunciationEngine.GetPhoneticsWord(word);
+                if (cmuWord is null) return (word, false, true);
+                if (cmuWord.Symbols.Count < 3) return (word, false, true);
+
+                var casing = DetectCasing(word);
+
+                if (!cache.TryGetValue(cmuWord, out var bestReplacement))
+                {
+                    bestReplacement = punStrategies
+                        .SelectMany(x => x.GetPossibleReplacements(cmuWord))
+                        .FirstOrDefault()!;
+
+                    cache.Add(cmuWord, bestReplacement);
+                }
+
+                if (string.IsNullOrWhiteSpace(bestReplacement.ReplacementString))
+                    return (word, false, true);
+
+                var newString = ToCase(bestReplacement.ReplacementString, casing);
+
+                return (newString, true, bestReplacement.IsAmalgam);
+            }
         }
 
         private static readonly Lazy<IReadOnlySet<string>> CommonWords = new Lazy<IReadOnlySet<string>>(
