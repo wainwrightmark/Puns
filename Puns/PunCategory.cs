@@ -6,11 +6,13 @@
         Movies,
         Bands,
         Books,
-        Brands
+        Brands,
+        Celebs,
+        Countries
+
 
 
         //TODO
-        //Celebs
         //Historical figures
         //Historical events
         //TV Shows
@@ -18,11 +20,10 @@
         //Cocktails
         //Songs
         //Christmas Songs
-        //Countries
         //Geography
         //Shakespeare
         //Movie Quotes
         //Video Games
-        //Company Name / Brands
+        //Major cities
     }
 }

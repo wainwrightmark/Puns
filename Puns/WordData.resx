@@ -127,8 +127,14 @@
   <data name="Brands" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Brands.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="Celebs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Celebs.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="CommonWords" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\CommonWords.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="Countries" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Countries.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="Idioms" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Idioms.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>

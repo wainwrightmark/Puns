@@ -201,6 +201,54 @@ namespace Puns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Justin Bieber
+        ///Taylor Swift
+        ///Rihanna
+        ///The Countess
+        ///Justin Timberlake
+        ///Ellen Degeneres
+        ///Britney Spears
+        ///Cristiano Ronaldo
+        ///Kim Kardashian West
+        ///Katy Perry
+        ///Shakira
+        ///Selena Gomez
+        ///Jennifer Lopez
+        ///Ariana Grande
+        ///Demi Lovato
+        ///Jimmy Fallon
+        ///Oprah Winfrey
+        ///P!Nk
+        ///Drizzy
+        ///Harry Styles
+        ///One Direction
+        ///Bill Gates
+        ///Lebron James
+        ///Lil Wayne
+        ///Bruno Mars
+        ///Kaka
+        ///Adele
+        ///Niall Horan
+        ///Miley Ray Cyrus
+        ///Alicia Keys
+        ///Kevin Hart
+        ///Cameron
+        ///Pitbull
+        ///Liam
+        ///Louis Tomlinson
+        ///Nicki Minaj
+        ///Neymar Jr
+        ///Marshall Mathers
+        ///Emma Watson
+        ///Avri [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Celebs {
+            get {
+                return ResourceManager.GetString("Celebs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to the
         ///be
         ///and
@@ -241,6 +289,60 @@ namespace Puns {
         internal static string CommonWords {
             get {
                 return ResourceManager.GetString("CommonWords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Afghanistan
+        ///Albania
+        ///Algeria
+        ///Andorra
+        ///Angola
+        ///Antigua and Barbuda
+        ///Argentina
+        ///Armenia
+        ///Australia
+        ///Austria
+        ///Azerbaijan
+        ///Bahamas
+        ///Bahrain
+        ///Bangladesh
+        ///Barbados
+        ///Belarus
+        ///Belgium
+        ///Belize
+        ///Benin
+        ///Bhutan
+        ///Bolivia
+        ///Bosnia and Herzegovina
+        ///Botswana
+        ///Brazil
+        ///Brunei
+        ///Bulgaria
+        ///Burkina Faso
+        ///Burundi
+        ///Côte d&apos;Ivoire
+        ///Cabo Verde
+        ///Cambodia
+        ///Cameroon
+        ///Canada
+        ///Central African Republic
+        ///Chad
+        ///Chile
+        ///China
+        ///Colombia
+        ///Comoros
+        ///Congo (Congo-Brazzaville)
+        ///Costa Rica
+        ///Croatia
+        ///Cuba
+        ///Cyprus
+        ///Czechia (Czech Republic)
+        ///Democratic [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Countries {
+            get {
+                return ResourceManager.GetString("Countries", resourceCulture);
             }
         }
         
