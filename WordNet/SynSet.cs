@@ -6,13 +6,26 @@ using System.Text;
 
 namespace WordNet
 {
+
+    public static class SynSetExtension
+    {
+        public static string GetShortDescription(this SynSet synSet, IReadOnlyCollection<SynSet> allSynSets)
+        {
+            //var uniqueWords =
+            //    synSet.Words.Where(word => allSynSets.All(s => s == synSet || !s.Words.Contains(word, StringComparer.OrdinalIgnoreCase))).ToHashSet();
+
+            //if (uniqueWords.Any())
+            //    return $"e.g. {string.Join(", ", uniqueWords)}";
+
+            return synSet.Gloss;
+        }
+    }
+
     /// <summary>
     /// Represents a WordNet synset
     /// </summary>
     public class SynSet
     {
-        #region static members
-
         /// <summary>
         /// Checks whether two synsets are equal
         /// </summary>
@@ -40,8 +53,6 @@ namespace WordNet
         /// <param name="synset2">Second synset</param>
         /// <returns>True if synsets are unequal, false otherwise</returns>
         public static bool operator !=(SynSet synset1, SynSet synset2) => !(synset1 == synset2);
-
-        #endregion
 
         private SynSet(
             SynsetId id,
@@ -99,19 +110,6 @@ namespace WordNet
 
         private readonly ILookup<SynSetRelation, SynsetId> _relationSynSets;
         private readonly ILookup<SynSetRelation, (SynsetId synSetId, int sourceWordIndex, int targetWordIndex)> _lexicalRelations;
-
-        #region construction
-
-        //public static (SynsetId id, Lazy<SynSet> lazySet) InstantiateLazy(string definition, PartOfSpeech partOfSpeech)
-        //{
-        //    var offset = uint.Parse(GetField(definition, 0));
-
-        //    var synsetId = new SynsetId(partOfSpeech, offset);
-
-        //    var lazySet = new Lazy<SynSet>(()=> Instantiate(definition, partOfSpeech));
-
-        //    return (synsetId, lazySet);
-        //}
 
 
         /// <summary>
@@ -228,11 +226,11 @@ namespace WordNet
                     throw new Exception("Invalid field number:  " + fieldNum);
 
                 // scan fields until we hit the one we want
-                var currField = 0;
+                var currentField = 0;
                 startIndex = 0;
                 while (true)
                 {
-                    if (currField == fieldNum)
+                    if (currentField == fieldNum)
                     {
                         // get the end of the field
                         var endIndex = line.IndexOf(' ', startIndex + 1) - 1;
@@ -255,7 +253,7 @@ namespace WordNet
                     if (startIndex == 0)
                         throw new Exception("Failed to get field number:  " + fieldNum);
 
-                    ++currField;
+                    ++currentField;
                 }
             }
             catch (Exception e)
@@ -284,7 +282,6 @@ namespace WordNet
             };
         }
 
-        #endregion
 
         /// <summary>
         /// Gets the number of synsets related to the current one by the given relation

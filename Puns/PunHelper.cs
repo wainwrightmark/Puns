@@ -108,9 +108,17 @@ namespace Puns
                 .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
 
-            var cache = new Dictionary<PhoneticsWord, (PhoneticsWord word, PunType type)>();
+            var cache = new Dictionary<PhoneticsWord, PunReplacement>();
 
             var puns = new List<Pun>();
+
+            var punStrategies = new List<PunStrategy>()
+            {
+                new HomophonePunStrategy(themeWords),
+                new PerfectRhymePunStrategy(themeWords),
+                new PrefixPunStrategy(themeWords)
+            };
+
 
             foreach (var phrase in phrases)
             {
@@ -129,30 +137,35 @@ namespace Puns
 
                     var casing = DetectCasing(word);
 
-                    if (!cache.TryGetValue(cmuWord, out var bestPunWord))
+                    if (!cache.TryGetValue(cmuWord, out var bestReplacement))
                     {
-                        var bestPuns = themeWords.Select(themeWord =>
-                            {
-                                var punType = PunClassifier.Classify(themeWord, cmuWord);
-                                var score = punType?.GetPunScore();
+                        bestReplacement = punStrategies.SelectMany(x => x.GetPossibleReplacements(cmuWord))
+                            .FirstOrDefault();
 
-                                return (themeWord, punType, score );
-                            })
-                            .Where(x => x.score.HasValue)
-                            .Where(x=> !(x.themeWord.IsCompound && (x.punType == PunType.Infix || x.punType == PunType.Prefix))) //prevent compound word prefix / infix
-                            .OrderByDescending(x => x.score!.Value)
-                            .ThenBy(x => x.themeWord.Text.Length);//Shorter words better
+                        cache.Add(cmuWord, bestReplacement);
 
-                        bestPunWord = bestPuns.Select(x=>(x.themeWord,x.punType!.Value)).FirstOrDefault();
-                        cache.Add(cmuWord, bestPunWord);
+
+                        //var bestPuns = themeWords.Select(themeWord =>
+                        //    {
+                        //        var punType = PunClassifier.Classify(themeWord, cmuWord);
+                        //        var score = punType?.GetPunScore();
+
+                        //        return (themeWord, punType, score );
+                        //    })
+                        //    .Where(x => x.score.HasValue)
+                        //    .Where(x=> !(x.themeWord.IsCompound && (x.punType == PunType.Infix || x.punType == PunType.Prefix))) //prevent compound word prefix / infix
+                        //    .OrderByDescending(x => x.score!.Value)
+                        //    .ThenBy(x => x.themeWord.Text.Length);//Shorter words better
+
+                        //bestPunWord = bestPuns.Select(x=>(x.themeWord,x.punType!.Value)).FirstOrDefault();
                     }
 
-                    if (bestPunWord == default) continue;
+                    if (string.IsNullOrWhiteSpace(bestReplacement.ReplacementString)) continue;
 
-                    var newString = ToCase(bestPunWord.word.Text, casing);
+                    var newString = ToCase(bestReplacement.ReplacementString, casing);
 
                     var newPhrase = phrase.Replace(word, newString);
-                    puns.Add(new Pun(newPhrase, phrase, bestPunWord.word.Text, bestPunWord.type));
+                    puns.Add(new Pun(newPhrase, phrase, bestReplacement.ReplacementString, bestReplacement.PunType));
 
                 }
             }

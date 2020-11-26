@@ -77,8 +77,8 @@ namespace WordNet
 
             foreach (var synsetId in ids)
             {
-                var ssdb = SynSetDictionary[synsetId.PartOfSpeech];
-                var synSet = ssdb[synsetId.Id];
+                var synSetDatabase = SynSetDictionary[synsetId.PartOfSpeech];
+                var synSet = synSetDatabase[synsetId.Id];
 
                 if (synSet is not null)
                     yield return synSet;

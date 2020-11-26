@@ -22,7 +22,7 @@ namespace Puns.Blazor.Pages
 
         public string? Theme { get; set; } = "Fish";
 
-        public IEnumerable<SynSet> SynSets => GetSynSets(Theme, WordNetEngine);
+        public IReadOnlyCollection<SynSet> SynSets => GetSynSets(Theme, WordNetEngine);
 
 
         public HashSet<SynSet> CrossedOffSynsets { get; } = new HashSet<SynSet>();
@@ -37,10 +37,10 @@ namespace Puns.Blazor.Pages
 
         public PronunciationEngine PronunciationEngine { get; }
 
-        private static IEnumerable<SynSet> GetSynSets(string? theme, WordNetEngine wordNetEngine)
+        private static IReadOnlyCollection<SynSet> GetSynSets(string? theme, WordNetEngine wordNetEngine)
         {
             if (string.IsNullOrWhiteSpace(theme))
-                return Enumerable.Empty<SynSet>();
+                return Array.Empty<SynSet>();
 
             var sets = wordNetEngine.GetSynSets(theme).ToList();
             return sets;

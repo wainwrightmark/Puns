@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using FluentAssertions;
 using Pronunciation;
@@ -87,16 +88,17 @@ namespace Puns.Test
         public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
 
         {
-            var theme = PronunciationEngine.GetPhoneticsWord(themeWord);
-            var replacementWord = PronunciationEngine.GetPhoneticsWord(wordToReplace);
+            throw new NotImplementedException();
+            //var theme = PronunciationEngine.GetPhoneticsWord(themeWord);
+            //var replacementWord = PronunciationEngine.GetPhoneticsWord(wordToReplace);
 
-            theme.Should().NotBeNull();
-            replacementWord.Should().NotBeNull();
+            //theme.Should().NotBeNull();
+            //replacementWord.Should().NotBeNull();
 
 
-            var realPunType = PunClassifier.Classify(theme!, replacementWord!);
+            //var realPunType = PunClassifier.Classify(theme!, replacementWord!);
 
-            realPunType.Should().Be(expectedPunType);
+            //realPunType.Should().Be(expectedPunType);
 
         }
 

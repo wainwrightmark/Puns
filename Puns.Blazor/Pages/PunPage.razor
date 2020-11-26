@@ -1,5 +1,6 @@
 ﻿@page "/puns"
 @using System.Linq
+@using WordNet
 
 <div class="themeBox">
 <br/>
@@ -9,24 +10,29 @@
 </div>
 
 
-    @foreach (var synSet in State.SynSets)
+@{
+    var synsets = State.SynSets;
+}
+
+
+@foreach (var synSet in synsets)
+{
+
+    var changeFunc = new Action<ChangeEventArgs>((e) =>
     {
+        if (!State.CrossedOffSynsets.Add(synSet))
+            State.CrossedOffSynsets.Remove(synSet);
+    });
 
-        var changeFunc = new Action<ChangeEventArgs>((e) =>
-        {
-            if (!State.CrossedOffSynsets.Add(synSet))
-                State.CrossedOffSynsets.Remove(synSet);
-        });
-
-        <div class="synsetBox">
-        <input type="checkbox" checked="@(!State.CrossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
-        <label>@synSet.Gloss</label>
-        <br />
-        </div>
-
-    }
-
+    <div class="synsetBox">
+    <input type="checkbox" checked="@(!State.CrossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
+    <label>@synSet.GetShortDescription(synsets)</label>
     <br />
+    </div>
+
+}
+
+<br />
 
 <div class="categoryBox">
 <label>Category</label>
