@@ -5,7 +5,8 @@
         Idiom,
         Movies,
         Bands,
-        Books
+        Books,
+        Brands
 
 
         //TODO
@@ -21,5 +22,7 @@
         //Geography
         //Shakespeare
         //Movie Quotes
+        //Video Games
+        //Company Name / Brands
     }
 }

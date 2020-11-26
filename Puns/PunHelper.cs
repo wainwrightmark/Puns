@@ -191,6 +191,8 @@ namespace Puns
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 PunCategory.Books => WordData.Books.Split("\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Brands => WordData.Brands.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
             };
         }

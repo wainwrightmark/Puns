@@ -124,6 +124,9 @@
   <data name="Books" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Books.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="Brands" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Brands.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="CommonWords" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\CommonWords.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

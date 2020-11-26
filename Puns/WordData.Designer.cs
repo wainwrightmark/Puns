@@ -140,6 +140,67 @@ namespace Puns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Brand
+        ///Amazon
+        ///Google
+        ///Apple
+        ///Microsoft
+        ///Samsung Group
+        ///ICBC
+        ///Facebook
+        ///Walmart
+        ///Ping An
+        ///Huawei
+        ///Mercedes-Benz
+        ///Verizon
+        ///China Construction Bank
+        ///AT&amp;T
+        ///Toyota
+        ///State Grid
+        ///Disney
+        ///Agricultural Bank Of China
+        ///WeChat
+        ///Bank of China
+        ///Home Depot
+        ///China Mobile
+        ///Shell
+        ///Saudi Aramco
+        ///Volkswagen
+        ///YouTube
+        ///Tencent (QQ)
+        ///Starbucks
+        ///Wells Fargo
+        ///BMW
+        ///Deutsche Telekom
+        ///Moutai
+        ///PetroChina
+        ///Coca-Cola
+        ///Mitsubishi Group
+        ///McDonald&apos;s
+        ///Taobao
+        ///NTT Group
+        ///Bank of America
+        ///Nike
+        ///Porsche
+        ///Sinopec
+        ///IBM
+        ///CITI
+        ///Honda
+        ///Marlboro
+        ///Deloitte
+        ///Chase
+        ///Tmall
+        ///UPS
+        ///American Express
+        ///Xfinity [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Brands {
+            get {
+                return ResourceManager.GetString("Brands", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to the
         ///be
         ///and

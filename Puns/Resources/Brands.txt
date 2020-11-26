@@ -1,0 +1,501 @@
+Brand
+Amazon
+Google
+Apple
+Microsoft
+Samsung Group
+ICBC
+Facebook
+Walmart
+Ping An
+Huawei
+Mercedes-Benz
+Verizon
+China Construction Bank
+AT&T
+Toyota
+State Grid
+Disney
+Agricultural Bank Of China
+WeChat
+Bank of China
+Home Depot
+China Mobile
+Shell
+Saudi Aramco
+Volkswagen
+YouTube
+Tencent (QQ)
+Starbucks
+Wells Fargo
+BMW
+Deutsche Telekom
+Moutai
+PetroChina
+Coca-Cola
+Mitsubishi Group
+McDonald's
+Taobao
+NTT Group
+Bank of America
+Nike
+Porsche
+Sinopec
+IBM
+CITI
+Honda
+Marlboro
+Deloitte
+Chase
+Tmall
+UPS
+American Express
+Xfinity
+UnitedHealthcare
+Sumitomo Group
+Intel
+VISA
+Instagram
+China Life
+accenture
+Allianz
+CSCEC
+PWC
+Lowe's
+Mitsui
+General Electric
+EY
+Oracle
+Cisco
+BP
+CVS
+Total
+FedEx
+Netflix
+China Merchants Bank
+JP Morgan
+Boeing
+Costco
+SK Group
+Wuliangye
+Evergrande
+Nestle
+Hyundai Group
+China Telecom
+Siemens
+TATA Group
+Mastercard
+Bosch
+IKEA
+HSBC
+Spectrum
+Vodafone
+Pepsi
+Alibaba.com
+Ford
+AIA
+Orange
+Nissan
+Chevron
+GUCCI
+Dell Technologies
+Santander
+LG Group
+Country Garden
+KFC
+Audi
+Volvo
+Anthem
+SAP
+Adidas
+Louis Vuitton
+AXA
+SoftBank
+TD
+Target
+PayPal
+au
+RBC
+ExxonMobil
+Uber
+Petronas
+Bank of Communications
+NBC
+Cartier
+Walgreens
+KPMG
+Universal
+Capital One
+ZARA
+Hitachi
+Aldi
+Airbus
+CPIC
+Chevrolet
+Shanghai Pudong Development Bank
+H&M
+Chanel
+Postal Savings Bank
+BNP Paribas
+Sberbank
+China CITIC Bank
+NetEase
+JD.com
+UNIQLO
+Sony
+Lockheed Martin
+Humana
+Tesla
+Lidl
+Midea
+Vanke
+CRCC
+JR
+Optum
+Hermès
+EDF
+Enel
+L'Oréal
+CBS
+Panasonic
+Greenland
+ADNOC
+Goldman Sachs
+ING
+CRECG
+Warner Bros
+ENGIE
+Tesco
+PICC
+Renault
+Sephora
+Johnson & Johnson
+Hilton
+Barclays
+Airbnb
+Industrial Bank
+GEICO
+Salesforce
+booking.com
+Marubeni
+Scotiabank
+DHL
+Nokia
+Sam's Club
+China Everbright Bank
+China Minsheng Bank
+Movistar
+Gree
+Equinor
+T.J. Maxx
+BMO
+Medtronic
+BBVA
+MUFG
+Canon
+Adobe
+China Unicom
+Eni
+Sky
+Longfor Properties
+Lexus
+Delta
+UBS
+HP
+Poly Real Estate
+Allstate
+Ferrari
+Baidu
+Morgan Stanley
+American Airlines
+3M
+Carrefour
+HCA
+Japan Post Holdings
+Union Pacific
+7-Eleven
+Yili
+Subaru
+TSMC
+Cognizant
+Yahoo! Group
+U.S. Bank
+China Resources Land
+Gillette
+DBS
+Etisalat
+Fox
+Tyson
+Aetna
+Progressive
+John Deere
+Zurich
+United Airlines
+ESPN
+eBay
+Woolworths
+Generali Group
+20th Century Studios
+LIC
+Corona
+Telstra
+Purina
+stc
+Subway
+Reliance
+VINCI
+CIBC
+BASF
+Rolex
+LinkedIn
+Danone
+Canada Life
+POWERCHINA
+Rabobank
+Metlife
+Haier
+Yanghe
+PNC
+Cigna
+Land Rover
+Roche
+Gazprom
+Dollar General
+Sunac
+BNSF
+KEPCO
+Northrop Grumman
+NIVEA
+Enterprise
+Société Générale
+Honeywell
+TIM
+Aviva
+Playstation
+Brookfield
+China Post
+CRRC
+Truist
+Michelin
+Qualcomm
+Broadcom
+Travelers
+Infosys
+Red Bull
+Bell
+Commonwealth Bank
+Merrill
+Philips
+Bridgestone
+Lloyds Bank
+Heineken
+Swiss Re
+Credit Suisse
+Pemex
+Nippon Life Insurance
+Hikvision
+Dior
+Suning
+Emirates
+Itaú
+Valero
+COACH
+Saint-Gobain
+Publix
+Kellogg's
+Prudential (US)
+Mizuho Financial Group
+3
+Poste Italiane
+Bradesco
+Capgemini
+Youku
+Chubb
+Telus
+Lego
+E.Leclerc
+Discover
+Xiaomi
+Intesa Sanpaolo
+Ross Dress For Less
+ADP
+HPE
+Budweiser
+State Bank of India
+CNOOC
+Sherwin-Williams
+Safran
+Pampers
+Daiwa House
+Asda
+O2
+L&M
+Estée Lauder
+Telenor
+Fresenius
+Clinique
+Kroger
+Nescafé
+PTT
+Claro
+Sprint
+Pall Mall
+Marriott
+QNB
+Tiffany & Co.
+Southwest Airlines
+Caterpillar
+BT
+NatWest
+HDFC Bank
+McLane
+ABC
+Lukoil
+DXC Technology
+CNBM
+AutoZone
+Viettel
+BHP
+Chow Tai Fook
+Bud Light
+CJ Group
+MCC
+Mahindra Group
+McKinsey
+Bouygues
+Standard Chartered
+Sysco
+Guerlain
+Shiseido
+Domino's Pizza
+ctrip.com
+Crédit Agricole
+Micron Technology
+Carmax
+Schlumberger
+Rogers
+Luzhou Laojiao
+SFR
+Pantene
+Fubon Financial
+FIS
+Xbox
+General Dynamics
+Centene Corporation
+Suzuki
+Sprite
+Circle K
+Pizza Hut
+Taco Bell
+Nintendo
+Prudential (UK)
+Lenovo
+VMWARE
+Lay's
+Esso
+Mengniu
+Victoria's Secret
+Activision Blizzard
+Raytheon
+Dunkin'
+Rakuten
+Coles
+El Corte Inglés
+CCCC
+Bayer
+Swisscom
+Best Buy
+Mobil
+Marshalls
+Thermo Fisher Scientific
+Tokio Marine
+ABB
+SiriusXM
+Royal Caribbean International
+Dove
+Bloomberg
+Indian Oil
+Aflac
+Wrigley
+CFLD
+Express Scripts
+CNRL
+Burberry
+Western Digital
+HCL
+Canadian National Railway
+Crédit Mutuel
+Dow
+OCBC Bank
+Caixa
+Unicharm
+Geely
+Whole Foods
+Iberdrola
+ConocoPhillips
+Telkom Indonesia
+nab
+Macy's
+BAE Systems
+Dalian Wanda Commercial Properties
+UOB
+Nordea
+Haidilao
+Enbridge
+McKesson
+Phillips 66
+Shinhan Financial Group
+Anta
+Carrier
+ANZ
+Munich RE
+Garnier
+Nvidia
+Leroy Merlin
+Daikin
+BUICK
+Victoria
+CSX
+Abbott
+Texas Instruments
+SF Express
+Banco do Brasil
+AIG
+Monster
+Mercadona
+Hyatt
+Kohl's
+McCain
+Telia Company
+Holiday Inn
+Emerson Electric
+Airtel
+Innogy
+Deutsche Post
+Kirin
+Tim Hortons
+Manulife
+Centurylink
+Las Vegas Sands
+Ralph Lauren
+Meituan
+Gatorade
+M.A.C
+Sompo Japan Nipponkoa
+HealthNet
+Sodexo
+Air China
+ZTE
+BD
+Nordstrom
+Fiserv
+SABIC
+Wipro
+Huggies
+KBC
+Burger King
+Head & Shoulders
+Merck & Co
+Sun Hung Kai Properties
+D.R. Horton
+Cummins
