@@ -35,7 +35,7 @@ namespace Puns
             {
                 if (!themeWord.Text.StartsWith(originalWord.Text))
                 {
-                    yield return new PunReplacement(PunType.Prefix, themeWord.Text, false);
+                    yield return new PunReplacement(PunType.Prefix, themeWord.Text, false, themeWord.Text);
                 }
             }
         }

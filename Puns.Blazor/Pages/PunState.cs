@@ -81,11 +81,15 @@ namespace Puns.Blazor.Pages
 
             var punList = puns
                 .Distinct()
-                .GroupBy(x => x.Word, StringComparer.OrdinalIgnoreCase)
+                .SelectMany(pun=> pun.PunWords.Select(punWord=> (pun, punWord)))
+
+
+                .GroupBy(x => x.punWord, x=>x.pun, StringComparer.OrdinalIgnoreCase)
+                .Where(x=> x.Count() > 1)
                 .OrderByDescending(x => x.Count())
                 .ToList();
 
-            Console.WriteLine($@"{puns.Count} Puns Got ({sw.Elapsed.ToString()})");
+            Console.WriteLine($@"{puns.Count} Puns Got ({sw.Elapsed})");
 
             return punList;
         }

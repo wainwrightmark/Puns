@@ -31,8 +31,6 @@ namespace Puns
 
             foreach (var themeWord in ThemeWordLookup[lastStressedVowel])
             {
-
-
                 var insert = false;
 
                 if (themeWord.Text.Length < originalWord.Text.Length)
@@ -50,7 +48,7 @@ namespace Puns
                     ? originalWord.Text.Substring(0, originalWord.Text.Length - themeWord.Text.Length) + themeWord.Text//TODO improve this replacement
                     : themeWord.Text;
 
-                yield return new PunReplacement(PunType.PerfectRhyme, replacement, insert);
+                yield return new PunReplacement(PunType.PerfectRhyme, replacement, insert, themeWord.Text);
             }
         }
 

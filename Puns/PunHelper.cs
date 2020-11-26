@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using MoreLinq;
 using Pronunciation;
 using WordNet;
@@ -10,85 +9,6 @@ namespace Puns
 {
     public static class PunHelper
     {
-        /*
-        public static int? GetPunScore(PhoneticsWord originalPhoneticsWord, PhoneticsWord replacementPhoneticsWord)
-        {
-            if (IsSameWord(originalPhoneticsWord.Text, replacementPhoneticsWord.Text))
-                return null;
-
-            static int GetScore(PhoneticsWord shortWord, PhoneticsWord longWord, int offSet)
-            {
-                var longestStreak = 0;
-                var currentStreak = 0;
-                var unmatchedSymbols = 0;
-                var otherMatches = 0;
-
-                void EndStreak()
-                {
-                    if (longestStreak < currentStreak)
-                    {
-                        otherMatches += longestStreak;
-                        longestStreak = currentStreak;
-                    }
-                    else
-                        otherMatches += currentStreak;
-
-                    currentStreak = 0;
-                }
-
-                for (var i = 0; i < shortWord.Symbols.Count; i++)
-                {
-                    if (shortWord.Symbols[i] == longWord.Symbols[i + offSet])
-                        currentStreak++;
-                    else if (shortWord.SyllableTypes.Value[i] == longWord.SyllableTypes.Value[i + offSet])
-                    {
-                        EndStreak();
-                        otherMatches++;
-                    }
-                    else
-                    {
-                        EndStreak();
-                        unmatchedSymbols++;
-                    }
-                }
-
-                EndStreak();
-
-                var score = 2 *(Triangle(longestStreak) - Triangle(unmatchedSymbols))  ;
-
-                return score;
-            }
-
-
-            var minLength = Math.Min(originalPhoneticsWord.Symbols.Count, replacementPhoneticsWord.Symbols.Count);
-
-            if (minLength < 3)
-                return null;
-
-
-
-
-            var (shortWord, longWord) = originalPhoneticsWord.Symbols.Count <= replacementPhoneticsWord.Symbols.Count
-                ? (originalPhoneticsWord, replacementPhoneticsWord)
-                : (replacementPhoneticsWord, originalPhoneticsWord);
-
-            var bestScoreSoFar = 0;
-
-            for (var offset = 0; offset <= longWord.Symbols.Count - shortWord.Symbols.Count; offset++)
-            {
-                var score = GetScore(shortWord, longWord, offset);
-                if (score > bestScoreSoFar) bestScoreSoFar = score;
-            }
-
-
-
-            if (bestScoreSoFar > 2) return bestScoreSoFar;
-            return null;
-            static int Triangle(int n) => n * (n + 1) / 2; //returns the nth triangular number
-        }
-        */
-
-
         public static IReadOnlyCollection<Pun> GetPuns(PunCategory category,
             string theme,
             IReadOnlyCollection<SynSet> synSets,
@@ -128,35 +48,47 @@ namespace Puns
                     .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 var wordList = new List<string>();
+                var punWords = new HashSet<string>();
                 var containsOriginal = false;
                 var containsPun = false;
 
                 foreach (var word in words)
                 {
-                    var bestReplacement = GetBestWord(word, pronunciationEngine, cache, punStrategies);
-                    wordList.Add(bestReplacement.word);
-                    containsOriginal |= bestReplacement.containsOriginal;
-                    containsPun |= bestReplacement.containsPun;
+                    var bestReplacement = GetBestReplacement(word, pronunciationEngine, cache, punStrategies);
+
+                    if (bestReplacement != null)
+                    {
+                        var casing = DetectCasing(word);
+                        var newString = ToCase(bestReplacement.Value.ReplacementString, casing);
+                        wordList.Add(newString);
+                        containsOriginal |= bestReplacement.Value.IsAmalgam;
+                        containsPun = true;
+                        punWords.Add(bestReplacement.Value.PunWord);
+                    }
+                    else
+                    {
+                        wordList.Add(word);
+                        containsOriginal = true;
+                    }
                 }
 
-                if(containsPun && containsOriginal)
-                    puns.Add(new Pun(wordList.ToDelimitedString(" "), phrase, "blah", PunType.PerfectRhyme));//TODO fix
+                if(containsPun && (words.Length > 1 || containsOriginal))
+                    puns.Add(new Pun(wordList.ToDelimitedString(" "), phrase, punWords));
             }
 
             return puns;
 
-            static (string word, bool containsPun, bool containsOriginal) GetBestWord(string word,
+            static PunReplacement? GetBestReplacement(string word,
                 PronunciationEngine pronunciationEngine,
                 IDictionary<PhoneticsWord, PunReplacement> cache,
-                IEnumerable<PunStrategy> punStrategies
-                )
+                IEnumerable<PunStrategy> punStrategies)
             {
-                if (CommonWords.Value.Contains(word)) return (word, false, true);
+                if (CommonWords.Value.Contains(word)) return null;
                 var cmuWord = pronunciationEngine.GetPhoneticsWord(word);
-                if (cmuWord is null) return (word, false, true);
-                if (cmuWord.Symbols.Count < 3) return (word, false, true);
+                if (cmuWord is null) return null;
+                if (cmuWord.Symbols.Count < 3) return null;
 
-                var casing = DetectCasing(word);
+
 
                 if (!cache.TryGetValue(cmuWord, out var bestReplacement))
                 {
@@ -168,11 +100,9 @@ namespace Puns
                 }
 
                 if (string.IsNullOrWhiteSpace(bestReplacement.ReplacementString))
-                    return (word, false, true);
+                    return null;
 
-                var newString = ToCase(bestReplacement.ReplacementString, casing);
-
-                return (newString, true, bestReplacement.IsAmalgam);
+                return bestReplacement;
             }
         }
 

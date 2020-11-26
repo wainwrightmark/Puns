@@ -20,11 +20,11 @@ namespace Puns
         {
             var symbolCluster = new SymbolCluster(originalWord.Symbols);
 
-            foreach (var phoneticsWord in ThemeWordLookup[symbolCluster])
+            foreach (var themeWord in ThemeWordLookup[symbolCluster])
             {
-                var punType = originalWord.Text.Equals(phoneticsWord.Text, StringComparison.OrdinalIgnoreCase)? PunType.SameWord : PunType.Identity;
+                var punType = originalWord.Text.Equals(themeWord.Text, StringComparison.OrdinalIgnoreCase)? PunType.SameWord : PunType.Identity;
 
-                yield return new PunReplacement(punType, phoneticsWord.Text, false);
+                yield return new PunReplacement(punType, themeWord.Text, false, themeWord.Text);
             }
         }
     }

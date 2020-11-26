@@ -1,23 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Puns
 {
     public readonly struct Pun : IEquatable<Pun>
     {
-        public Pun(string newPhrase, string oldPhrase, string word, PunType type)
+        public Pun(string newPhrase, string oldPhrase, IReadOnlySet<string> punWords)
         {
 
             NewPhrase = newPhrase;
             OldPhrase = oldPhrase;
-            Word = word;
-            Type = type;
+            PunWords = punWords;
         }
 
         public string NewPhrase { get; }
         public string OldPhrase { get; }
 
-        public string Word { get; }
-        public PunType Type { get; }
+
+        public IReadOnlySet<string> PunWords { get; }
 
         /// <inheritdoc />
         public override string ToString() => NewPhrase;
