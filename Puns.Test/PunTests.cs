@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Pronunciation;
@@ -78,27 +79,40 @@ namespace Puns.Test
 
         [Theory]
         [InlineData("colt", "bolt", PunType.PerfectRhyme)]
-        [InlineData("smelt", "bolt", PunType.ImperfectRhyme)]
-        [InlineData("car", "carnage", PunType.Prefix)]
-        [InlineData("car", "incarcerate", PunType.Infix)]
-        [InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
+        //[InlineData("smelt", "bolt", PunType.ImperfectRhyme)]
+        //[InlineData("carnage", "car", PunType.Prefix)]
+        //[InlineData("car", "incarcerate", PunType.Infix)]
+        //[InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
         [InlineData("bear", "bare", PunType.Identity)]
         [InlineData("beard", "weird", PunType.PerfectRhyme)]
+        [InlineData("bovine", "valentine", PunType.PerfectRhyme)]
+        //[InlineData("dairy", "diary", PunType.SimilarWord)]
 
         public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
 
         {
-            throw new NotImplementedException();
-            //var theme = PronunciationEngine.GetPhoneticsWord(themeWord);
-            //var replacementWord = PronunciationEngine.GetPhoneticsWord(wordToReplace);
+            var theme = PronunciationEngine.GetPhoneticsWord(themeWord)!;
+            var originalWord = PronunciationEngine.GetPhoneticsWord(wordToReplace)!;
 
-            //theme.Should().NotBeNull();
-            //replacementWord.Should().NotBeNull();
+            var themeWords = new List<PhoneticsWord>(){theme};
 
 
-            //var realPunType = PunClassifier.Classify(theme!, replacementWord!);
+            var punStrategies = new List<PunStrategy>()
+            {
+                new HomophonePunStrategy(themeWords),
+                new PerfectRhymePunStrategy(themeWords),
+                new PrefixPunStrategy(themeWords)
+            };
 
-            //realPunType.Should().Be(expectedPunType);
+            var bestReplacement = punStrategies
+                        .SelectMany(x => x.GetPossibleReplacements(originalWord))
+                        .FirstOrDefault()!;
+
+            bestReplacement.ReplacementString.Should().NotBeNull();
+
+            var realPunType = bestReplacement.PunType;
+
+            realPunType.Should().Be(expectedPunType);
 
         }
 
