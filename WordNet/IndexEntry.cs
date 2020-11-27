@@ -11,9 +11,9 @@ namespace WordNet
 
             var numberOfSynSets = int.Parse(fields[2]);
 
-            var ids = new HashSet<SynsetId>();
+            var ids = new List<SynsetId>();
 
-            for (var i = 0; i < numberOfSynSets; i++)
+            for (var i = numberOfSynSets - 1; i >= 0; i--)
             {
                 var id = int.Parse(fields[fields.Length - 1 - i]);
                 var synsetId = new SynsetId(partOfSpeech, id);
@@ -26,7 +26,7 @@ namespace WordNet
         }
 
 
-        private IndexEntry(string word, PartOfSpeech partOfSpeech, IReadOnlySet<SynsetId> synsetIds)
+        private IndexEntry(string word, PartOfSpeech partOfSpeech, IReadOnlyList<SynsetId> synsetIds)
         {
             Word = word;
             PartOfSpeech = partOfSpeech;
@@ -36,7 +36,7 @@ namespace WordNet
         public string Word { get; }
         public PartOfSpeech PartOfSpeech { get; }
 
-        public IReadOnlySet<SynsetId> SynsetIds { get; }
+        public IReadOnlyList<SynsetId> SynsetIds { get; }
 
         /// <inheritdoc />
         public override string ToString() => Word;

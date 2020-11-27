@@ -11,18 +11,18 @@ namespace WordNet
         {
             var dataFiles = new (byte[] bytes, PartOfSpeech partOfSpeech)[]
             {
-                    (DictionaryFiles.dataAdj, PartOfSpeech.Adjective),
-                    (DictionaryFiles.dataAdv, PartOfSpeech.Adverb),
                     (DictionaryFiles.dataNoun, PartOfSpeech.Noun),
                     (DictionaryFiles.dataVerb, PartOfSpeech.Verb),
+                    (DictionaryFiles.dataAdj, PartOfSpeech.Adjective),
+                    (DictionaryFiles.dataAdv, PartOfSpeech.Adverb),
             };
 
             var indexFiles = new (byte[] bytes, PartOfSpeech partOfSpeech)[]
             {
-                    (DictionaryFiles.indexAdj, PartOfSpeech.Adjective),
-                    (DictionaryFiles.indexAdv, PartOfSpeech.Adverb),
                     (DictionaryFiles.indexNoun, PartOfSpeech.Noun),
                     (DictionaryFiles.indexVerb, PartOfSpeech.Verb),
+                    (DictionaryFiles.indexAdj, PartOfSpeech.Adjective),
+                    (DictionaryFiles.indexAdv, PartOfSpeech.Adverb),
             };
 
             SynSetDictionary = dataFiles.ToDictionary(x=>x.partOfSpeech,
