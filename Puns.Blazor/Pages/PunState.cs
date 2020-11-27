@@ -61,11 +61,11 @@ namespace Puns.Blazor.Pages
 
         public IReadOnlyCollection<Choice<SynSet>> SynSets { get; private set; } = new List<Choice<SynSet>>();
 
-        public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
+        public IReadOnlyCollection<Choice<IGrouping<string, Pun>>> PunList { get; set; } = Array.Empty<Choice<IGrouping<string, Pun>>>();
 
         public HashSet<string> RevealedWords { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase); //TODO replace with choice
 
-        public bool IsGenerating { get; set; } = false;
+        public bool IsGenerating { get; set; }
 
         public WordNetEngine WordNetEngine { get; }
 
@@ -90,11 +90,11 @@ namespace Puns.Blazor.Pages
             }
 
             IsGenerating = true;
-            PunList = null;
+            PunList = Array.Empty<Choice<IGrouping<string, Pun>>>();
             RevealedWords.Clear();
             var synSets = SynSets.Where(x=>x.Chosen).Select(x=>x.Entity).ToList();
 
-            var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>?>(()=>GetPuns(synSets, PunCategory, Theme, WordNetEngine, PronunciationEngine));
+            var task = new Task<IReadOnlyCollection<Choice<IGrouping<string, Pun>>>>(()=>GetPuns(synSets, PunCategory, Theme, WordNetEngine, PronunciationEngine));
             task.Start();
 
             PunList = await task;
@@ -102,7 +102,7 @@ namespace Puns.Blazor.Pages
             IsGenerating = false;
         }
 
-        private static IReadOnlyCollection<IGrouping<string, Pun>> GetPuns(IReadOnlyCollection<SynSet> synSets,
+        private static IReadOnlyCollection<Choice<IGrouping<string, Pun>>> GetPuns(IReadOnlyCollection<SynSet> synSets,
             PunCategory punCategory,
             string theme,
             WordNetEngine wordNetEngine,
@@ -113,19 +113,22 @@ namespace Puns.Blazor.Pages
 
             var puns = PunHelper.GetPuns(punCategory, theme, synSets, wordNetEngine, pronunciationEngine);
 
-            var punList = puns
-                .Distinct()
-                .SelectMany(pun=> pun.PunWords.Select(punWord=> (pun, punWord)))
-
-
-                .GroupBy(x => x.punWord, x=>x.pun, StringComparer.OrdinalIgnoreCase)
-                .Where(x=> x.Count() > 1)
-                .OrderByDescending(x => x.Count())
-                .ToList();
-
             Console.WriteLine($@"{puns.Count} Puns Got ({sw.Elapsed})");
 
-            return punList;
+            var groupedPuns = puns
+                .Distinct()
+                .SelectMany(pun=> pun.PunWords.Select(punWord=> (pun, punWord)))
+                .GroupBy(x => x.punWord, x=>x.pun, StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(x => x.Count());
+
+            HashSet<Pun> usedPuns = new HashSet<Pun>();
+            var pairs = from @group in groupedPuns from pun in @group where usedPuns.Add(pun) select (@group.Key, pun);
+
+            var finalList = pairs.GroupBy(x => x.Key, x => x.pun)
+                .OrderByDescending(x=>x.Count())
+                .Select(x => new Choice<IGrouping<string, Pun>>(x, false)).ToList();
+
+            return finalList;
         }
 
         /// <inheritdoc />
