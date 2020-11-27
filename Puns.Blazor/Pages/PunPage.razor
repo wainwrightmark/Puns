@@ -1,6 +1,11 @@
 ﻿@page "/puns"
 @using System.Linq
-@using WordNet
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavManager
+
+
+
+
 
 <div class="themeBox">
 <br/>
@@ -8,6 +13,8 @@
 <input type="text" style="width: 100%" @bind="State.Theme"/>
 <br/>
 </div>
+
+
 
 
 @{
@@ -18,15 +25,9 @@
 @foreach (var synSet in synsets)
 {
 
-    var changeFunc = new Action<ChangeEventArgs>((e) =>
-    {
-        if (!State.CrossedOffSynsets.Add(synSet))
-            State.CrossedOffSynsets.Remove(synSet);
-    });
-
     <div class="synsetBox">
-    <input type="checkbox" checked="@(!State.CrossedOffSynsets.Contains(synSet))" @onchange="changeFunc" />
-    <label>@synSet.GetShortDescription(synsets)</label>
+    <input type="checkbox" @bind="synSet.Chosen" />
+    <label>@synSet.Entity.Gloss</label>
     <br />
     </div>
 
@@ -103,11 +104,33 @@
 @code {
 
     /// <inheritdoc />
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+
+        var punImmediately = true;
+
+        if (!QueryHelpers.ParseQuery(uri.Query).TryGetValue("theme", out var theme))
+        {
+            theme = "Fish";
+            punImmediately = false;
+        }
+
+        PunCategory category;
+        if (!(QueryHelpers.ParseQuery(uri.Query).TryGetValue("category", out var categoryString) && PunCategory.TryParse(categoryString, true, out category)))
+        {
+            category = PunCategory.Idiom;
+            punImmediately = false;
+        }
+
+        State = new PunState(theme) {PunCategory = category};
+
+        if(punImmediately)
+            await State.Find();
+
+        await base.OnInitializedAsync();
     }
 
-    public PunState State { get; } = new PunState();
+    public PunState? State { get; private set; }
 
 }

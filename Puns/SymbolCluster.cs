@@ -27,7 +27,7 @@ namespace Puns
         }
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Symbols.Count, Symbols.First(), Symbols.Last());
+        public override int GetHashCode() => HashCode.Combine(Symbols.Count, Symbols[0], Symbols[Symbols.Count - 1]);
 
         public static bool operator ==(SymbolCluster? left, SymbolCluster? right) => Equals(left, right);
 

@@ -9,27 +9,61 @@ using WordNet;
 
 namespace Puns.Blazor.Pages
 {
-    public class PunState : IDisposable
+
+    public class Choice<T>
     {
-        public PunState()
+        public Choice(T entity, bool chosen)
+        {
+            Entity = entity;
+            Chosen = chosen;
+        }
+
+        public T Entity { get; }
+
+        public bool Chosen { get; set; }
+
+        /// <inheritdoc />
+        public override string ToString() => (Entity, Chosen).ToString();
+    }
+
+    public sealed class PunState : IDisposable
+    {
+        public PunState(string initialTheme)
         {
             WordNetEngine =  new WordNetEngine();
             PronunciationEngine =  new PronunciationEngine();
+            Theme = initialTheme;
         }
 
 
         public PunCategory PunCategory { get; set; } = PunCategory.Idiom;
 
-        public string? Theme { get; set; } = "Fish";
 
-        public IReadOnlyCollection<SynSet> SynSets => GetSynSets(Theme, WordNetEngine);
+        private string _theme = "";
 
+        public string Theme
+        {
+            get => _theme;
+            set
+            {
+                var changed = !_theme.Trim().Equals(value.Trim(), StringComparison.OrdinalIgnoreCase);
 
-        public HashSet<SynSet> CrossedOffSynsets { get; } = new HashSet<SynSet>();
+                _theme = value.Trim();
+
+                if (changed)
+                {
+                    SynSets =
+                    GetSynSets(Theme, WordNetEngine).Select((x,i)=> new Choice<SynSet>(x, i == 0)).ToList();
+                }
+
+            }
+        }
+
+        public IReadOnlyCollection<Choice<SynSet>> SynSets { get; private set; } = new List<Choice<SynSet>>();
 
         public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
 
-        public HashSet<string> RevealedWords { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> RevealedWords { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase); //TODO replace with choice
 
         public bool IsGenerating { get; set; } = false;
 
@@ -37,12 +71,12 @@ namespace Puns.Blazor.Pages
 
         public PronunciationEngine PronunciationEngine { get; }
 
-        private static IReadOnlyCollection<SynSet> GetSynSets(string? theme, WordNetEngine wordNetEngine)
+        private static IEnumerable<SynSet> GetSynSets(string? theme, WordNetEngine wordNetEngine)
         {
             if (string.IsNullOrWhiteSpace(theme))
-                return Array.Empty<SynSet>();
+                return Enumerable.Empty<SynSet>();
 
-            var sets = wordNetEngine.GetSynSets(theme).ToList();
+            var sets = wordNetEngine.GetSynSets(theme);
             return sets;
         }
 
@@ -58,7 +92,7 @@ namespace Puns.Blazor.Pages
             IsGenerating = true;
             PunList = null;
             RevealedWords.Clear();
-            var synSets = SynSets.Except(CrossedOffSynsets).ToList();
+            var synSets = SynSets.Where(x=>x.Chosen).Select(x=>x.Entity).ToList();
 
             var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>?>(()=>GetPuns(synSets, PunCategory, Theme, WordNetEngine, PronunciationEngine));
             task.Start();
