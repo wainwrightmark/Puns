@@ -20,6 +20,7 @@ namespace Puns
             var themeWords =
                 synSets.SelectMany(synSet => GetRelatedWords(theme, synSet, wordNetEngine)
                 .Select(x => x.Word))
+                .Where(x=>!x.Contains('_'))
                 .Prepend(theme)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Except(CommonWords.Value, StringComparer.OrdinalIgnoreCase)

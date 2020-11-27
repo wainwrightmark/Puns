@@ -140,6 +140,7 @@ namespace Puns.Test
         [InlineData("house", PunCategory.Bands)]
         [InlineData("house", PunCategory.Movies)]
         [InlineData("house", PunCategory.Books)]
+        [InlineData("Green", PunCategory.Idiom)]
         public void TestPunHelper(string theme, PunCategory category)
         {
 

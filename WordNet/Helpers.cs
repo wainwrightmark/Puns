@@ -56,8 +56,11 @@ namespace WordNet
                 {"$", SynSetRelation.VerbGroup},
                 {"+", SynSetRelation.DerivationallyRelated},
                 {";c", SynSetRelation.TopicDomain},
+                {"-c", SynSetRelation.TopicDomainMember},
                 {";r", SynSetRelation.RegionDomain},
-                {";u", SynSetRelation.UsageDomain}
+                {"-r", SynSetRelation.RegionDomainMember},
+                {";u", SynSetRelation.UsageDomain},
+                {"-u", SynSetRelation.UsageDomainMember},
             };
             dict.Add(PartOfSpeech.Verb, verbSymbolRelation);
 
@@ -71,8 +74,11 @@ namespace WordNet
                 {"=", SynSetRelation.Attribute},
                 {"^", SynSetRelation.AlsoSee},
                 {";c", SynSetRelation.TopicDomain},
+                {"-c", SynSetRelation.TopicDomainMember},
                 {";r", SynSetRelation.RegionDomain},
+                {"-r", SynSetRelation.RegionDomainMember},
                 {";u", SynSetRelation.UsageDomain},
+                {"-u", SynSetRelation.UsageDomainMember},
                 {"+", SynSetRelation.DerivationallyRelated}
             };
             // not in documentation
@@ -84,8 +90,11 @@ namespace WordNet
                 {"!", SynSetRelation.Antonym},
                 {@"\", SynSetRelation.DerivedFromAdjective},
                 {";c", SynSetRelation.TopicDomain},
+                {"-c", SynSetRelation.TopicDomainMember},
                 {";r", SynSetRelation.RegionDomain},
+                {"-r", SynSetRelation.RegionDomainMember},
                 {";u", SynSetRelation.UsageDomain},
+                {"-u", SynSetRelation.UsageDomainMember},
                 {"+", SynSetRelation.DerivationallyRelated}
             };
             // not in documentation
