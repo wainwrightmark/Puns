@@ -61,6 +61,46 @@ namespace Puns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pablo Picasso
+        ///Giotto Di Bondone
+        ///Leonardo Da Vinci
+        ///Paul Cézanne
+        ///Rembrandt Van Rijn
+        ///Diego Velázquez
+        ///Wassily Kandinsky
+        ///Claude Monet
+        ///Caravaggio
+        ///Joseph Mallord William Turner
+        ///Jan Van Eyck
+        ///Albrecht Dürer
+        ///Jackson Pollock
+        ///Michelangelo Buonarroti
+        ///Paul Gauguin
+        ///Francisco De Goya
+        ///Vincent Van Gogh
+        ///Édouard Manet
+        ///Mark Rothko
+        ///Henri Matisse
+        ///Raphael
+        ///Jean-Michel Basquiat
+        ///Edvard Munch
+        ///Titian
+        ///Piet Mondrian
+        ///Piero Della Francesca
+        ///Peter Paul Rubens
+        ///Andy Warhol
+        ///Joan Miró
+        ///Tommaso Masaccio
+        ///Marc Chagall
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Artists {
+            get {
+                return ResourceManager.GetString("Artists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Beatles
         ///The Rolling Stones
         ///Bob Dylan
@@ -405,6 +445,93 @@ namespace Puns {
         internal static string Movies {
             get {
                 return ResourceManager.GetString("Movies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ain&apos;t Misbehavin&apos;
+        ///Annie
+        ///Applause
+        ///Avenue Q
+        ///The Band&apos;s Visit
+        ///Beauty and the Beast
+        ///Big River
+        ///Billy Elliot the Musical
+        ///Blood Brothers
+        ///The Book of Mormon
+        ///Bye Bye Birdie
+        ///Cabaret
+        ///La Cage aux Folles
+        ///Candide
+        ///Carmen Jones
+        ///Caroline, or Change
+        ///Cats
+        ///A Chorus Line
+        ///City of Angels
+        ///Come from Away
+        ///The Comedy of Errors
+        ///Company
+        ///Contact
+        ///Crazy for You
+        ///Damn Yankees
+        ///Dear Evan Hansen
+        ///Drood
+        ///Evita
+        ///Fiddler on the Roof
+        ///Fiorello!
+        ///Follies
+        ///42nd Street
+        ///Fosse
+        ///Fun Home
+        ///A Funny Thing Happened on the Way to th [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Musicals {
+            get {
+                return ResourceManager.GetString("Musicals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m a Celebrity ...
+        ///The Mighty Boosh
+        ///The Shadow Line
+        ///Broad City
+        ///Skins
+        ///RuPaul
+        ///Twenty Four
+        ///The L Word
+        ///Fresh Meat
+        ///Gogglebox
+        ///Looking
+        ///Buffy the Vampire Slayer
+        ///Strictly Come Dancing
+        ///Entertainment TV
+        ///Gavin and Stacey
+        ///Veep
+        ///The Shield
+        ///TV crime drama
+        ///US television
+        ///A Very English Scandal
+        ///The Inbetweeners
+        ///Spiral
+        ///Science and nature TV
+        ///Factual TV
+        ///Lost
+        ///Shameless
+        ///The Good Place
+        ///Borgen
+        ///Inside No 9
+        ///Flight of the Conchords
+        ///Six Feet Under
+        ///Succession
+        ///Sherlock
+        ///Wolf Hall
+        ///Orange is the New Black
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TVShows {
+            get {
+                return ResourceManager.GetString("TVShows", resourceCulture);
             }
         }
     }

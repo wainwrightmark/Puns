@@ -108,6 +108,9 @@ namespace Puns.Blazor.Pages
             WordNetEngine wordNetEngine,
             PronunciationEngine pronunciationEngine)
         {
+
+            //TODO use virtualize https://docs.microsoft.com/en-us/aspnet/core/blazor/webassembly-performance-best-practices?view=aspnetcore-5.0
+
             var sw = Stopwatch.StartNew();
             Console.WriteLine(@"Getting Puns");
 

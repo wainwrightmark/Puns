@@ -48,6 +48,24 @@ namespace WordNet
         public readonly IReadOnlyDictionary<PartOfSpeech, FileDatabase.Database<IndexEntry, (string, PartOfSpeech)>> IndexDictionary;
 
 
+        public IEnumerable<SynSet> GetAllSynSets()
+        {
+            foreach (var partOfSpeech in Enum.GetValues<PartOfSpeech>())
+            {
+                if (SynSetDictionary.TryGetValue(partOfSpeech, out var db))
+                {
+                    var synSets = db.GetAll();
+
+                    foreach (var synSet in synSets)
+                    {
+                        yield return synSet;
+                    }
+                }
+
+            }
+        }
+
+
         private static string NormalizeWord(string word) => word.ToLower().Replace(' ', '_');
 
         public SynSet GetSynset(SynsetId id)

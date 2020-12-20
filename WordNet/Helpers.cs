@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace WordNet
 {
@@ -109,7 +110,19 @@ namespace WordNet
         /// <param name="partOfSpeech">POS to get relation for</param>
         /// <param name="symbol">Symbol to get relation for</param>
         /// <returns>SynSet relation</returns>
-        public static SynSetRelation GetSynSetRelation(this PartOfSpeech partOfSpeech, string symbol) => PartOfSpeechSymbolRelationDictionary[partOfSpeech][symbol];
+        public static SynSetRelation GetSynSetRelation(this PartOfSpeech partOfSpeech, string symbol)
+        {
+            var dict = PartOfSpeechSymbolRelationDictionary[partOfSpeech];
 
+            if (dict.TryGetValue(symbol, out var relation))
+                return relation;
+
+            else
+            {
+                Console.WriteLine($"Missing Relation {partOfSpeech} {symbol}"); //TODO fix all these
+                return SynSetRelation.AlsoSee;
+            }
+
+        }
     }
 }

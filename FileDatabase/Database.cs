@@ -35,6 +35,27 @@ namespace FileDatabase
 
         //TODO enumerate function
 
+        public IEnumerable<T> GetAll()
+        {
+            lock (_myLock)
+            {
+                _streamReader.DiscardBufferedData();
+                _streamReader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                while (true)
+                {
+                    var line = _streamReader.ReadLine();
+                    if (line == null) break;
+
+                    if(string.IsNullOrWhiteSpace(line)) continue;
+
+                    var t = _deserializeFunc(line);
+
+                    yield return t;
+                }
+            }
+        }
+
         public T? this[TKey key] => _dictionary.GetOrAdd(key, SearchDb);
 
         private T? SearchDb(TKey key)

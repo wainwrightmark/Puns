@@ -2,20 +2,24 @@
 {
     public enum PunCategory
     {
+
         Idiom,
+
+        Artists,
         Movies,
+        Musicals,
         Bands,
         Books,
         Brands,
         Celebs,
-        Countries
+        Countries,
+        TVShows,
 
 
 
         //TODO
         //Historical figures
         //Historical events
-        //TV Shows
         //Musical
         //Cocktails
         //Songs
