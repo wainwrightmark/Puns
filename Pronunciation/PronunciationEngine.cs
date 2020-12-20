@@ -27,7 +27,7 @@ namespace Pronunciation
                 words.Add(word);
             }
 
-            var newPhoneticsWord = new PhoneticsWord(text, 0, true, words.SelectMany(x => x.Symbols).ToList());
+            var newPhoneticsWord = new PhoneticsWord(text, 0, true, words.SelectMany(x => x.Syllables).ToList());
 
             return newPhoneticsWord;
         }
@@ -60,17 +60,27 @@ namespace Pronunciation
 
             var number = match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 0;
 
+            var syllables = new List<Syllable>();
             var symbols = new List<Symbol>();
 
             foreach (var symbolString in terms.Skip(1))
             {
-                if (Enum.TryParse(symbolString, out Symbol symbol))
+                if (symbolString == "-")
+                {
+                    if (symbols.Any())
+                    {
+                        syllables.Add(new Syllable(symbols));
+                        symbols = new List<Symbol>();
+                    }
+                }
+                else if (Enum.TryParse(symbolString, out Symbol symbol))
                     symbols.Add(symbol);
                 else
                     throw new ArgumentException($"Could not parse symbol {symbolString}");
             }
+            if (symbols.Any()) syllables.Add(new Syllable(symbols));
 
-            return new PhoneticsWord(word, number, false, symbols);
+            return new PhoneticsWord(word, number, false, syllables);
         }
 
         private static readonly Regex VariantRegex = new Regex(@"\A(?<word>.+?)(?:\((?<number>\d+)\))?\Z", RegexOptions.Compiled);

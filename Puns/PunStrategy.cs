@@ -9,14 +9,14 @@ namespace Puns
         protected PunStrategy(IEnumerable<PhoneticsWord> themeWords)
         {
             ThemeWordLookup = themeWords.SelectMany(word =>
-                    GetThemeWordSymbolClusters(word).Select(cluster=> (word, cluster)))
+                    GetThemeWordSubwords(word).Select(cluster=> (word, cluster)))
                 .OrderBy(x=>x.word.Text.Length)
-                .ToLookup(x => x.cluster, x => x.word);
+                .ToLookup(x => x.cluster, x => x.word, WordPronunciationComparer.Instance);
         }
 
-        public ILookup<SymbolCluster, PhoneticsWord> ThemeWordLookup { get; }
+        public ILookup<PhoneticsWord, PhoneticsWord> ThemeWordLookup { get; }
 
-        public abstract IEnumerable<SymbolCluster> GetThemeWordSymbolClusters(PhoneticsWord word);
+        public abstract IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word);
 
         public abstract IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord);
     }

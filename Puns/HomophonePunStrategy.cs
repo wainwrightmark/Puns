@@ -10,17 +10,17 @@ namespace Puns
         public HomophonePunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) {}
 
         /// <inheritdoc />
-        public override IEnumerable<SymbolCluster> GetThemeWordSymbolClusters(PhoneticsWord word)
+        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
         {
-            yield return new SymbolCluster(word.Symbols);
+            yield return word;
         }
+
 
         /// <inheritdoc />
         public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
         {
-            var symbolCluster = new SymbolCluster(originalWord.Symbols);
 
-            foreach (var themeWord in ThemeWordLookup[symbolCluster])
+            foreach (var themeWord in ThemeWordLookup[originalWord])
             {
                 var punType = originalWord.Text.Equals(themeWord.Text, StringComparison.OrdinalIgnoreCase)? PunType.SameWord : PunType.Identity;
 

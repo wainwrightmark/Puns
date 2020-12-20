@@ -1,19 +1,9 @@
 ﻿// ReSharper disable InconsistentNaming
 
+using System.Text;
+
 namespace Pronunciation
 {
-    public enum SyllableType
-    {
-        Vowel,
-        Stop,
-        Affricate,
-        Aspirate,
-        Fricative,
-        Liquid,
-        Nasal,
-        Semivowel
-    }
-
     public enum Symbol
     {
         AA,

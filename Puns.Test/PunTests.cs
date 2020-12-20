@@ -73,13 +73,14 @@ namespace Puns.Test
         public void TestPronunciation()
         {
             PronunciationEngine.GetPhoneticsWord("fish").Should().NotBeNull();
-            PronunciationEngine.GetPhoneticsWord("fish")!.Symbols.Should().NotBeEmpty();
+            PronunciationEngine.GetPhoneticsWord("fish")!.Syllables.Should().NotBeEmpty();
         }
 
         [Theory]
         [InlineData("colt", "bolt", PunType.PerfectRhyme)]
         //[InlineData("smelt", "bolt", PunType.ImperfectRhyme)]
         //[InlineData("carnage", "car", PunType.Prefix)]
+        //[InlineData("carnage", "far", PunType.PrefixRhyme)]
         //[InlineData("car", "incarcerate", PunType.Infix)]
         //[InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
         [InlineData("bear", "bare", PunType.Identity)]

@@ -5,6 +5,24 @@ using Pronunciation;
 namespace Puns
 {
 
+    //public class PrefixRhymePunStrategy : PunStrategy
+    //{
+    //    /// <inheritdoc />
+    //    public PrefixRhymePunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) { }
+
+    //    /// <inheritdoc />
+    //    public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
+    //    {
+    //        throw new System.NotImplementedException();
+    //    }
+
+    //    /// <inheritdoc />
+    //    public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
+    //    {
+    //        throw new System.NotImplementedException();
+    //    }
+    //}
+
     //TODO first syllable rhyme
 
     /// <summary>
@@ -15,23 +33,23 @@ namespace Puns
         /// <inheritdoc />
         public PrefixPunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) {}
 
-
         /// <inheritdoc />
-        public override IEnumerable<SymbolCluster> GetThemeWordSymbolClusters(PhoneticsWord word)
+        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
         {
-            for (var i = 2; i < word.Symbols.Count - 1; i++)
+            for (var i = 1; i < word.Syllables.Count - 1; i++)
             {
-                var cluster = new SymbolCluster(word.Symbols.Take(i).ToList());
+                var syllables = word.Syllables.Take(i).ToList();
+
+                var cluster = new PhoneticsWord(string.Join("", syllables), 0, true, syllables);
                 yield return cluster;
             }
         }
 
+
         /// <inheritdoc />
         public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
         {
-            var cluster = new SymbolCluster(originalWord.Symbols);
-
-            foreach (var themeWord in ThemeWordLookup[cluster])
+            foreach (var themeWord in ThemeWordLookup[originalWord])
             {
                 if (!themeWord.Text.StartsWith(originalWord.Text))
                 {

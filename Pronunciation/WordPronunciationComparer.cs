@@ -15,9 +15,9 @@ namespace Pronunciation
             if (ReferenceEquals(x, y)) return true;
             if (x is null || y is null) return false;
 
-            return x.Symbols.SequenceEqual(y.Symbols);
+            return x.Syllables.SequenceEqual(y.Syllables);
         }
 
-        public int GetHashCode(PhoneticsWord phoneticsWord) => HashCode.Combine(phoneticsWord.Symbols.Count, phoneticsWord.Symbols[0], phoneticsWord.Symbols[^1]);
+        public int GetHashCode(PhoneticsWord phoneticsWord) => HashCode.Combine(phoneticsWord.Syllables.Count, phoneticsWord.Syllables[0], phoneticsWord.Syllables[^1]);
     }
 }

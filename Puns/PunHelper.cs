@@ -27,7 +27,7 @@ namespace Puns
                 .Select(pronunciationEngine.GetPhoneticsWord)
                 .Where(x=>x is not null)
                 .Cast<PhoneticsWord>()
-                .Where(x=>x.Symbols.Count > 2)
+                .Where(x=>x.Syllables.Count > 1 || x.Syllables[0].Symbols.Count > 1)
                 .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
 
@@ -35,11 +35,12 @@ namespace Puns
 
             var puns = new List<Pun>();
 
-            var punStrategies = new List<PunStrategy>()
+            var punStrategies = new List<PunStrategy>
             {
                 new HomophonePunStrategy(themeWords),
                 new PerfectRhymePunStrategy(themeWords),
-                new PrefixPunStrategy(themeWords)
+                new PrefixPunStrategy(themeWords),
+                //new PrefixRhymePunStrategy(themeWords)
             };
 
 
@@ -87,7 +88,7 @@ namespace Puns
                 if (CommonWords.Value.Contains(word)) return null;
                 var cmuWord = pronunciationEngine.GetPhoneticsWord(word);
                 if (cmuWord is null) return null;
-                if (cmuWord.Symbols.Count < 3) return null;
+                if (cmuWord.Syllables.Count < 2 && cmuWord.Syllables[0].Symbols.Count < 3) return null;
 
 
 

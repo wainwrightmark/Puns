@@ -11,20 +11,24 @@ namespace Puns
     {
         public PerfectRhymePunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) { }
 
-        public override IEnumerable<SymbolCluster> GetThemeWordSymbolClusters(PhoneticsWord word)
+        /// <inheritdoc />
+        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
         {
-            var lastStressedVowelIndex = word.Symbols.LastIndexOf(x => x.IsStressedVowel());
+            var lastStressedVowelIndex = word.Syllables.LastIndexOf(x=>x.Nucleus.IsStressedVowel());
 
-            if (lastStressedVowelIndex >= 0)
-            {
-                var vowel = new SymbolCluster(word.Symbols.Skip(lastStressedVowelIndex).ToList());
-                yield return vowel;
-            }
+            if (lastStressedVowelIndex < 0) yield break; //No stressed vowel
+
+
+            var syllables = word.Syllables.Skip(lastStressedVowelIndex).Select((x,i)=> i == 0? x.GetRhymeSyllable : x).ToList();
+            var subWord = new PhoneticsWord(string.Join("", syllables), 0, true, syllables);
+
+            yield return subWord;
         }
+
 
         public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
         {
-            var lastStressedVowel = GetThemeWordSymbolClusters(originalWord).FirstOrDefault();
+            var lastStressedVowel = GetThemeWordSubwords(originalWord).FirstOrDefault();
 
             if(lastStressedVowel is null) yield break;
 
@@ -35,10 +39,10 @@ namespace Puns
 
                 if (themeWord.Text.Length < originalWord.Text.Length)
                 {
-                    var originalWordStressedVowels = originalWord.Symbols.Count(x => x.IsStressedVowel());
+                    var originalWordStressedVowels = originalWord.Syllables.Count(x => x.Nucleus.IsStressedVowel());
                     if (originalWordStressedVowels > 1)
                     {
-                        var themeWordStressedVowels = themeWord.Symbols.Count(x => x.IsStressedVowel());
+                        var themeWordStressedVowels = themeWord.Syllables.Count(x => x.Nucleus.IsStressedVowel());
                         if (originalWordStressedVowels > themeWordStressedVowels)
                             insert = true;
                     }

@@ -6,11 +6,11 @@ namespace Pronunciation
     public sealed class PhoneticsWord : IEquatable<PhoneticsWord>
     {
 
-        public PhoneticsWord(string text, int variant, bool isCompound, IReadOnlyList<Symbol> symbols)
+        public PhoneticsWord(string text, int variant, bool isCompound, IReadOnlyList<Syllable> syllables)
         {
             Text = text;
             Variant = variant;
-            Symbols = symbols;
+            Syllables = syllables;
             IsCompound = isCompound;
         }
 
@@ -26,7 +26,7 @@ namespace Pronunciation
 
         public int Variant { get; }
 
-        public IReadOnlyList<Symbol> Symbols { get; }
+        public IReadOnlyList<Syllable> Syllables { get; }
 
         /// <inheritdoc />
         public bool Equals(PhoneticsWord? other)
