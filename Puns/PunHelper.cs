@@ -18,7 +18,8 @@ namespace Puns
                 new PerfectRhymePunStrategy(spellingEngine,themeWords),
                 new PrefixPunStrategy(spellingEngine,themeWords),
                 new PrefixRhymePunStrategy(spellingEngine,themeWords),
-                new SameConsonantsPunStrategy(spellingEngine,themeWords)
+                new SameConsonantsPunStrategy(spellingEngine,themeWords),
+                new InfixRhymePunStrategy(spellingEngine, themeWords)
             };
 
             return punStrategies;

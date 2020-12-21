@@ -53,7 +53,7 @@ namespace Puns.Strategies
                 {
                     var lastStressedVowelIndex = originalWord.Syllables.LastIndexOf(x=>x.Nucleus.IsStressedVowel());
 
-                    replacement = CreateSpelling(originalWord.Syllables.Take(lastStressedVowelIndex)) + themeWord.Text;
+                    replacement = GetSpelling(originalWord.Syllables.Take(lastStressedVowelIndex)) + themeWord.Text;
                 }
                 else
                     replacement = themeWord.Text;

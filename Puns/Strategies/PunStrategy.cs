@@ -24,7 +24,7 @@ namespace Puns.Strategies
 
         public abstract IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord);
 
-        protected string CreateSpelling(IEnumerable<Syllable> syllables)
+        protected string GetSpelling(IEnumerable<Syllable> syllables)
         {
             var sb = new StringBuilder();
 

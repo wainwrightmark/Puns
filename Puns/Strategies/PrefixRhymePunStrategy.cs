@@ -31,7 +31,7 @@ namespace Puns.Strategies
                 {
                     if (themeWord.Syllables.Count > 1 || themeWord.Syllables[^1] != originalWord.Syllables[0])
                     {
-                        var suffix = CreateSpelling(originalWord.Syllables.Skip(1));
+                        var suffix = GetSpelling(originalWord.Syllables.Skip(1));
 
                         yield return new PunReplacement(PunType.PrefixRhyme, themeWord + suffix, true, themeWord.Text);
                     }
