@@ -95,6 +95,7 @@ namespace Puns.Test
         [InlineData("pisces", "pieces", PunType.SameConsonants)]
         [InlineData("pieces","pisces",  PunType.SameConsonants)]
         [InlineData("ray", "relationship", PunType.Infix)]
+        [InlineData("ray", "away", PunType.PerfectRhyme)]
 
         public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
 

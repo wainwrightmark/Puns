@@ -28,31 +28,25 @@ namespace Puns.Strategies
 
         public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
         {
-            var lastStressedVowel = GetThemeWordSubwords(originalWord).FirstOrDefault();
+            var lastStressedVowelIndex = originalWord.Syllables.LastIndexOf(x => x.Nucleus.IsStressedVowel());
 
-            if(lastStressedVowel is null) yield break;
+            if (lastStressedVowelIndex < 0) yield break; //No stressed vowel
+
+            var syllables = originalWord.Syllables.Skip(lastStressedVowelIndex).Select((x, i) => i == 0 ? x.GetRhymeSyllable : x).ToList();
+            var subWord = new PhoneticsWord(string.Join("", syllables), 0, true, syllables);
 
 
-            foreach (var themeWord in ThemeWordLookup[lastStressedVowel])
+
+            foreach (var themeWord in ThemeWordLookup[subWord])
             {
-                var insert = false;
+                if(originalWord.Text.Contains(themeWord.Text))
+                    yield break;
 
-                if (themeWord.Text.Length < originalWord.Text.Length)
-                {
-                    var originalWordStressedVowels = originalWord.Syllables.Count(x => x.Nucleus.IsStressedVowel());
-                    if (originalWordStressedVowels > 1)
-                    {
-                        var themeWordStressedVowels = themeWord.Syllables.Count(x => x.Nucleus.IsStressedVowel());
-                        if (originalWordStressedVowels > themeWordStressedVowels)
-                            insert = true;
-                    }
-                }
+                var insert = themeWord.Syllables.Count < originalWord.Syllables.Count;
 
                 string replacement;
                 if (insert)
                 {
-                    var lastStressedVowelIndex = originalWord.Syllables.LastIndexOf(x=>x.Nucleus.IsStressedVowel());
-
                     replacement = GetSpelling(originalWord.Syllables.Take(lastStressedVowelIndex)) + themeWord.Text;
                 }
                 else
