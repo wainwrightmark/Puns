@@ -17,7 +17,8 @@ namespace Puns
                 new HomophonePunStrategy(themeWords),
                 new PerfectRhymePunStrategy(themeWords),
                 new PrefixPunStrategy(themeWords),
-                new PrefixRhymePunStrategy(themeWords)
+                new PrefixRhymePunStrategy(themeWords),
+                new SameConsonantsPunStrategy(themeWords)
             };
 
             return punStrategies;

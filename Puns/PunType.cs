@@ -42,8 +42,7 @@
         /// <summary>
         /// Both words share at least four syllables of prefix
         /// </summary>
-        SharedPrefix
-
-
+        SharedPrefix,
+        SameConsonants
     }
 }

@@ -87,7 +87,8 @@ namespace Puns.Test
         [InlineData("bear", "bare", PunType.Identity)]
         [InlineData("beard", "weird", PunType.PerfectRhyme)]
         [InlineData("bovine", "valentine", PunType.PerfectRhyme)]
-        //[InlineData("dairy", "diary", PunType.SimilarWord)]
+        [InlineData("pisces", "pieces", PunType.SameConsonants)]
+        [InlineData("pieces","pisces",  PunType.SameConsonants)]
 
         public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
 
