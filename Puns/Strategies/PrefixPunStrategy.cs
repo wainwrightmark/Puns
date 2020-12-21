@@ -12,7 +12,7 @@ namespace Puns.Strategies
     public class PrefixPunStrategy : PunStrategy
     {
         /// <inheritdoc />
-        public PrefixPunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) {}
+        public PrefixPunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
         public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)

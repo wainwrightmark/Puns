@@ -69,5 +69,15 @@ namespace Pronunciation {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Spelling {
+            get {
+                object obj = ResourceManager.GetObject("Spelling", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Pronunciation;
-using Puns.Strategies;
 using WordNet;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,12 +13,15 @@ namespace Puns.Test
     {
         public WordFixture()
         {
+            SpellingEngine = new SpellingEngine();
             WordNetEngine = new WordNetEngine();
             PronunciationEngine = new PronunciationEngine();
         }
 
         public PronunciationEngine PronunciationEngine { get; }
         public WordNetEngine WordNetEngine { get; }
+
+        public SpellingEngine SpellingEngine { get; }
     }
 
 
@@ -37,6 +39,9 @@ namespace Puns.Test
         public PronunciationEngine PronunciationEngine => WordFixture.PronunciationEngine;
 
         public WordNetEngine WordNetEngine => WordFixture.WordNetEngine;
+
+
+        public SpellingEngine SpellingEngine => WordFixture.SpellingEngine;
 
         [Fact]
         public void TestSynSets()
@@ -98,7 +103,7 @@ namespace Puns.Test
 
             var themeWords = new List<PhoneticsWord>(){theme};
 
-            var punStrategies = PunHelper.GetPunStrategies(themeWords);
+            var punStrategies = PunHelper.GetPunStrategies(SpellingEngine, themeWords);
 
 
             var bestReplacement = punStrategies
@@ -144,7 +149,7 @@ namespace Puns.Test
 
             var synSets = WordNetEngine.GetSynSets(theme).ToList();
 
-            var puns =  PunHelper.GetPuns(category, theme, synSets, WordNetEngine, PronunciationEngine);
+            var puns =  PunHelper.GetPuns(category, theme, synSets, WordNetEngine, PronunciationEngine, SpellingEngine);
 
             puns.Should().HaveCountGreaterThan(2);
 

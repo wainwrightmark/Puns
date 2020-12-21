@@ -10,15 +10,15 @@ namespace Puns
 {
     public static class PunHelper
     {
-        public static IReadOnlyList<PunStrategy> GetPunStrategies(IReadOnlyList<PhoneticsWord> themeWords)
+        public static IReadOnlyList<PunStrategy> GetPunStrategies(SpellingEngine spellingEngine, IReadOnlyList<PhoneticsWord> themeWords)
         {
             var punStrategies = new List<PunStrategy>
             {
-                new HomophonePunStrategy(themeWords),
-                new PerfectRhymePunStrategy(themeWords),
-                new PrefixPunStrategy(themeWords),
-                new PrefixRhymePunStrategy(themeWords),
-                new SameConsonantsPunStrategy(themeWords)
+                new HomophonePunStrategy(spellingEngine, themeWords),
+                new PerfectRhymePunStrategy(spellingEngine,themeWords),
+                new PrefixPunStrategy(spellingEngine,themeWords),
+                new PrefixRhymePunStrategy(spellingEngine,themeWords),
+                new SameConsonantsPunStrategy(spellingEngine,themeWords)
             };
 
             return punStrategies;
@@ -29,7 +29,8 @@ namespace Puns
             string theme,
             IReadOnlyCollection<SynSet> synSets,
             WordNetEngine wordNetEngine,
-            PronunciationEngine pronunciationEngine)
+            PronunciationEngine pronunciationEngine,
+            SpellingEngine spellingEngine)
         {
             var phrases = GetPhrases(category);
 
@@ -51,7 +52,7 @@ namespace Puns
 
             var puns = new List<Pun>();
 
-            var punStrategies = GetPunStrategies(themeWords);
+            var punStrategies = GetPunStrategies(spellingEngine, themeWords);
 
 
             foreach (var phrase in phrases)

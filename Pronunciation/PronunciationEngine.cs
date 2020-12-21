@@ -7,7 +7,6 @@ using FileDatabase;
 
 namespace Pronunciation
 {
-
     public sealed class PronunciationEngine : IDisposable
     {
         public IEnumerable<PhoneticsWord> GetAllPhoneticsWords() => _database.GetAll();

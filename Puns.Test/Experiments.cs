@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -10,11 +11,176 @@ using Xunit.Abstractions;
 
 namespace Puns.Test
 {
-    public class SyllableSpelling
+    public class SyllableSpellingHelper
     {
-        public SyllableSpelling(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
+        public SyllableSpellingHelper(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         public ITestOutputHelper TestOutputHelper { get; }
+
+
+        [Fact]
+        public void FindSyllableSpellings()
+        {
+            var engine = new PronunciationEngine();
+            var words = engine.GetAllPhoneticsWords().ToList();
+
+            var remainingWords = new Stack<PhoneticsWord>(words.OrderByDescending(x=>x.Syllables.Count));
+
+            var dict = new ConcurrentDictionary<Syllable, SyllableSpelling>();
+
+
+            while (remainingWords.Any())
+            {
+                var anyChanged = false;
+                var wordsToPutBack = new List<PhoneticsWord>();
+
+                while (remainingWords.TryPop(out var word))
+                {
+                    if(!TryEat(word.Syllables.ToArray(), word.Text, dict))
+                        wordsToPutBack.Add(word);
+                    else
+                        anyChanged = true;
+                }
+
+                remainingWords = new Stack<PhoneticsWord>(wordsToPutBack);
+                if (!anyChanged)
+                    break;
+            }
+
+            TestOutputHelper.WriteLine($"Found {dict.Count} syllables");
+
+            if (remainingWords.Any()) TestOutputHelper.WriteLine($"Could not find {remainingWords.Count} words");
+
+            foreach (var (syllable, spelling) in dict.OrderBy(x=>x.Key.ToString()))
+            {
+                var sl = $"{syllable}\t{spelling.GetBestDetail()}";
+                TestOutputHelper.WriteLine(sl);
+            }
+
+            //foreach (var remainingWord in remainingWords)
+            //{
+            //    TestOutputHelper.WriteLine(remainingWord.Text + " Not Found");
+            //}
+
+            static bool TryEat(ReadOnlySpan<Syllable> syllables, string text, ConcurrentDictionary<Syllable, SyllableSpelling> dictionary)
+            {
+                switch (syllables.Length)
+                {
+                    case 0:
+                        return true;
+                    case 1:
+                        dictionary.AddOrUpdate(syllables[0], s =>
+                        {
+                            var ss = new SyllableSpelling();
+                            ss.AddSpelling(text);
+                            return ss;
+                        }, (_, ss) =>
+                        {
+                            ss.AddSpelling(text);
+                            return ss;
+                        });
+                        return true;
+                    default:
+                    {
+                        if (dictionary.TryGetValue(syllables[0], out var spelling))
+                        {
+                            if (spelling.GetPrefix(text, out var prefix))
+                            {
+                                var suffix = text.Substring(prefix.Length);
+
+                                if (TryEat(syllables[1..], suffix, dictionary))
+                                {
+                                    spelling.AddSpelling(prefix);
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(dictionary.TryGetValue(syllables[^1], out var spelling2))
+                        {
+                            if (spelling2.GetSuffix(text, out var suffix))
+                            {
+                                var prefix = text.Substring(0, text.Length - suffix.Length);
+
+                                if (TryEat(syllables[..^1], prefix, dictionary))
+                                {
+                                    spelling2.AddSpelling(suffix);
+                                    return true;
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        class SyllableSpelling
+        {
+            private readonly ConcurrentDictionary<string, int> _spellings  = new(StringComparer.OrdinalIgnoreCase);
+
+            public void AddSpelling(string s)
+            {
+                _spellings.AddOrUpdate(s, 1, (_, i) => i + 1);
+            }
+
+            public int Count => _spellings.Count;
+
+            public bool GetPrefix(string text, out string prefix)
+            {
+                var maxLength = Math.Min(5, text.Length - 1);
+
+                for (var length = maxLength; length > 0; length--)
+                {
+                    var p = text[..length];
+                    if (_spellings.ContainsKey(p))
+                    {
+                        prefix = p;
+                        return true;
+                    }
+                }
+
+                prefix = null;
+                return false;
+            }
+
+            public bool GetSuffix(string text, out string suffix)
+            {
+                var maxLength = Math.Min(5, text.Length - 1);
+
+                for (var length = maxLength; length > 0; length--)
+                {
+                    var s = text.Substring(text.Length - length);
+                    if (_spellings.ContainsKey(s))
+                    {
+                        suffix = s;
+                        return true;
+                    }
+                }
+
+                suffix = null;
+                return false;
+            }
+
+            public string GetBestDetail()
+            {
+                var count = 0;
+                var best = (count:0,text: "");
+
+                foreach (var (text, c) in _spellings)
+                {
+                    count += c;
+                    if (best.count < c)
+                        best = (c, text);
+                }
+
+                return $"{best.text}";// ({best.count}/{count})";
+
+            }
+        }
 
         [Fact]
         public void FindFirstSyllableSpellings()

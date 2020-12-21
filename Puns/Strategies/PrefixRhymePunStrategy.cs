@@ -7,7 +7,7 @@ namespace Puns.Strategies
     public class PrefixRhymePunStrategy : PunStrategy //The last syllable of the themeword rhymes with the first syllable of the original word
     {
         /// <inheritdoc />
-        public PrefixRhymePunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) { }
+        public PrefixRhymePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
         public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)

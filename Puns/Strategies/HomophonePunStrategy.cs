@@ -7,7 +7,7 @@ namespace Puns.Strategies
     public class HomophonePunStrategy : PunStrategy
     {
         /// <inheritdoc />
-        public HomophonePunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) {}
+        public HomophonePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
         public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)

@@ -32,6 +32,7 @@ namespace Puns.Blazor.Pages
         {
             WordNetEngine =  new WordNetEngine();
             PronunciationEngine =  new PronunciationEngine();
+            SpellingEngine = new SpellingEngine();
             Theme = initialTheme;
         }
 
@@ -71,6 +72,8 @@ namespace Puns.Blazor.Pages
 
         public PronunciationEngine PronunciationEngine { get; }
 
+        public SpellingEngine SpellingEngine { get; }
+
         private static IEnumerable<SynSet> GetSynSets(string? theme, WordNetEngine wordNetEngine)
         {
             if (string.IsNullOrWhiteSpace(theme))
@@ -94,7 +97,8 @@ namespace Puns.Blazor.Pages
             RevealedWords.Clear();
             var synSets = SynSets.Where(x=>x.Chosen).Select(x=>x.Entity).ToList();
 
-            var task = new Task<IReadOnlyCollection<Choice<IGrouping<string, Pun>>>>(()=>GetPuns(synSets, PunCategory, Theme, WordNetEngine, PronunciationEngine));
+            var task = new Task<IReadOnlyCollection<Choice<IGrouping<string, Pun>>>>(
+                ()=>GetPuns(synSets, PunCategory, Theme, WordNetEngine, PronunciationEngine, SpellingEngine));
             task.Start();
 
             PunList = await task;
@@ -106,7 +110,8 @@ namespace Puns.Blazor.Pages
             PunCategory punCategory,
             string theme,
             WordNetEngine wordNetEngine,
-            PronunciationEngine pronunciationEngine)
+            PronunciationEngine pronunciationEngine,
+            SpellingEngine spellingEngine)
         {
 
             //TODO use virtualize https://docs.microsoft.com/en-us/aspnet/core/blazor/webassembly-performance-best-practices?view=aspnetcore-5.0
@@ -114,7 +119,7 @@ namespace Puns.Blazor.Pages
             var sw = Stopwatch.StartNew();
             Console.WriteLine(@"Getting Puns");
 
-            var puns = PunHelper.GetPuns(punCategory, theme, synSets, wordNetEngine, pronunciationEngine);
+            var puns = PunHelper.GetPuns(punCategory, theme, synSets, wordNetEngine, pronunciationEngine, spellingEngine);
 
             Console.WriteLine($@"{puns.Count} Puns Got ({sw.Elapsed})");
 

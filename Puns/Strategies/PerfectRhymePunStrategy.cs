@@ -9,7 +9,7 @@ namespace Puns.Strategies
     /// </summary>
     public class PerfectRhymePunStrategy : PunStrategy
     {
-        public PerfectRhymePunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) { }
+        public PerfectRhymePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
         public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
