@@ -42,17 +42,17 @@ namespace Puns.Strategies
                 if(originalWord.Text.Contains(themeWord.Text))
                     yield break;
 
-                var insert = themeWord.Syllables.Count < originalWord.Syllables.Count;
 
-                string replacement;
-                if (insert)
+                if(themeWord.Syllables.Count == originalWord.Syllables.Count)
                 {
-                    replacement = GetSpelling(originalWord.Syllables.Take(lastStressedVowelIndex)) + themeWord.Text;
+                    yield return new PunReplacement(PunType.PerfectRhyme, themeWord.Text, false, themeWord.Text);
                 }
-                else
-                    replacement = themeWord.Text;
+                else if (themeWord.Syllables.Count < originalWord.Syllables.Count)
+                {
+                    var replacement = GetSpelling(originalWord.Syllables.Take(lastStressedVowelIndex)) + themeWord.Text;
 
-                yield return new PunReplacement(PunType.PerfectRhyme, replacement, insert, themeWord.Text);
+                    yield return new PunReplacement(PunType.PerfectRhyme, replacement, false, themeWord.Text);
+                }
             }
         }
 

@@ -29,7 +29,7 @@ namespace Puns.Strategies
 
                 foreach (var themeWord in ThemeWordLookup[rhymeWord])
                 {
-                    if (themeWord.Syllables.Count > 1 || themeWord.Syllables[^1] != originalWord.Syllables[0])
+                    if (themeWord.Syllables.Count == 1 || themeWord.Syllables[^1] == originalWord.Syllables[0])
                     {
                         var suffix = GetSpelling(originalWord.Syllables.Skip(1));
 

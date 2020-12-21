@@ -129,6 +129,7 @@ namespace Puns.Test
         [InlineData("fish", PunCategory.Bands)]
         [InlineData("fish", PunCategory.Movies)]
         [InlineData("fish", PunCategory.Books)]
+        [InlineData("fish", PunCategory.ChristmasSongs)]
         [InlineData("chocolate", PunCategory.Idiom)]
         [InlineData("chocolate", PunCategory.Bands)]
         [InlineData("chocolate", PunCategory.Movies)]
