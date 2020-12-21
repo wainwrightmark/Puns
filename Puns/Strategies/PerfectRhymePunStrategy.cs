@@ -2,7 +2,7 @@
 using System.Linq;
 using Pronunciation;
 
-namespace Puns
+namespace Puns.Strategies
 {
     /// <summary>
     /// The theme word rhymes with original word
@@ -48,9 +48,15 @@ namespace Puns
                     }
                 }
 
-                string replacement = insert
-                    ? originalWord.Text.Substring(0, originalWord.Text.Length - themeWord.Text.Length) + themeWord.Text//TODO improve this replacement
-                    : themeWord.Text;
+                string replacement;
+                if (insert)
+                {
+                    var lastStressedVowelIndex = originalWord.Syllables.LastIndexOf(x=>x.Nucleus.IsStressedVowel());
+
+                    replacement = CreateSpelling(originalWord.Syllables.Take(lastStressedVowelIndex)) + themeWord.Text;
+                }
+                else
+                    replacement = themeWord.Text;
 
                 yield return new PunReplacement(PunType.PerfectRhyme, replacement, insert, themeWord.Text);
             }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Pronunciation;
 
-namespace Puns
+namespace Puns.Strategies
 {
     public class HomophonePunStrategy : PunStrategy
     {

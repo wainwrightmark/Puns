@@ -10,7 +10,7 @@ namespace Pronunciation
 
         public IReadOnlyList<Symbol> Symbols { get; }
 
-        public IEnumerable<Symbol> Onset => Symbols.TakeWhile(x => SymbolHelper.GetSyllableType(x) != SyllableType.Vowel);
+        public IEnumerable<Symbol> Onset => Symbols.TakeWhile(x => x.GetSyllableType() != SyllableType.Vowel);
         public Symbol Nucleus => Symbols.First(x => x.GetSyllableType() == SyllableType.Vowel);
         public IEnumerable<Symbol> Coda => Symbols.SkipWhile(x => x.GetSyllableType() != SyllableType.Vowel).Skip(1);
 
@@ -29,7 +29,7 @@ namespace Pronunciation
         public override string ToString() => string.Join(" ", Symbols.Select(x => x.ToString()));
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Symbols.Count, Symbols.First(), Symbols.Last());
+        public override int GetHashCode() => HashCode.Combine(Symbols.Count, Symbols[0], Symbols[^1]);
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is Syllable other && Equals(other);

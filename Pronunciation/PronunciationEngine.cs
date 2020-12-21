@@ -10,6 +10,8 @@ namespace Pronunciation
 
     public sealed class PronunciationEngine : IDisposable
     {
+        public IEnumerable<PhoneticsWord> GetAllPhoneticsWords() => _database.GetAll();
+
         public PhoneticsWord? GetPhoneticsWord(string text)//todo multiple pronunciations
         {
             var splits = text.Split('_', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

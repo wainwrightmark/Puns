@@ -2,27 +2,8 @@
 using System.Linq;
 using Pronunciation;
 
-namespace Puns
+namespace Puns.Strategies
 {
-
-    //public class PrefixRhymePunStrategy : PunStrategy
-    //{
-    //    /// <inheritdoc />
-    //    public PrefixRhymePunStrategy(IEnumerable<PhoneticsWord> themeWords) : base(themeWords) { }
-
-    //    /// <inheritdoc />
-    //    public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
-    //    {
-    //        throw new System.NotImplementedException();
-    //    }
-
-    //    /// <inheritdoc />
-    //    public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
-    //    {
-    //        throw new System.NotImplementedException();
-    //    }
-    //}
-
     //TODO first syllable rhyme
 
     /// <summary>

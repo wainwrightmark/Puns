@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Pronunciation;
 
-namespace Puns
+namespace Puns.Strategies
 {
     public abstract class PunStrategy
     {
@@ -19,5 +20,12 @@ namespace Puns
         public abstract IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word);
 
         public abstract IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord);
+
+        protected string CreateSpelling(IEnumerable<Syllable> syllables)
+        {
+            //TODO do better
+            return new string(syllables.SelectMany(x => x.ToString()).Where(char.IsLetter).ToArray());
+
+        }
     }
 }

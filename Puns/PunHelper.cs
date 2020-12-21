@@ -3,12 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using MoreLinq;
 using Pronunciation;
+using Puns.Strategies;
 using WordNet;
 
 namespace Puns
 {
     public static class PunHelper
     {
+        public static IReadOnlyList<PunStrategy> GetPunStrategies(IReadOnlyList<PhoneticsWord> themeWords)
+        {
+            var punStrategies = new List<PunStrategy>
+            {
+                new HomophonePunStrategy(themeWords),
+                new PerfectRhymePunStrategy(themeWords),
+                new PrefixPunStrategy(themeWords),
+                new PrefixRhymePunStrategy(themeWords)
+            };
+
+            return punStrategies;
+        }
+
+
         public static IReadOnlyCollection<Pun> GetPuns(PunCategory category,
             string theme,
             IReadOnlyCollection<SynSet> synSets,
@@ -35,13 +50,7 @@ namespace Puns
 
             var puns = new List<Pun>();
 
-            var punStrategies = new List<PunStrategy>
-            {
-                new HomophonePunStrategy(themeWords),
-                new PerfectRhymePunStrategy(themeWords),
-                new PrefixPunStrategy(themeWords),
-                //new PrefixRhymePunStrategy(themeWords)
-            };
+            var punStrategies = GetPunStrategies(themeWords);
 
 
             foreach (var phrase in phrases)

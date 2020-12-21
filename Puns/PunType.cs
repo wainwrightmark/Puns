@@ -32,6 +32,8 @@
         /// </summary>
         Prefix,
 
+        PrefixRhyme ,
+
         /// <summary>
         /// One word is contained within the other
         /// </summary>

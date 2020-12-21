@@ -3,15 +3,164 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using Pronunciation;
 using WordNet;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Puns.Test
 {
-    public class Experiments
+    public class SyllableSpelling
     {
-        public Experiments(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
+        public SyllableSpelling(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
+
+        public ITestOutputHelper TestOutputHelper { get; }
+
+        [Fact]
+        public void FindFirstSyllableSpellings()
+        {
+            var engine = new PronunciationEngine();
+
+            var words = engine.GetAllPhoneticsWords().ToList();
+
+            var syllables = words.SelectMany(x => x.Syllables).Distinct().Count();
+
+            var wordsBySyllable = words
+                .SelectMany(word =>
+                {
+                    var first = (word,syllable: word.Syllables[0], start: true);
+                    var last = (word,syllable: word.Syllables[^1], start: false);
+
+                    return new[] {first, last};
+
+                })
+
+                .GroupBy(x => x.syllable)
+                .OrderByDescending(x=>x.Count()).ToList();
+
+
+            TestOutputHelper.WriteLine($"{wordsBySyllable.Count}/{syllables}  syllables");
+
+            var results = new List<(string Syllable, string spelling, int totalInstances, int spellingInstances)>();
+
+            foreach (var grouping in wordsBySyllable)
+            {
+                var syllable = grouping.Key;
+
+                var prefixes = grouping.SelectMany(x =>
+                {
+                    var (word,_, start) = x;
+
+                    if (word.Syllables.Count == 1)
+                        return new[]{word.Text};
+
+                    if (start)
+                    {
+                        return
+                        Enumerable.Range(1, 5)
+                            .Where(l => word.Text.Length > l)
+                            .Select(l => word.Text.Substring(0, l));
+                    }
+                    else
+                    {
+                        return
+                        Enumerable.Range(1, 5)
+                            .Where(l => word.Text.Length > l)
+                            .Select(l => word.Text[^l..]);
+                    }
+
+                }).GroupBy(x=>x);
+
+                var mostCommonPrefix = prefixes.OrderByDescending(GetScore).First();
+
+                results.Add((syllable.ToString(), mostCommonPrefix.Key, grouping.Count(), mostCommonPrefix.Count()));
+
+                static double GetScore(IGrouping<string, string> grouping)
+                {
+                    return grouping.Count() * Math.Log2(grouping.Key.Length) ;//TODO improve
+                }
+            }
+
+            foreach (var (syllable, spelling, totalInstances, spellingInstances) in results.OrderBy(x=>x.Syllable))
+            {
+                TestOutputHelper.WriteLine($"{syllable}: {spelling} ({spellingInstances}/{totalInstances})");
+            }
+
+        }
+    }
+
+
+    public class DoubleStraights
+    {
+        public DoubleStraights(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
+
+        public ITestOutputHelper TestOutputHelper { get; }
+
+        [Fact]
+        public void FindDoubleStraights()
+        {
+            var wordNetEngine = new WordNetEngine();
+
+            var synSets = wordNetEngine.GetAllSynSets().ToList();
+
+            var doubleWords = synSets
+                .SelectMany(x => x.Words)
+                .Where(s => s.Count(x => x == '_') == 1)
+                .Select(doubleWord =>
+                {
+                    var split =  doubleWord.Split('_');
+
+                    return (word1: split[0], word2: split[1], doubleWord);
+                }).Where(x=>!x.word1.Equals(x.word2, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            TestOutputHelper.WriteLine($"{doubleWords.Count} double words");
+
+            var results = new HashSet<string>();
+
+            foreach (var (word1, word2, doubleWord) in doubleWords)
+            {
+                var word1Sets = wordNetEngine.GetSynSets(word1);
+                var word1Words = word1Sets.SelectMany(x => x.Words).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                if(word1Words.Contains(word2))
+                    continue;
+
+                var word2Sets = wordNetEngine.GetSynSets(word2);
+                var word2Words = word2Sets.SelectMany(x => x.Words).ToList();
+
+
+
+                var commonWords = word1Words.Intersect(word2Words)
+                    .Except(new []{word1,word2,doubleWord}).ToHashSet();
+
+                if (commonWords.Any())
+                {
+                    var doubleWordSynonyms = wordNetEngine.GetSynSets(doubleWord).SelectMany(x => x.Words);
+                    commonWords = commonWords.Except(doubleWordSynonyms).ToHashSet();
+                }
+
+                foreach (var commonWord in commonWords)
+                {
+                    results.Add($"{word1}, {word2}: {commonWord}");
+                }
+            }
+
+            TestOutputHelper.WriteLine($"{results.Count} found");
+
+            foreach (var result in results)
+            {
+                TestOutputHelper.WriteLine(result);
+            }
+
+
+
+        }
+    }
+
+
+    public class WordSquares
+    {
+        public WordSquares(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         public ITestOutputHelper TestOutputHelper { get; }
 
@@ -21,7 +170,7 @@ namespace Puns.Test
          * ock
          */
 
-        [Theory]
+        [Theory(Skip = "true")]
         [InlineData(9,1)]
         [InlineData(16,1)]
         [InlineData(9, 2)]
@@ -125,7 +274,7 @@ namespace Puns.Test
 
         }
 
-        private static IReadOnlyDictionary<int, IReadOnlyCollection<(string name,  IReadOnlyList<int> pattern) >>
+        private static readonly IReadOnlyDictionary<int, IReadOnlyCollection<(string name,  IReadOnlyList<int> pattern) >>
 
 
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Pronunciation;
+using Puns.Strategies;
 using WordNet;
 using Xunit;
 using Xunit.Abstractions;
@@ -80,7 +81,7 @@ namespace Puns.Test
         [InlineData("colt", "bolt", PunType.PerfectRhyme)]
         //[InlineData("smelt", "bolt", PunType.ImperfectRhyme)]
         //[InlineData("carnage", "car", PunType.Prefix)]
-        //[InlineData("carnage", "far", PunType.PrefixRhyme)]
+        [InlineData("far", "carnage", PunType.PrefixRhyme)]
         //[InlineData("car", "incarcerate", PunType.Infix)]
         //[InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
         [InlineData("bear", "bare", PunType.Identity)]
@@ -96,13 +97,8 @@ namespace Puns.Test
 
             var themeWords = new List<PhoneticsWord>(){theme};
 
+            var punStrategies = PunHelper.GetPunStrategies(themeWords);
 
-            var punStrategies = new List<PunStrategy>()
-            {
-                new HomophonePunStrategy(themeWords),
-                new PerfectRhymePunStrategy(themeWords),
-                new PrefixPunStrategy(themeWords)
-            };
 
             var bestReplacement = punStrategies
                         .SelectMany(x => x.GetPossibleReplacements(originalWord))
