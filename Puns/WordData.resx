@@ -133,11 +133,17 @@
   <data name="Celebs" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Celebs.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="ChristmasSongs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\ChristmasSongs.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="CommonWords" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\CommonWords.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="Countries" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Countries.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="CountrySongs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\CountrySongs.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="Idioms" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Idioms.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
@@ -147,6 +153,9 @@
   </data>
   <data name="Musicals" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Musicals.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Songs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Songs.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="TVShows" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\TVShows.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

@@ -289,6 +289,36 @@ namespace Puns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Little Drummer Boy
+        ///Do You Hear What I Hear?
+        ///Santa Baby
+        ///Rudolph the Red-Nosed Reindeer
+        ///Silver Bells
+        ///Carol of the Bells
+        ///Linus and Lucy
+        ///The Chipmunk Song
+        ///I Saw Mommy Kissing Santa Claus
+        ///Little Saint Nick
+        ///Wonderful Christmastime
+        ///Hallelujah
+        ///Do They Know It’s Christmas?
+        ///Frosty the Snowman
+        ///Where Are You, Christmas?
+        ///Christmas Bells Are Ringing
+        ///Mary, Did You Know?
+        ///The Twelve Days of Christmas
+        ///The Christmas Shoes
+        ///Christmas Time Is Here
+        ///I Heard the Bells on Christmas Day
+        ///Hark! the Herald Angels Si [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ChristmasSongs {
+            get {
+                return ResourceManager.GetString("ChristmasSongs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to the
         ///be
         ///and
@@ -383,6 +413,41 @@ namespace Puns {
         internal static string Countries {
             get {
                 return ResourceManager.GetString("Countries", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to He Stopped Loving Her Today
+        ///Crazy
+        ///Your Cheatin&apos; Heart
+        ///I Fall to Pieces
+        ///El Paso
+        ///I&apos;m So Lonesome I Could Cry
+        ///Today I Started Loving You Again
+        ///Lovesick Blues
+        ///He&apos;ll Have to Go
+        ///The Dance
+        ///Sixteen Tons
+        ///San Antonio Rose
+        ///Workin&apos; Man Blues
+        ///I Walk the Line
+        ///Mama Tried
+        ///Coal Miner&apos;s Daughter
+        ///Old Dogs, Children, and Watermelon Wine
+        ///Always on My Mind
+        ///Oh, Lonesome Me
+        ///Tiger By the Tail
+        ///Stand by Your Man
+        ///Jambalaya
+        ///Ring of Fire
+        ///For the Good Times
+        ///White Lightning
+        ///The Last Thing on My Mind
+        ///Tennessee Wal [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CountrySongs {
+            get {
+                return ResourceManager.GetString("CountrySongs", resourceCulture);
             }
         }
         
@@ -488,6 +553,46 @@ namespace Puns {
         internal static string Musicals {
             get {
                 return ResourceManager.GetString("Musicals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Like a Rolling Stone
+        ///Satisfaction
+        ///Imagine
+        ///What&apos;s Going On
+        ///Respect
+        ///Good Vibrations
+        ///Johnny B. Goode
+        ///Hey Jude
+        ///Smells Like Teen Spirit
+        ///What&apos;d I Say
+        ///My Generation
+        ///A Change Is Gonna Come
+        ///Yesterday
+        ///Blowin&apos; in the Wind
+        ///London Calling
+        ///I Want to Hold Your Hand
+        ///Purple Haze
+        ///Maybellene
+        ///Hound Dog
+        ///Let It Be
+        ///Born to Run
+        ///Be My Baby
+        ///In My Life
+        ///People Get Ready
+        ///God Only Knows
+        ///A Day in the Life
+        ///Layla
+        ///(Sittin&apos; On) the Dock of the Bay
+        ///Help!
+        ///I Walk the Line
+        ///Stairway to Heaven
+        ///Sympathy for the Devil        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Songs {
+            get {
+                return ResourceManager.GetString("Songs", resourceCulture);
             }
         }
         

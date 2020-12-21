@@ -14,6 +14,9 @@
         Celebs,
         Countries,
         TVShows,
+        Songs,
+        CountrySongs,
+        ChristmasSongs
 
 
 

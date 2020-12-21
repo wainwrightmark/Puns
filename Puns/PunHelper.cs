@@ -146,6 +146,12 @@ namespace Puns
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 PunCategory.Artists => WordData.Artists.Split("\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.Songs => WordData.Songs.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.CountrySongs => WordData.CountrySongs.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PunCategory.ChristmasSongs => WordData.ChristmasSongs.Split("\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 PunCategory.TVShows => WordData.TVShows.Split("\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
