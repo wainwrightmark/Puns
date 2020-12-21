@@ -37,11 +37,7 @@ namespace Puns.Strategies
                     {
                         if (themeWord.Syllables.Count == 1 && !themeWord.Syllables.Single().Equals(syllable))
                         {
-                            var newSyllables = originalWord.Syllables.Take(index)
-                                .Concat(themeWord.Syllables)
-                                .Concat(originalWord.Syllables.Skip(index + 1)).ToList();
-
-                            var spelling = GetSpelling(newSyllables);
+                            var spelling = GetSpelling( originalWord.Syllables.Take(index)) + themeWord.Text + GetSpelling(originalWord.Syllables.Skip(index + 1));
 
                             yield return new PunReplacement(PunType.Infix, spelling, true, themeWord.Text);
                         }
