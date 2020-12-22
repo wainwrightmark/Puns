@@ -15,12 +15,10 @@ namespace Puns.Strategies
         }
 
         /// <inheritdoc />
-        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
+        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
         {
             if (word.Syllables.Count == 1)
-                return word.Syllables.Select(x => x.GetRhymeSyllable)
-                    .Select(x => new PhoneticsWord(word.Text, 0, false, new[] {x}));
-            return Enumerable.Empty<PhoneticsWord>();
+                yield return word.Syllables.Select(x=>x.GetRhymeSyllable).ToList();
         }
 
         /// <inheritdoc />
@@ -33,7 +31,7 @@ namespace Puns.Strategies
                 {
                     var rhymeSyllable = syllable.GetRhymeSyllable;
 
-                    foreach (var themeWord in ThemeWordLookup[new PhoneticsWord(rhymeSyllable.ToString(), 0, false, new []{rhymeSyllable})])
+                    foreach (var themeWord in ThemeWordLookup[new []{rhymeSyllable}])
                     {
                         if (themeWord.Syllables.Count == 1 && !themeWord.Syllables.Single().Equals(syllable))
                         {

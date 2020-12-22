@@ -10,22 +10,21 @@ namespace Puns.Strategies
         public SameConsonantsPunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
-        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
+        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
         {
-            yield return GetSubWord(word);
+            yield return GetConsonantSyllables(word);
         }
 
-        private static PhoneticsWord GetSubWord(PhoneticsWord word)
+        private static IReadOnlyList<Syllable> GetConsonantSyllables(PhoneticsWord word)
         {
             var syllables = word.Syllables.Select(s => s.GetNoConsonantSyllable).ToList();
-
-            return new PhoneticsWord(word.Text, 0, true, syllables);
+            return syllables;
         }
 
         /// <inheritdoc />
         public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
         {
-            var sw = GetSubWord(originalWord);
+            var sw = GetConsonantSyllables(originalWord);
 
             foreach (var themeWord in ThemeWordLookup[sw])
             {

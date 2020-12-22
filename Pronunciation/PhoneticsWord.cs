@@ -3,6 +3,34 @@ using System.Collections.Generic;
 
 namespace Pronunciation
 {
+    public sealed class ListComparer<T> : IEqualityComparer<IReadOnlyList<T>>
+    {
+        private ListComparer() {}
+
+        public static IEqualityComparer<IReadOnlyList<T>> Instance { get; } = new ListComparer<T>();
+
+        public bool Equals(IReadOnlyList<T>? x, IReadOnlyList<T>? y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
+
+            if (x.Count == 0)
+                return y.Count == 0;
+
+            if (x.Count == 1)
+                return y.Count == 1 && x[0]!.Equals(y[0]);
+
+            return x.Count == y.Count && x[0]!.Equals(y[0]) && x[^1]!.Equals(y[^1]);
+        }
+
+        public int GetHashCode(IReadOnlyList<T> obj)
+        {
+            if (obj.Count == 0) return 0;
+
+            return HashCode.Combine(obj.Count, obj[0], obj[^1]);
+        }
+    }
+
     public sealed class PhoneticsWord : IEquatable<PhoneticsWord>
     {
 

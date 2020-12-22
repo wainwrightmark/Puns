@@ -11,16 +11,16 @@ namespace Puns.Strategies
         {
             SpellingEngine = spellingEngine;
             ThemeWordLookup = themeWords.SelectMany(word =>
-                    GetThemeWordSubwords(word).Select(cluster=> (word, cluster)))
+                    GetThemeWordSyllables(word).Select(cluster=> (word, cluster)))
                 .OrderBy(x=>x.word.Text.Length)
-                .ToLookup(x => x.cluster, x => x.word, WordPronunciationComparer.Instance);
+                .ToLookup(x => x.cluster, x => x.word, ListComparer<Syllable>.Instance);
         }
 
         public SpellingEngine SpellingEngine { get; }
 
-        public ILookup<PhoneticsWord, PhoneticsWord> ThemeWordLookup { get; }
+        public ILookup<IReadOnlyList<Syllable>, PhoneticsWord> ThemeWordLookup { get; }
 
-        public abstract IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word);
+        public abstract IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word);
 
         public abstract IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord);
 

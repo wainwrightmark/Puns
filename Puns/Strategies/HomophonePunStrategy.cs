@@ -10,9 +10,9 @@ namespace Puns.Strategies
         public HomophonePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
-        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
+        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
         {
-            yield return word;
+            yield return word.Syllables;
         }
 
 
@@ -20,7 +20,7 @@ namespace Puns.Strategies
         public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
         {
 
-            foreach (var themeWord in ThemeWordLookup[originalWord])
+            foreach (var themeWord in ThemeWordLookup[originalWord.Syllables])
             {
                 var punType = originalWord.Text.Equals(themeWord.Text, StringComparison.OrdinalIgnoreCase)? PunType.SameWord : PunType.Identity;
 

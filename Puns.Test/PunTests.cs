@@ -83,21 +83,18 @@ namespace Puns.Test
         }
 
         [Theory]
-        [InlineData("colt", "bolt", PunType.PerfectRhyme)]
-        //[InlineData("smelt", "bolt", PunType.ImperfectRhyme)]
-        //[InlineData("carnage", "car", PunType.Prefix)]
-        [InlineData("far", "carnage", PunType.PrefixRhyme)]
-        //[InlineData("car", "incarcerate", PunType.Infix)]
-        //[InlineData("butterfield", "butterscotch", PunType.SharedPrefix)]
-        [InlineData("bear", "bare", PunType.Identity)]
-        [InlineData("beard", "weird", PunType.PerfectRhyme)]
-        [InlineData("bovine", "valentine", PunType.PerfectRhyme)]
-        [InlineData("pisces", "pieces", PunType.SameConsonants)]
-        [InlineData("pieces","pisces",  PunType.SameConsonants)]
-        [InlineData("ray", "relationship", PunType.Infix)]
-        [InlineData("ray", "away", PunType.PerfectRhyme)]
+        [InlineData("colt", "bolt", PunType.PerfectRhyme, "colt")]
+        [InlineData("far", "carnage", PunType.PrefixRhyme, "farnage")]
+        [InlineData("butterscotch", "butterfield", PunType.SharedPrefix, "butterscotch")]
+        [InlineData("bear", "bare", PunType.Identity, "bear")]
+        [InlineData("beard", "weird", PunType.PerfectRhyme, "beard")]
+        [InlineData("bovine", "valentine", PunType.PerfectRhyme, "vallenbovine")]
+        [InlineData("pisces", "pieces", PunType.SameConsonants, "pisces")]
+        [InlineData("pieces","pisces",  PunType.SameConsonants, "pieces")]
+        [InlineData("ray", "relationship", PunType.Infix, "reraytionship")]
+        [InlineData("ray", "away", PunType.PerfectRhyme, "aray")]
 
-        public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType)
+        public void TestPunClassification(string themeWord,  string wordToReplace, PunType? expectedPunType, string expectedReplacementString)
 
         {
             var theme = PronunciationEngine.GetPhoneticsWord(themeWord)!;
@@ -114,9 +111,9 @@ namespace Puns.Test
 
             bestReplacement.ReplacementString.Should().NotBeNull();
 
-            var realPunType = bestReplacement.PunType;
+            bestReplacement.PunType.Should().Be(expectedPunType);
 
-            realPunType.Should().Be(expectedPunType);
+            bestReplacement.ReplacementString.ToLowerInvariant().Should().Be(expectedReplacementString.ToLowerInvariant());
 
         }
 

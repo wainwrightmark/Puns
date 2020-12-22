@@ -12,7 +12,7 @@ namespace Puns.Strategies
         public PerfectRhymePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
-        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
+        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
         {
             var lastStressedVowelIndex = word.Syllables.LastIndexOf(x=>x.Nucleus.IsStressedVowel());
 
@@ -20,9 +20,8 @@ namespace Puns.Strategies
 
 
             var syllables = word.Syllables.Skip(lastStressedVowelIndex).Select((x,i)=> i == 0? x.GetRhymeSyllable : x).ToList();
-            var subWord = new PhoneticsWord(string.Join("", syllables), 0, true, syllables);
 
-            yield return subWord;
+            yield return syllables;
         }
 
 
@@ -33,11 +32,9 @@ namespace Puns.Strategies
             if (lastStressedVowelIndex < 0) yield break; //No stressed vowel
 
             var syllables = originalWord.Syllables.Skip(lastStressedVowelIndex).Select((x, i) => i == 0 ? x.GetRhymeSyllable : x).ToList();
-            var subWord = new PhoneticsWord(string.Join("", syllables), 0, true, syllables);
 
 
-
-            foreach (var themeWord in ThemeWordLookup[subWord])
+            foreach (var themeWord in ThemeWordLookup[syllables])
             {
                 if(originalWord.Text.Contains(themeWord.Text))
                     yield break;

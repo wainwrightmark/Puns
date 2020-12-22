@@ -10,12 +10,12 @@ namespace Puns.Strategies
         public PrefixRhymePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
-        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
+        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
         {
             if (word.Syllables[^1].Nucleus.IsStressedVowel())
             {
                 var rhymeSyllable = word.Syllables[^1].GetRhymeSyllable;
-                yield return new PhoneticsWord(rhymeSyllable.ToString(), 0, true, new []{rhymeSyllable});
+                yield return new []{rhymeSyllable};
             }
         }
 
@@ -25,7 +25,7 @@ namespace Puns.Strategies
             if (originalWord.Syllables.Count > 1 && originalWord.Syllables[0].Nucleus.IsStressedVowel())
             {
                 var rhymeSyllable = originalWord.Syllables[0].GetRhymeSyllable;
-                var rhymeWord = new PhoneticsWord(rhymeSyllable.ToString(), 0, true, new []{rhymeSyllable});
+                var rhymeWord =new []{rhymeSyllable};
 
                 foreach (var themeWord in ThemeWordLookup[rhymeWord])
                 {

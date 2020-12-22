@@ -15,14 +15,12 @@ namespace Puns.Strategies
         public PrefixPunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
 
         /// <inheritdoc />
-        public override IEnumerable<PhoneticsWord> GetThemeWordSubwords(PhoneticsWord word)
+        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
         {
             for (var i = 1; i < word.Syllables.Count - 1; i++)
             {
                 var syllables = word.Syllables.Take(i).ToList();
-
-                var cluster = new PhoneticsWord(string.Join("", syllables), 0, true, syllables);
-                yield return cluster;
+                yield return syllables;
             }
         }
 
@@ -30,7 +28,7 @@ namespace Puns.Strategies
         /// <inheritdoc />
         public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
         {
-            foreach (var themeWord in ThemeWordLookup[originalWord])
+            foreach (var themeWord in ThemeWordLookup[originalWord.Syllables])
             {
                 if (!themeWord.Text.StartsWith(originalWord.Text))
                 {
