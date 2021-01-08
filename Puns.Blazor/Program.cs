@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using MatBlazor;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,8 +16,10 @@ public class Program
         builder.RootComponents.Add<App>("#app");
 
         builder.Services.AddScoped(
-            sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) }
+            _ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) }
         );
+
+        builder.Services.AddMatBlazor();
 
         await builder.Build().RunAsync();
     }

@@ -47,7 +47,6 @@ public sealed class PunState : IDisposable
             var changed = !_theme.Trim().Equals(value.Trim(), StringComparison.OrdinalIgnoreCase);
 
             _theme = value.Trim();
-
             if (changed)
             {
                 SynSets =
@@ -64,8 +63,6 @@ public sealed class PunState : IDisposable
     public IReadOnlyCollection<Choice<IGrouping<string, Pun>>> PunList { get; set; } =
         Array.Empty<Choice<IGrouping<string, Pun>>>();
 
-    public HashSet<string> RevealedWords { get; } =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase); //TODO replace with choice
 
     public bool IsGenerating { get; set; }
 
@@ -94,7 +91,6 @@ public sealed class PunState : IDisposable
 
         IsGenerating = true;
         PunList      = Array.Empty<Choice<IGrouping<string, Pun>>>();
-        RevealedWords.Clear();
         var synSets = SynSets.Where(x => x.Chosen).Select(x => x.Entity).ToList();
 
         var task = new Task<IReadOnlyCollection<Choice<IGrouping<string, Pun>>>>(

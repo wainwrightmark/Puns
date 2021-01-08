@@ -4,48 +4,29 @@
 @inject NavigationManager NavManager
 
 
-<div class="themeBox">
-    <br/>
-    <label>Theme</label>
-    <input type="text" style="width: 100%" @bind="State.Theme"/>
-    <br/>
-</div>
 
 
-@{
-    var synsets = State.SynSets;
-}
+<MatAutocompleteList Items="@_themeSuggestions" TItem="string" Label="Theme" OnTextChanged="s => State.Theme = s" Value="@State.Theme">@State.Theme</MatAutocompleteList>
 
 
-@foreach (var synSet in synsets)
+
+
+@foreach (var synSet in State.SynSets)
 {
-    <div class="synsetBox">
-        <input type="checkbox" @bind="synSet.Chosen"/>
-        <label>@synSet.Entity.Gloss</label>
-        <br/>
-    </div>
+    <br />
+    <MatSlideToggle TValue="bool" Label="@synSet.Entity.Gloss" @bind-Value="@synSet.Chosen"></MatSlideToggle>
 }
 
 <br/>
 
-<div class="categoryBox">
-    <label>Category</label>
-    <select @bind="State.PunCategory">
-        @foreach (var c in Enum.GetValues<PunCategory>())
-        {
-            <option value="@c">@c</option>
-        }
-    </select>
-
-</div>
+<p>
+    <MatSelectItem Label="Category" @bind-Value="@State.PunCategory" Items="@(Enum.GetValues<PunCategory>())"></MatSelectItem>
+</p>
 
 <br/>
 
-<div class="GenerateButton">
-    <button disabled="@State.IsGenerating" class="btn btn-primary" @onclick="State.Find">
-        @(State.IsGenerating ? "Pundering" : ("Pun!"))
-    </button>
-</div>
+<MatButton Disabled="@State.IsGenerating" @onclick="State.Find" Label="@(State.IsGenerating ? "Pundering" : ("Pun!"))"/>
+
 
 <br/>
 <br/>
@@ -113,5 +94,15 @@
     }
 
     public PunState State { get; private set; }
+
+
+    string[] _themeSuggestions = new[]
+            {
+                "Fish",
+                "Furniture",
+                "Vegetable",
+                "Cake",
+                "Baby"
+            };
 
 }
