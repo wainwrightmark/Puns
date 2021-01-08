@@ -1,9 +1,11 @@
 ﻿namespace Puns
 {
-    public enum Casing
-    {
-        Lower,
-        Upper,
-        Title
-    }
+
+public enum Casing
+{
+    Lower,
+    Upper,
+    Title
+}
+
 }

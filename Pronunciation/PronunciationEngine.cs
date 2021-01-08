@@ -7,86 +7,110 @@ using FileDatabase;
 
 namespace Pronunciation
 {
-    public sealed class PronunciationEngine : IDisposable
+
+public sealed class PronunciationEngine : IDisposable
+{
+    public IEnumerable<PhoneticsWord> GetAllPhoneticsWords() => _database.GetAll();
+
+    public PhoneticsWord? GetPhoneticsWord(string text) //todo multiple pronunciations
     {
-        public IEnumerable<PhoneticsWord> GetAllPhoneticsWords() => _database.GetAll();
+        var splits = text.Split(
+            '_',
+            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+        );
 
-        public PhoneticsWord? GetPhoneticsWord(string text)//todo multiple pronunciations
+        if (splits.Length == 1)
+            return GetSinglePhoneticsWord(text);
+
+        var words = new List<PhoneticsWord>();
+
+        foreach (var split in splits)
         {
-            var splits = text.Split('_', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            if(splits.Length == 1)
-                return GetSinglePhoneticsWord(text);
+            var word = GetSinglePhoneticsWord(split);
 
-            var words = new List<PhoneticsWord>();
+            if (word is null)
+                return null;
 
-            foreach (var split in splits)
-            {
-                var word = GetSinglePhoneticsWord(split);
-                if(word is null)
-                    return null;
-
-                words.Add(word);
-            }
-
-            var newPhoneticsWord = new PhoneticsWord(text, 0, true, words.SelectMany(x => x.Syllables).ToList());
-
-            return newPhoneticsWord;
+            words.Add(word);
         }
 
-        private PhoneticsWord? GetSinglePhoneticsWord(string text)
-        {
-            var key = (text.ToUpperInvariant().Trim(), 0);
-            var r = _database[key];
-            return r;
-        }
+        var newPhoneticsWord = new PhoneticsWord(
+            text,
+            0,
+            true,
+            words.SelectMany(x => x.Syllables).ToList()
+        );
 
-        public PronunciationEngine() =>
-            _database = new Database<PhoneticsWord, (string, int)>(
-                PhoeneticsFiles.Pronunciation, Encoding.UTF8, x=> (x.Text, x.Variant), CreateFromLine );
-
-        private readonly Database<PhoneticsWord, (string, int)> _database;
-
-        private static PhoneticsWord CreateFromLine(string s)
-        {
-            var terms = s.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-            if (terms.Length < 2)
-                throw new ArgumentException($"Not enough terms in '{s}'");
-
-            var match = VariantRegex.Match(terms[0]);
-            if (!match.Success)
-                throw new ArgumentException($"Could not match '{terms[0]}'");
-
-            var word = match.Groups["word"].Value;
-
-            var number = match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 0;
-
-            var syllables = new List<Syllable>();
-            var symbols = new List<Symbol>();
-
-            foreach (var symbolString in terms.Skip(1))
-            {
-                if (symbolString == "-")
-                {
-                    if (symbols.Any())
-                    {
-                        syllables.Add(new Syllable(symbols));
-                        symbols = new List<Symbol>();
-                    }
-                }
-                else if (Enum.TryParse(symbolString, out Symbol symbol))
-                    symbols.Add(symbol);
-                else
-                    throw new ArgumentException($"Could not parse symbol {symbolString}");
-            }
-            if (symbols.Any()) syllables.Add(new Syllable(symbols));
-
-            return new PhoneticsWord(word, number, false, syllables);
-        }
-
-        private static readonly Regex VariantRegex = new Regex(@"\A(?<word>.+?)(?:\((?<number>\d+)\))?\Z", RegexOptions.Compiled);
-
-        /// <inheritdoc />
-        public void Dispose() => _database.Dispose();
+        return newPhoneticsWord;
     }
+
+    private PhoneticsWord? GetSinglePhoneticsWord(string text)
+    {
+        var key = (text.ToUpperInvariant().Trim(), 0);
+        var r   = _database[key];
+        return r;
+    }
+
+    public PronunciationEngine() => _database = new Database<PhoneticsWord, (string, int)>(
+        PhoeneticsFiles.Pronunciation,
+        Encoding.UTF8,
+        x => (x.Text, x.Variant),
+        CreateFromLine
+    );
+
+    private readonly Database<PhoneticsWord, (string, int)> _database;
+
+    private static PhoneticsWord CreateFromLine(string s)
+    {
+        var terms = s.Split(
+            ' ',
+            StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+        );
+
+        if (terms.Length < 2)
+            throw new ArgumentException($"Not enough terms in '{s}'");
+
+        var match = VariantRegex.Match(terms[0]);
+
+        if (!match.Success)
+            throw new ArgumentException($"Could not match '{terms[0]}'");
+
+        var word = match.Groups["word"].Value;
+
+        var number = match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 0;
+
+        var syllables = new List<Syllable>();
+        var symbols   = new List<Symbol>();
+
+        foreach (var symbolString in terms.Skip(1))
+        {
+            if (symbolString == "-")
+            {
+                if (symbols.Any())
+                {
+                    syllables.Add(new Syllable(symbols));
+                    symbols = new List<Symbol>();
+                }
+            }
+            else if (Enum.TryParse(symbolString, out Symbol symbol))
+                symbols.Add(symbol);
+            else
+                throw new ArgumentException($"Could not parse symbol {symbolString}");
+        }
+
+        if (symbols.Any())
+            syllables.Add(new Syllable(symbols));
+
+        return new PhoneticsWord(word, number, false, syllables);
+    }
+
+    private static readonly Regex VariantRegex = new Regex(
+        @"\A(?<word>.+?)(?:\((?<number>\d+)\))?\Z",
+        RegexOptions.Compiled
+    );
+
+    /// <inheritdoc />
+    public void Dispose() => _database.Dispose();
+}
+
 }

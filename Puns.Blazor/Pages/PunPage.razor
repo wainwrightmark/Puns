@@ -4,17 +4,12 @@
 @inject NavigationManager NavManager
 
 
-
-
-
 <div class="themeBox">
-<br/>
-<label>Theme</label>
-<input type="text" style="width: 100%" @bind="State.Theme"/>
-<br/>
+    <br/>
+    <label>Theme</label>
+    <input type="text" style="width: 100%" @bind="State.Theme"/>
+    <br/>
 </div>
-
-
 
 
 @{
@@ -24,25 +19,23 @@
 
 @foreach (var synSet in synsets)
 {
-
     <div class="synsetBox">
-    <input type="checkbox" @bind="synSet.Chosen" />
-    <label>@synSet.Entity.Gloss</label>
-    <br />
+        <input type="checkbox" @bind="synSet.Chosen"/>
+        <label>@synSet.Entity.Gloss</label>
+        <br/>
     </div>
-
 }
 
-<br />
+<br/>
 
 <div class="categoryBox">
-<label>Category</label>
-<select @bind="State.PunCategory">
-    @foreach (var c in Enum.GetValues<PunCategory>())
-    {
-        <option value="@c">@c</option>
-    }
-</select>
+    <label>Category</label>
+    <select @bind="State.PunCategory">
+        @foreach (var c in Enum.GetValues<PunCategory>())
+        {
+            <option value="@c">@c</option>
+        }
+    </select>
 
 </div>
 
@@ -50,7 +43,7 @@
 
 <div class="GenerateButton">
     <button disabled="@State.IsGenerating" class="btn btn-primary" @onclick="State.Find">
-    @(State.IsGenerating? "Pundering" :("Pun!") )
+        @(State.IsGenerating ? "Pundering" : ("Pun!"))
     </button>
 </div>
 
@@ -58,38 +51,33 @@
 <br/>
 <hr/>
 
-@if(State.PunList != null)
+@if (State.PunList != null)
 {
-    var totalResults = State.PunList.Select(x => x.Entity .Count()).Prepend(0).Sum();
+    var totalResults = State.PunList.Select(x => x.Entity.Count()).Prepend(0).Sum();
 
     @foreach (var choice in State.PunList)
     {
         var grouping = choice.Entity;
         var isSmallGroup = grouping.Count() < 4 || totalResults < 20;
 
+        <div hidden="@isSmallGroup" class="punHeader">
+            <h2>
+                @grouping.Key (@grouping.Count())
+            </h2>
+            <input type="checkbox" @bind="choice.Chosen"/>
+        </div>
 
-    <div hidden="@isSmallGroup" class="punHeader">
-        <h2>
-            @grouping.Key (@grouping.Count())
-        </h2>
-        <input type="checkbox" @bind="choice.Chosen" />
-    </div>
+        <div hidden="@(!choice.Chosen && !isSmallGroup)" class="punGroup">
+            @foreach (var pun in grouping)
+            {
+                <br/>
+                <label>@pun.NewPhrase</label>
+                <label> (@pun.OldPhrase)</label>
+                <br/>
+            }
 
-
-
-    <div hidden="@(!choice.Chosen && !isSmallGroup)" class="punGroup">
-        @foreach (var pun in grouping)
-    {
-        <br/>
-        <label>@pun.NewPhrase</label>
-        <label> (@pun.OldPhrase)</label>
-        <br/>
+        </div>
     }
-
-    </div>
-
-
-}
 }
 
 
@@ -116,9 +104,9 @@
             punImmediately = false;
         }
 
-        State = new PunState(theme) {PunCategory = category};
+        State = new PunState(theme) { PunCategory = category };
 
-        if(punImmediately)
+        if (punImmediately)
             await State.Find();
 
         await base.OnInitializedAsync();

@@ -4,55 +4,71 @@ using Pronunciation;
 
 namespace Puns.Strategies
 {
-    /// <summary>
-    /// The theme word rhymes with original word
-    /// </summary>
-    public class PerfectRhymePunStrategy : PunStrategy
+
+/// <summary>
+/// The theme word rhymes with original word
+/// </summary>
+public class PerfectRhymePunStrategy : PunStrategy
+{
+    public PerfectRhymePunStrategy(
+        SpellingEngine spellingEngine,
+        IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) { }
+
+    /// <inheritdoc />
+    public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
     {
-        public PerfectRhymePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
+        var lastStressedVowelIndex = word.Syllables.LastIndexOf(x => x.Nucleus.IsStressedVowel());
 
-        /// <inheritdoc />
-        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
+        if (lastStressedVowelIndex < 0)
+            yield break; //No stressed vowel
+
+        var syllables = word.Syllables.Skip(lastStressedVowelIndex)
+            .Select((x, i) => i == 0 ? x.GetRhymeSyllable : x)
+            .ToList();
+
+        yield return syllables;
+    }
+
+    public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
+    {
+        var lastStressedVowelIndex =
+            originalWord.Syllables.LastIndexOf(x => x.Nucleus.IsStressedVowel());
+
+        if (lastStressedVowelIndex < 0)
+            yield break; //No stressed vowel
+
+        var syllables = originalWord.Syllables.Skip(lastStressedVowelIndex)
+            .Select((x, i) => i == 0 ? x.GetRhymeSyllable : x)
+            .ToList();
+
+        foreach (var themeWord in ThemeWordLookup[syllables])
         {
-            var lastStressedVowelIndex = word.Syllables.LastIndexOf(x=>x.Nucleus.IsStressedVowel());
+            if (originalWord.Text.Contains(themeWord.Text))
+                yield break;
 
-            if (lastStressedVowelIndex < 0) yield break; //No stressed vowel
-
-
-            var syllables = word.Syllables.Skip(lastStressedVowelIndex).Select((x,i)=> i == 0? x.GetRhymeSyllable : x).ToList();
-
-            yield return syllables;
-        }
-
-
-        public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
-        {
-            var lastStressedVowelIndex = originalWord.Syllables.LastIndexOf(x => x.Nucleus.IsStressedVowel());
-
-            if (lastStressedVowelIndex < 0) yield break; //No stressed vowel
-
-            var syllables = originalWord.Syllables.Skip(lastStressedVowelIndex).Select((x, i) => i == 0 ? x.GetRhymeSyllable : x).ToList();
-
-
-            foreach (var themeWord in ThemeWordLookup[syllables])
+            if (themeWord.Syllables.Count == originalWord.Syllables.Count)
             {
-                if(originalWord.Text.Contains(themeWord.Text))
-                    yield break;
+                yield return new PunReplacement(
+                    PunType.PerfectRhyme,
+                    themeWord.Text,
+                    false,
+                    themeWord.Text
+                );
+            }
+            else if (themeWord.Syllables.Count < originalWord.Syllables.Count)
+            {
+                var replacement = GetSpelling(originalWord.Syllables.Take(lastStressedVowelIndex))
+                                + themeWord.Text;
 
-
-                if(themeWord.Syllables.Count == originalWord.Syllables.Count)
-                {
-                    yield return new PunReplacement(PunType.PerfectRhyme, themeWord.Text, false, themeWord.Text);
-                }
-                else if (themeWord.Syllables.Count < originalWord.Syllables.Count)
-                {
-                    var replacement = GetSpelling(originalWord.Syllables.Take(lastStressedVowelIndex)) + themeWord.Text;
-
-                    yield return new PunReplacement(PunType.PerfectRhyme, replacement, false, themeWord.Text);
-                }
+                yield return new PunReplacement(
+                    PunType.PerfectRhyme,
+                    replacement,
+                    false,
+                    themeWord.Text
+                );
             }
         }
-
-
     }
+}
+
 }

@@ -4,28 +4,33 @@ using Pronunciation;
 
 namespace Puns.Strategies
 {
-    public class HomophonePunStrategy : PunStrategy
+
+public class HomophonePunStrategy : PunStrategy
+{
+    /// <inheritdoc />
+    public HomophonePunStrategy(
+        SpellingEngine spellingEngine,
+        IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) { }
+
+    /// <inheritdoc />
+    public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
     {
-        /// <inheritdoc />
-        public HomophonePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
+        yield return word.Syllables;
+    }
 
-        /// <inheritdoc />
-        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
+    /// <inheritdoc />
+    public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
+    {
+        foreach (var themeWord in ThemeWordLookup[originalWord.Syllables])
         {
-            yield return word.Syllables;
-        }
+            var punType =
+                originalWord.Text.Equals(themeWord.Text, StringComparison.OrdinalIgnoreCase)
+                    ? PunType.SameWord
+                    : PunType.Identity;
 
-
-        /// <inheritdoc />
-        public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
-        {
-
-            foreach (var themeWord in ThemeWordLookup[originalWord.Syllables])
-            {
-                var punType = originalWord.Text.Equals(themeWord.Text, StringComparison.OrdinalIgnoreCase)? PunType.SameWord : PunType.Identity;
-
-                yield return new PunReplacement(punType, themeWord.Text, false, themeWord.Text);
-            }
+            yield return new PunReplacement(punType, themeWord.Text, false, themeWord.Text);
         }
     }
+}
+
 }

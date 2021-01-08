@@ -4,39 +4,50 @@ using Pronunciation;
 
 namespace Puns.Strategies
 {
-    public class PrefixRhymePunStrategy : PunStrategy //The last syllable of the themeword rhymes with the first syllable of the original word
+
+public class
+    PrefixRhymePunStrategy : PunStrategy //The last syllable of the themeword rhymes with the first syllable of the original word
+{
+    /// <inheritdoc />
+    public PrefixRhymePunStrategy(
+        SpellingEngine spellingEngine,
+        IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) { }
+
+    /// <inheritdoc />
+    public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
     {
-        /// <inheritdoc />
-        public PrefixRhymePunStrategy(SpellingEngine spellingEngine, IEnumerable<PhoneticsWord> themeWords) : base(spellingEngine, themeWords) {}
-
-        /// <inheritdoc />
-        public override IEnumerable<IReadOnlyList<Syllable>> GetThemeWordSyllables(PhoneticsWord word)
+        if (word.Syllables[^1].Nucleus.IsStressedVowel())
         {
-            if (word.Syllables[^1].Nucleus.IsStressedVowel())
-            {
-                var rhymeSyllable = word.Syllables[^1].GetRhymeSyllable;
-                yield return new []{rhymeSyllable};
-            }
+            var rhymeSyllable = word.Syllables[^1].GetRhymeSyllable;
+            yield return new[] { rhymeSyllable };
         }
+    }
 
-        /// <inheritdoc />
-        public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
+    /// <inheritdoc />
+    public override IEnumerable<PunReplacement> GetPossibleReplacements(PhoneticsWord originalWord)
+    {
+        if (originalWord.Syllables.Count > 1 && originalWord.Syllables[0].Nucleus.IsStressedVowel())
         {
-            if (originalWord.Syllables.Count > 1 && originalWord.Syllables[0].Nucleus.IsStressedVowel())
+            var rhymeSyllable = originalWord.Syllables[0].GetRhymeSyllable;
+            var rhymeWord     = new[] { rhymeSyllable };
+
+            foreach (var themeWord in ThemeWordLookup[rhymeWord])
             {
-                var rhymeSyllable = originalWord.Syllables[0].GetRhymeSyllable;
-                var rhymeWord =new []{rhymeSyllable};
-
-                foreach (var themeWord in ThemeWordLookup[rhymeWord])
+                if (themeWord.Syllables.Count == 1
+                 || themeWord.Syllables[^1] == originalWord.Syllables[0])
                 {
-                    if (themeWord.Syllables.Count == 1 || themeWord.Syllables[^1] == originalWord.Syllables[0])
-                    {
-                        var suffix = GetSpelling(originalWord.Syllables.Skip(1));
+                    var suffix = GetSpelling(originalWord.Syllables.Skip(1));
 
-                        yield return new PunReplacement(PunType.PrefixRhyme, themeWord + suffix, true, themeWord.Text);
-                    }
+                    yield return new PunReplacement(
+                        PunType.PrefixRhyme,
+                        themeWord + suffix,
+                        true,
+                        themeWord.Text
+                    );
                 }
             }
         }
     }
+}
+
 }
