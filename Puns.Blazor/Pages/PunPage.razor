@@ -1,22 +1,18 @@
 ﻿@page "/puns"
 @using System.Linq
 @using Microsoft.AspNetCore.WebUtilities
+@using WordNet
 @inject NavigationManager NavManager
-
-
 
 
 <MatAutocompleteList Items="@_themeSuggestions" TItem="string" Label="Theme" OnTextChanged="s => State.Theme = s" Value="@State.Theme">@State.Theme</MatAutocompleteList>
 
 
-
-
-@foreach (var synSet in State.SynSets)
+@foreach (var synSet in State.AllSynSets)
 {
     <br />
     <MatSlideToggle TValue="bool" Label="@synSet.Entity.Gloss" @bind-Value="@synSet.Chosen"></MatSlideToggle>
 }
-
 <br/>
 
 <p>
@@ -28,37 +24,50 @@
 <MatButton Disabled="@State.IsGenerating" @onclick="State.Find" Label="@(State.IsGenerating ? "Pundering" : ("Pun!"))"/>
 
 
-<br/>
-<br/>
-<hr/>
+<MatDivider/>
 
-@if (State.PunList != null)
+@if (State.PunList.Any())
 {
-    var totalResults = State.PunList.Select(x => x.Entity.Count()).Prepend(0).Sum();
+    var totalResults = State.PunList.Select(x => x.Count()).Prepend(0).Sum();
 
-    @foreach (var choice in State.PunList)
+
+    <MatAccordion>
+        @foreach (var grouping in State.PunList)
     {
-        var grouping = choice.Entity;
         var isSmallGroup = grouping.Count() < 4 || totalResults < 20;
 
-        <div hidden="@isSmallGroup" class="punHeader">
-            <h2>
-                @grouping.Key (@grouping.Count())
-            </h2>
-            <input type="checkbox" @bind="choice.Chosen"/>
-        </div>
+        <MatExpansionPanel Expanded ="@isSmallGroup">
+                <MatExpansionPanelSummary>
+                    <MatExpansionPanelHeader>@grouping.Key</MatExpansionPanelHeader>
+                    @if (!isSmallGroup)
+                    {
+                        <MatExpansionPanelSubHeader>
+                        @grouping.Count()
+                    </MatExpansionPanelSubHeader>
+                    }
+                </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
+                <MatList TwoLine="true">
+                    @foreach (var pun in grouping)
+                    {
+                        <MatListItem >
+                            <MatListItemText>
+                                <MatListItemPrimaryText>@pun.NewPhrase</MatListItemPrimaryText>
+                                @if(pun.IsNewDifferent)
+                                {
+                                    <MatListItemSecondaryText>@pun.OldPhrase</MatListItemSecondaryText>
+                                }
 
-        <div hidden="@(!choice.Chosen && !isSmallGroup)" class="punGroup">
-            @foreach (var pun in grouping)
-            {
-                <br/>
-                <label>@pun.NewPhrase</label>
-                <label> (@pun.OldPhrase)</label>
-                <br/>
-            }
-
-        </div>
+                            </MatListItemText>
+                        </MatListItem>
+                    }
+                </MatList>
+            </MatExpansionPanelDetails>
+            </MatExpansionPanel>
     }
+    </MatAccordion>
+
+
 }
 
 

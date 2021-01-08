@@ -16,6 +16,8 @@ public readonly struct Pun : IEquatable<Pun>
     public string NewPhrase { get; }
     public string OldPhrase { get; }
 
+    public bool IsNewDifferent => !NewPhrase.Equals(OldPhrase, StringComparison.OrdinalIgnoreCase);
+
     public IReadOnlySet<string> PunWords { get; }
 
     /// <inheritdoc />

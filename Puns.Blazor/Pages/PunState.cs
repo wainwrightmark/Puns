@@ -49,19 +49,18 @@ public sealed class PunState : IDisposable
             _theme = value.Trim();
             if (changed)
             {
-                SynSets =
+                AllSynSets =
                     GetSynSets(Theme, WordNetEngine)
-                        .Select((x, i) => new Choice<SynSet>(x, i == 0))
+                        .Select((x,i)=> new Choice<SynSet>(x, i==0))
                         .ToList();
             }
         }
     }
 
-    public IReadOnlyCollection<Choice<SynSet>> SynSets { get; private set; } =
-        new List<Choice<SynSet>>();
+    public IReadOnlyCollection<Choice<SynSet>> AllSynSets { get; private set; } =  new List<Choice<SynSet>>();
 
-    public IReadOnlyCollection<Choice<IGrouping<string, Pun>>> PunList { get; set; } =
-        Array.Empty<Choice<IGrouping<string, Pun>>>();
+
+    public IReadOnlyCollection<IGrouping<string, Pun>> PunList { get; set; } = Array.Empty<IGrouping<string, Pun>>();
 
 
     public bool IsGenerating { get; set; }
@@ -90,12 +89,11 @@ public sealed class PunState : IDisposable
         }
 
         IsGenerating = true;
-        PunList      = Array.Empty<Choice<IGrouping<string, Pun>>>();
-        var synSets = SynSets.Where(x => x.Chosen).Select(x => x.Entity).ToList();
+        PunList      = Array.Empty<IGrouping<string, Pun>>();
 
-        var task = new Task<IReadOnlyCollection<Choice<IGrouping<string, Pun>>>>(
+        var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>>(
             () => GetPuns(
-                synSets,
+                AllSynSets.Where(x=>x.Chosen).Select(x=>x.Entity).ToList(),
                 PunCategory,
                 Theme,
                 WordNetEngine,
@@ -111,7 +109,7 @@ public sealed class PunState : IDisposable
         IsGenerating = false;
     }
 
-    private static IReadOnlyCollection<Choice<IGrouping<string, Pun>>> GetPuns(
+    private static IReadOnlyCollection<IGrouping<string, Pun>> GetPuns(
         IReadOnlyCollection<SynSet> synSets,
         PunCategory punCategory,
         string theme,
@@ -141,7 +139,7 @@ public sealed class PunState : IDisposable
             .GroupBy(x => x.punWord, x => x.pun, StringComparer.OrdinalIgnoreCase)
             .OrderByDescending(x => x.Count());
 
-        HashSet<Pun> usedPuns = new HashSet<Pun>();
+        HashSet<Pun> usedPuns = new();
 
         var pairs = from @group in groupedPuns
                     from pun in @group
@@ -150,7 +148,6 @@ public sealed class PunState : IDisposable
 
         var finalList = pairs.GroupBy(x => x.Key, x => x.pun)
             .OrderByDescending(x => x.Count())
-            .Select(x => new Choice<IGrouping<string, Pun>>(x, false))
             .ToList();
 
         return finalList;
