@@ -5,13 +5,9 @@
     flex-direction: column;
 }
 
-.main[b-uqaa12hdjf] {
-    flex: 1;
-}
+.main[b-uqaa12hdjf] { flex: 1; }
 
-.sidebar[b-uqaa12hdjf] {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-}
+.sidebar[b-uqaa12hdjf] { background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%); }
 
 .top-row[b-uqaa12hdjf] {
     background-color: #f7f7f7;
@@ -22,34 +18,26 @@
     align-items: center;
 }
 
-    .top-row[b-uqaa12hdjf]  a, .top-row .btn-link[b-uqaa12hdjf] {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-    }
+.top-row[b-uqaa12hdjf]  a, .top-row .btn-link[b-uqaa12hdjf] {
+    white-space: nowrap;
+    margin-left: 1.5rem;
+}
 
-    .top-row a:first-child[b-uqaa12hdjf] {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+.top-row a:first-child[b-uqaa12hdjf] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 @media (max-width: 640.98px) {
-    .top-row:not(.auth)[b-uqaa12hdjf] {
-        display: none;
-    }
+    .top-row:not(.auth)[b-uqaa12hdjf] { display: none; }
 
-    .top-row.auth[b-uqaa12hdjf] {
-        justify-content: space-between;
-    }
+    .top-row.auth[b-uqaa12hdjf] { justify-content: space-between; }
 
-    .top-row a[b-uqaa12hdjf], .top-row .btn-link[b-uqaa12hdjf] {
-        margin-left: 0;
-    }
+    .top-row a[b-uqaa12hdjf], .top-row .btn-link[b-uqaa12hdjf] { margin-left: 0; }
 }
 
 @media (min-width: 641px) {
-    .page[b-uqaa12hdjf] {
-        flex-direction: row;
-    }
+    .page[b-uqaa12hdjf] { flex-direction: row; }
 
     .sidebar[b-uqaa12hdjf] {
         width: 250px;
