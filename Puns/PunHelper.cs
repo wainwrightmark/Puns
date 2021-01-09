@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using MoreLinq;
 using Pronunciation;
 using Puns.Strategies;
@@ -40,7 +43,7 @@ public static class PunHelper
     {
         var sw = Stopwatch.StartNew();
         Console.WriteLine(@"Getting Puns");
-        var count = 0;
+        var resultCount = 0;
 
         var phrases = GetPhrases(category);
 
@@ -60,12 +63,17 @@ public static class PunHelper
                 .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
 
+        Console.WriteLine($@"Got Theme Words ({sw.Elapsed}");
         var cache = new Dictionary<PhoneticsWord, PunReplacement>();
 
         var punStrategies = GetPunStrategies(spellingEngine, themeWords);
 
+        Console.WriteLine($@"Built Strategies ({sw.Elapsed}");
+
+        //TODO run in parallel
         foreach (var phrase in phrases)
         {
+
             var words = phrase
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -103,18 +111,16 @@ public static class PunHelper
             {
                 var pun = new Pun(wordList.ToDelimitedString(" "), phrase, punWords);
 
-                if(count == 0)
+                if (resultCount == 0)
                     Console.WriteLine($@"{pun.NewPhrase} ({sw.Elapsed})");
 
                 yield return pun;
 
-                count++;
+                resultCount++;
             }
-
-
         }
 
-        Console.WriteLine($@"{count} Puns Got ({sw.Elapsed})");
+        Console.WriteLine($@"{resultCount} Puns Got ({sw.Elapsed})");
 
         static PunReplacement? BestReplacement(
             string word,
@@ -234,10 +240,51 @@ public static class PunHelper
         {
             Casing.Lower => s.ToLower(),
             Casing.Upper => s.ToUpper(),
-            Casing.Title => System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo
+            Casing.Title => Thread.CurrentThread.CurrentCulture.TextInfo
                 .ToTitleCase(s.ToLower()),
             _ => throw new ArgumentOutOfRangeException(nameof(casing), casing, null)
         };
+    }
+
+    public static IEnumerable<(SynSet synSet, string newGloss)> GetRelativeGloss(
+        IEnumerable<SynSet> synSets,
+        int maxGlossWords,
+        WordNetEngine wordNetEngine)
+    {
+        TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+
+
+        var dictionary = synSets.Distinct()
+            .ToDictionary(
+                x => x,
+                x =>
+                    //x.Words
+
+                    GetPunSynSets(x, wordNetEngine, false).SelectMany(y => y.Words)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase)
+            );
+
+        foreach (var (synSet, words) in dictionary)
+        {
+            var otherSets = dictionary.Where(x => x.Key != synSet)
+                .Select(x => x.Value)
+                .ToList();
+
+            var uniqueWords = words.Where(word => !otherSets.Any(x => x.Contains(word)))
+                .Take(maxGlossWords)
+                .ToList();
+
+            if (uniqueWords.Any())
+            {
+                string newGloss = string.Join(", ", uniqueWords.Select(x => Format(x, textInfo)));
+                yield return (synSet, newGloss);
+            }
+        }
+
+        static string Format(string word, TextInfo textInfo)
+        {
+            return textInfo.ToTitleCase(word.Replace('_', ' '));
+        }
     }
 
     public static IEnumerable<RelatedWord> GetRelatedWords(
@@ -245,19 +292,25 @@ public static class PunHelper
         SynSet synSet,
         WordNetEngine wordNetEngine)
     {
-        var synSets = GetPunSynSets(synSet, wordNetEngine);
+        var synSets = GetPunSynSets(synSet, wordNetEngine, true);
 
         foreach (var set in synSets)
         foreach (var word in set.Words)
             yield return new RelatedWord(word, relatedToWord, "...", set.Gloss);
     }
 
-    public static IEnumerable<SynSet> GetPunSynSets(SynSet synSet, WordNetEngine engine)
+    public static IEnumerable<SynSet> GetPunSynSets(SynSet synSet, WordNetEngine engine, bool includeRecursive)
     {
         var oneStepSets   = synSet.GetRelatedSynSets(SingleStepRelations, false, engine);
         var multiStepSets = synSet.GetRelatedSynSets(RecursiveRelations,  true,  engine);
 
-        return oneStepSets.Concat(multiStepSets).Prepend(synSet).Distinct();
+        var sets = oneStepSets.Prepend(synSet);
+
+        if (includeRecursive)
+            sets = sets.Concat(multiStepSets);
+
+
+        return sets.Distinct();
     }
 
     /// <summary>

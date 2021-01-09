@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Pronunciation;
@@ -11,15 +10,31 @@ namespace Puns.Blazor.Pages
 
 public class Choice<T>
 {
-    public Choice(T entity, bool chosen)
+    public Choice(T entity, bool chosen, Action<bool> onChanged)
     {
-        Entity = entity;
-        Chosen = chosen;
+        Entity    = entity;
+        _chosen   = chosen;
+        OnChanged = onChanged;
     }
 
     public T Entity { get; }
 
-    public bool Chosen { get; set; }
+    private bool _chosen;
+
+    public bool Chosen
+    {
+        get => _chosen;
+        set
+        {
+            if (_chosen != value)
+            {
+                _chosen = value;
+                OnChanged(_chosen);
+            }
+        }
+    }
+
+    public Action<bool> OnChanged { get; }
 
     /// <inheritdoc />
     public override string ToString() => (Entity, Chosen).ToString();
@@ -27,15 +42,27 @@ public class Choice<T>
 
 public sealed class PunState : IDisposable
 {
-    public PunState(string initialTheme)
+    public PunState(string initialTheme, PunCategory? initialCategory, Action stateHasChanged)
     {
         WordNetEngine       = new WordNetEngine();
         PronunciationEngine = new PronunciationEngine();
         SpellingEngine      = new SpellingEngine();
         Theme               = initialTheme;
+        StateHasChanged     = stateHasChanged;
+        PunCategory         = initialCategory;
     }
 
-    public PunCategory PunCategory { get; set; } = PunCategory.Idiom;
+    private PunCategory? _punCategory;
+
+    public PunCategory? PunCategory
+    {
+        get => _punCategory;
+        set
+        {
+            _punCategory = value;
+            ClearPuns();
+        }
+    }
 
     private string _theme = "";
 
@@ -46,24 +73,58 @@ public sealed class PunState : IDisposable
         {
             var changed = !_theme.Trim().Equals(value.Trim(), StringComparison.OrdinalIgnoreCase);
 
+            Console.WriteLine($"Theme {_theme} changed ({changed}) to {value}");
+
             _theme = value.Trim();
+
             if (changed)
             {
+                var sets          = GetSynSets(Theme, WordNetEngine);
+                var setGlossPairs = PunHelper.GetRelativeGloss(sets, 3, WordNetEngine);
+
                 AllSynSets =
-                    GetSynSets(Theme, WordNetEngine)
-                        .Select((x,i)=> new Choice<SynSet>(x, i==0))
+                    setGlossPairs
+                        .Select(
+                            (x, i) => new Choice<(SynSet synSet, string gloss)>(
+                                x,
+                                i == 0,
+                                _ => ClearPuns()
+                            )
+                        )
                         .ToList();
+
+                Console.WriteLine($"Synsets changed to {AllSynSets.Count}");
+
+                ClearPuns();
             }
         }
     }
 
-    public IReadOnlyCollection<Choice<SynSet>> AllSynSets { get; private set; } =  new List<Choice<SynSet>>();
+    public Action StateHasChanged { get; }
 
+    public IReadOnlyCollection<Choice<(SynSet synSet, string gloss)>> AllSynSets
+    {
+        get;
+        private set;
+    } = new List<Choice<(SynSet synSet, string gloss)>>();
 
-    public IReadOnlyCollection<IGrouping<string, Pun>> PunList { get; set; } = Array.Empty<IGrouping<string, Pun>>();
+    public IReadOnlyCollection<IGrouping<string, Pun>> PunList { get; set; } =
+        Array.Empty<IGrouping<string, Pun>>();
 
+    public void ClearPuns()
+    {
+        PunList = ArraySegment<IGrouping<string, Pun>>.Empty;
+    }
 
-    public bool IsGenerating { get; set; }
+    public IReadOnlyList<PunCategory?> PossibleCategories = Enum.GetValues<PunCategory>()
+        .Cast<PunCategory?>()
+        .Prepend(null)
+        .ToList();
+
+    public bool IsGenerating => _generatingTask != null;
+    public bool CanGenerate => !string.IsNullOrWhiteSpace(Theme) && PunCategory.HasValue;
+
+    private Task<IReadOnlyCollection<IGrouping<string, Pun>>>? _generatingTask = null;
 
     public WordNetEngine WordNetEngine { get; }
 
@@ -82,56 +143,47 @@ public sealed class PunState : IDisposable
 
     public async Task Find()
     {
-        if (string.IsNullOrWhiteSpace(Theme))
-        {
-            IsGenerating = false;
-            return;
-        }
+        _generatingTask = null;
+        ClearPuns();
 
-        IsGenerating = true;
-        PunList      = Array.Empty<IGrouping<string, Pun>>();
+        if (!CanGenerate)
+            return;
 
         var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>>(
             () => GetPuns(
-                PunCategory,
+                PunCategory.Value,
                 Theme,
-                AllSynSets.Where(x=>x.Chosen).Select(x=>x.Entity).ToList(),
+                AllSynSets.Where(x => x.Chosen).Select(x => x.Entity.synSet).ToList(),
                 WordNetEngine,
                 PronunciationEngine,
                 SpellingEngine
-            ).ToList()
+            )
         );
+
+        _generatingTask = task;
+
+        StateHasChanged();
 
         task.Start();
-
         PunList = await task;
 
-        IsGenerating = false;
+        if (_generatingTask == task)
+        {
+            _generatingTask = null;
+        }
+
+        StateHasChanged();
     }
 
-        public IEnumerable<Pun> StreamPuns() => PunHelper.GetPuns(
-            PunCategory,
-            Theme,
-            AllSynSets.Where(x => x.Chosen).Select(x => x.Entity).ToList(),
-            WordNetEngine,
-            PronunciationEngine,
-            SpellingEngine
-        );
-
-
-
-        private static IEnumerable<IGrouping<string, Pun>> GetPuns(
+    private static IReadOnlyCollection<IGrouping<string, Pun>> GetPuns(
         PunCategory punCategory,
         string theme,
         IReadOnlyCollection<SynSet> synSets,
-
         WordNetEngine wordNetEngine,
         PronunciationEngine pronunciationEngine,
         SpellingEngine spellingEngine)
     {
         //TODO use virtualize https://docs.microsoft.com/en-us/aspnet/core/blazor/webassembly-performance-best-practices?view=aspnetcore-5.0
-
-
 
         var puns = PunHelper.GetPuns(
             punCategory,
@@ -140,9 +192,7 @@ public sealed class PunState : IDisposable
             wordNetEngine,
             pronunciationEngine,
             spellingEngine
-        ).ToList();
-
-
+        );
 
         var groupedPuns = puns
             .Distinct()
@@ -158,8 +208,8 @@ public sealed class PunState : IDisposable
                     select (@group.Key, pun);
 
         var finalPuns = pairs.GroupBy(x => x.Key, x => x.pun)
-            .OrderByDescending(x => x.Count());
-            //.ToList();
+            .OrderByDescending(x => x.Count())
+            .ToList();
 
         return finalPuns;
     }

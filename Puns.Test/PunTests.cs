@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Pronunciation;
 using WordNet;
@@ -63,7 +66,7 @@ public class PunTests : IClassFixture<WordFixture>
         var synSets = WordNetEngine.GetSynSets(word).ToList();
 
         foreach (var synSet in synSets)
-        foreach (var relatedSynSet in PunHelper.GetPunSynSets(synSet, WordNetEngine))
+        foreach (var relatedSynSet in PunHelper.GetPunSynSets(synSet, WordNetEngine, true))
         foreach (var word1 in relatedSynSet.Words)
             TestOutputHelper.WriteLine((word1, synSet.Gloss, relatedSynSet.Gloss).ToString());
     }
@@ -140,18 +143,20 @@ public class PunTests : IClassFixture<WordFixture>
     [InlineData("house",  PunCategory.Movies)]
     [InlineData("house",  PunCategory.Books)]
     [InlineData("Green",  PunCategory.Idiom)]
-    public void TestPunHelper(string theme, PunCategory category)
+    public async Task TestPunHelper(string theme, PunCategory category)
     {
         var synSets = WordNetEngine.GetSynSets(theme).ToList();
 
-        var puns = PunHelper.GetPuns(
+        var puns = await PunHelper.GetPuns(
             category,
             theme,
             synSets,
             WordNetEngine,
             PronunciationEngine,
-            SpellingEngine
-        ).ToList();
+            SpellingEngine,
+            new Progress<(double amount, bool typesLoaded)>((_)=>{}),
+            CancellationToken.None
+        ).ToListAsync();
 
         puns.Should().HaveCountGreaterThan(2);
 

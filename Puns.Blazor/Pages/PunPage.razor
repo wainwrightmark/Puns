@@ -5,73 +5,81 @@
 @inject NavigationManager NavManager
 
 
-<MatAutocompleteList Items="@_themeSuggestions" TItem="string" Label="Theme" OnTextChanged="s => State.Theme = s" Value="@State.Theme">@State.Theme</MatAutocompleteList>
+<MatAutocompleteList Items="@_themeSuggestions" TItem="string" Label="Any Word" ShowClearButton="true" OnTextChanged="s => State.Theme = s" Value="@State.Theme">@State.Theme</MatAutocompleteList>
 
 
 @foreach (var synSet in State.AllSynSets)
 {
-    <br />
-    <MatSlideToggle TValue="bool" Label="@synSet.Entity.Gloss" @bind-Value="@synSet.Chosen"></MatSlideToggle>
+    <br/>
+
+    <MatCheckbox @bind-Value="@synSet.Chosen" Label="@synSet.Entity.gloss"></MatCheckbox>
 }
 <br/>
 
 <p>
-    <MatSelectItem Label="Category" @bind-Value="@State.PunCategory" Items="@(Enum.GetValues<PunCategory>())"></MatSelectItem>
+    <MatSelectItem Label="Category" @bind-Value="@State.PunCategory"  Items="@State.PossibleCategories"></MatSelectItem>
 </p>
 
 <br/>
 
-<MatButton Disabled="@State.IsGenerating" @onclick="State.Find" Label="@(State.IsGenerating ? "Pundering" : ("Pun!"))"/>
-
 <MatDivider/>
 
+<br />
 
-@if (State.PunList.Any())
+@if (!State.PunList.Any())
+{
+    @if (State.IsGenerating)
+    {
+        <MatProgressBar Indeterminate="true"/>
+    }
+    else if (State.CanGenerate)
+    {
+        <MatFAB @onclick="State.Find" Label="Punder"/>
+    }
+}
+else
 {
     var totalResults = State.PunList.Select(x => x.Count()).Prepend(0).Sum();
 
-
     <MatAccordion>
         @foreach (var grouping in State.PunList)
-    {
-        var isSmallGroup = grouping.Count() < 4 || totalResults < 20;
+        {
+            var isSmallGroup = grouping.Count() < 4 || totalResults < 20;
 
-        <MatExpansionPanel Expanded ="@isSmallGroup">
+            <MatExpansionPanel Expanded="@isSmallGroup">
                 <MatExpansionPanelSummary>
                     <MatExpansionPanelHeader>@grouping.Key</MatExpansionPanelHeader>
                     @if (!isSmallGroup)
                     {
                         <MatExpansionPanelSubHeader>
-                        @grouping.Count()
-                    </MatExpansionPanelSubHeader>
+                            @grouping.Count()
+                        </MatExpansionPanelSubHeader>
                     }
                 </MatExpansionPanelSummary>
-            <MatExpansionPanelDetails>
-                <MatList TwoLine="true">
-                    @foreach (var pun in grouping)
-                    {
-                        <MatListItem >
-                            <MatListItemText>
-                                <MatListItemPrimaryText>@pun.NewPhrase</MatListItemPrimaryText>
-                                @if(pun.IsNewDifferent)
-                                {
-                                    <MatListItemSecondaryText>@pun.OldPhrase</MatListItemSecondaryText>
-                                }
-                                else
-                                {
-                                    <MatListItemSecondaryText/>
-                                }
+                <MatExpansionPanelDetails>
+                    <MatList TwoLine="true">
+                        @foreach (var pun in grouping)
+                        {
+                            <MatListItem >
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>@pun.NewPhrase</MatListItemPrimaryText>
+                                    @if (pun.IsNewDifferent)
+                                    {
+                                        <MatListItemSecondaryText>@pun.OldPhrase</MatListItemSecondaryText>
+                                    }
+                                    else
+                                    {
+                                        <MatListItemSecondaryText/>
+                                    }
 
-                            </MatListItemText>
-                        </MatListItem>
-                    }
-                </MatList>
-            </MatExpansionPanelDetails>
+                                </MatListItemText>
+                            </MatListItem>
+                        }
+                    </MatList>
+                </MatExpansionPanelDetails>
             </MatExpansionPanel>
-    }
+        }
     </MatAccordion>
-
-
 }
 
 
@@ -79,7 +87,7 @@
 
 @code {
 
-        const string DefaultTheme = "Fish";
+        const string DefaultTheme = "";
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -94,30 +102,35 @@
             punImmediately = false;
         }
 
-        if (!(QueryHelpers.ParseQuery(uri.Query).TryGetValue("category", out var categoryString) && Enum.TryParse(categoryString, true, out PunCategory category)))
+        PunCategory? pc;
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("category", out var categoryString) && Enum.TryParse(categoryString, true, out PunCategory category))
         {
-            category = PunCategory.Idiom;
+            pc = category;
+        }
+        else
+        {
+            pc = null;
             punImmediately = false;
         }
 
-        State = new PunState(theme) { PunCategory = category };
+        State = new PunState(theme, pc, StateHasChanged);
 
         if (punImmediately)
-            await State.Find();
+           await State.Find();
 
         await base.OnInitializedAsync();
     }
 
     public PunState State { get; private set; }
 
-
     string[] _themeSuggestions = new[]
-            {
-                "Fish",
-                "Furniture",
-                "Vegetable",
-                "Cake",
-                "Baby"
-            };
+    {
+        "Fish",
+        "Furniture",
+        "Vegetable",
+        "Cake",
+        "Baby"
+    };
 
 }
