@@ -108,12 +108,11 @@ public sealed class PunState : IDisposable
         private set;
     } = new List<Choice<(SynSet synSet, string gloss)>>();
 
-    public IReadOnlyCollection<IGrouping<string, Pun>> PunList { get; set; } =
-        Array.Empty<IGrouping<string, Pun>>();
+    public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; } = null;
 
     public void ClearPuns()
     {
-        PunList = ArraySegment<IGrouping<string, Pun>>.Empty;
+        PunList = null;
     }
 
     public IReadOnlyList<PunCategory?> PossibleCategories = Enum.GetValues<PunCategory>()

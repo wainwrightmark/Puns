@@ -26,7 +26,7 @@
 
 <br />
 
-@if (!State.PunList.Any())
+@if (State.PunList == null)
 {
     @if (State.IsGenerating)
     {
@@ -37,6 +37,11 @@
         <MatFAB @onclick="State.Find" Label="Punder"/>
     }
 }
+else if (!State.PunList.Any())
+{
+    <label>No Pun Invented</label>
+}
+
 else
 {
     var totalResults = State.PunList.Select(x => x.Count()).Prepend(0).Sum();
@@ -124,13 +129,6 @@ else
 
     public PunState State { get; private set; }
 
-    string[] _themeSuggestions = new[]
-    {
-        "Fish",
-        "Furniture",
-        "Vegetable",
-        "Cake",
-        "Baby"
-    };
+    IReadOnlyCollection<string> _themeSuggestions = ThemeSuggestion.All.Value;
 
 }
