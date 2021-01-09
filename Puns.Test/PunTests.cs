@@ -151,7 +151,7 @@ public class PunTests : IClassFixture<WordFixture>
             WordNetEngine,
             PronunciationEngine,
             SpellingEngine
-        );
+        ).ToList();
 
         puns.Should().HaveCountGreaterThan(2);
 

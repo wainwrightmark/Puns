@@ -23,8 +23,8 @@
 
 <MatButton Disabled="@State.IsGenerating" @onclick="State.Find" Label="@(State.IsGenerating ? "Pundering" : ("Pun!"))"/>
 
-
 <MatDivider/>
+
 
 @if (State.PunList.Any())
 {
@@ -57,6 +57,10 @@
                                 {
                                     <MatListItemSecondaryText>@pun.OldPhrase</MatListItemSecondaryText>
                                 }
+                                else
+                                {
+                                    <MatListItemSecondaryText/>
+                                }
 
                             </MatListItemText>
                         </MatListItem>
@@ -75,6 +79,8 @@
 
 @code {
 
+        const string DefaultTheme = "Fish";
+
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
@@ -84,11 +90,11 @@
 
         if (!QueryHelpers.ParseQuery(uri.Query).TryGetValue("theme", out var theme))
         {
-            theme = "Fish";
+            theme = DefaultTheme;
             punImmediately = false;
         }
 
-        if (!(QueryHelpers.ParseQuery(uri.Query).TryGetValue("category", out var categoryString) && PunCategory.TryParse(categoryString, true, out PunCategory category)))
+        if (!(QueryHelpers.ParseQuery(uri.Query).TryGetValue("category", out var categoryString) && Enum.TryParse(categoryString, true, out PunCategory category)))
         {
             category = PunCategory.Idiom;
             punImmediately = false;

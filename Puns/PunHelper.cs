@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using MoreLinq;
 using Pronunciation;
@@ -29,7 +30,7 @@ public static class PunHelper
         return punStrategies;
     }
 
-    public static IReadOnlyCollection<Pun> GetPuns(
+    public static IEnumerable<Pun> GetPuns(
         PunCategory category,
         string theme,
         IReadOnlyCollection<SynSet> synSets,
@@ -37,6 +38,10 @@ public static class PunHelper
         PronunciationEngine pronunciationEngine,
         SpellingEngine spellingEngine)
     {
+        var sw = Stopwatch.StartNew();
+        Console.WriteLine(@"Getting Puns");
+        var count = 0;
+
         var phrases = GetPhrases(category);
 
         var themeWords =
@@ -57,8 +62,6 @@ public static class PunHelper
 
         var cache = new Dictionary<PhoneticsWord, PunReplacement>();
 
-        var puns = new List<Pun>();
-
         var punStrategies = GetPunStrategies(spellingEngine, themeWords);
 
         foreach (var phrase in phrases)
@@ -73,7 +76,7 @@ public static class PunHelper
 
             foreach (var word in words)
             {
-                var bestReplacement = GetBestReplacement(
+                var bestReplacement = BestReplacement(
                     word,
                     pronunciationEngine,
                     cache,
@@ -97,12 +100,23 @@ public static class PunHelper
             }
 
             if (containsPun && (words.Length > 1 || containsOriginal))
-                puns.Add(new Pun(wordList.ToDelimitedString(" "), phrase, punWords));
+            {
+                var pun = new Pun(wordList.ToDelimitedString(" "), phrase, punWords);
+
+                if(count == 0)
+                    Console.WriteLine($@"{pun.NewPhrase} ({sw.Elapsed})");
+
+                yield return pun;
+
+                count++;
+            }
+
+
         }
 
-        return puns;
+        Console.WriteLine($@"{count} Puns Got ({sw.Elapsed})");
 
-        static PunReplacement? GetBestReplacement(
+        static PunReplacement? BestReplacement(
             string word,
             PronunciationEngine pronunciationEngine,
             IDictionary<PhoneticsWord, PunReplacement> cache,
@@ -135,7 +149,7 @@ public static class PunHelper
         }
     }
 
-    private static readonly Lazy<IReadOnlySet<string>> CommonWords = new Lazy<IReadOnlySet<string>>(
+    private static readonly Lazy<IReadOnlySet<string>> CommonWords = new(
         () => WordData.CommonWords.Split(
                 "\n",
                 StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
@@ -224,14 +238,6 @@ public static class PunHelper
                 .ToTitleCase(s.ToLower()),
             _ => throw new ArgumentOutOfRangeException(nameof(casing), casing, null)
         };
-    }
-
-    public static bool IsSameWord(string s1, string s2)
-    {
-        //TODO improve
-        return s1.Equals(s2, StringComparison.OrdinalIgnoreCase) ||
-               (s1 + "s").Equals(s2, StringComparison.OrdinalIgnoreCase) ||
-               (s2 + "s").Equals(s1, StringComparison.OrdinalIgnoreCase);
     }
 
     public static IEnumerable<RelatedWord> GetRelatedWords(

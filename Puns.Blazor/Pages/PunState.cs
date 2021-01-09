@@ -93,13 +93,13 @@ public sealed class PunState : IDisposable
 
         var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>>(
             () => GetPuns(
-                AllSynSets.Where(x=>x.Chosen).Select(x=>x.Entity).ToList(),
                 PunCategory,
                 Theme,
+                AllSynSets.Where(x=>x.Chosen).Select(x=>x.Entity).ToList(),
                 WordNetEngine,
                 PronunciationEngine,
                 SpellingEngine
-            )
+            ).ToList()
         );
 
         task.Start();
@@ -109,18 +109,29 @@ public sealed class PunState : IDisposable
         IsGenerating = false;
     }
 
-    private static IReadOnlyCollection<IGrouping<string, Pun>> GetPuns(
-        IReadOnlyCollection<SynSet> synSets,
+        public IEnumerable<Pun> StreamPuns() => PunHelper.GetPuns(
+            PunCategory,
+            Theme,
+            AllSynSets.Where(x => x.Chosen).Select(x => x.Entity).ToList(),
+            WordNetEngine,
+            PronunciationEngine,
+            SpellingEngine
+        );
+
+
+
+        private static IEnumerable<IGrouping<string, Pun>> GetPuns(
         PunCategory punCategory,
         string theme,
+        IReadOnlyCollection<SynSet> synSets,
+
         WordNetEngine wordNetEngine,
         PronunciationEngine pronunciationEngine,
         SpellingEngine spellingEngine)
     {
         //TODO use virtualize https://docs.microsoft.com/en-us/aspnet/core/blazor/webassembly-performance-best-practices?view=aspnetcore-5.0
 
-        var sw = Stopwatch.StartNew();
-        Console.WriteLine(@"Getting Puns");
+
 
         var puns = PunHelper.GetPuns(
             punCategory,
@@ -129,9 +140,9 @@ public sealed class PunState : IDisposable
             wordNetEngine,
             pronunciationEngine,
             spellingEngine
-        );
+        ).ToList();
 
-        Console.WriteLine($@"{puns.Count} Puns Got ({sw.Elapsed})");
+
 
         var groupedPuns = puns
             .Distinct()
@@ -146,11 +157,11 @@ public sealed class PunState : IDisposable
                     where usedPuns.Add(pun)
                     select (@group.Key, pun);
 
-        var finalList = pairs.GroupBy(x => x.Key, x => x.pun)
-            .OrderByDescending(x => x.Count())
-            .ToList();
+        var finalPuns = pairs.GroupBy(x => x.Key, x => x.pun)
+            .OrderByDescending(x => x.Count());
+            //.ToList();
 
-        return finalList;
+        return finalPuns;
     }
 
     /// <inheritdoc />
