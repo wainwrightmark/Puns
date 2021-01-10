@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Pronunciation;
 using WordNet;
@@ -143,20 +140,18 @@ public class PunTests : IClassFixture<WordFixture>
     [InlineData("house",  PunCategory.Movies)]
     [InlineData("house",  PunCategory.Books)]
     [InlineData("Green",  PunCategory.Idiom)]
-    public async Task TestPunHelper(string theme, PunCategory category)
+    public void TestPunHelper(string theme, PunCategory category)
     {
         var synSets = WordNetEngine.GetSynSets(theme).ToList();
 
-        var puns = await PunHelper.GetPuns(
+        var puns =  PunHelper.GetPuns(
             category,
             theme,
             synSets,
             WordNetEngine,
             PronunciationEngine,
-            SpellingEngine,
-            new Progress<(double amount, bool typesLoaded)>((_)=>{}),
-            CancellationToken.None
-        ).ToListAsync();
+            SpellingEngine
+        ).ToList();
 
         puns.Should().HaveCountGreaterThan(2);
 

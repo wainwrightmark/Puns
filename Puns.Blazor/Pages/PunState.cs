@@ -73,8 +73,6 @@ public sealed class PunState : IDisposable
         {
             var changed = !_theme.Trim().Equals(value.Trim(), StringComparison.OrdinalIgnoreCase);
 
-            Console.WriteLine($"Theme {_theme} changed ({changed}) to {value}");
-
             _theme = value.Trim();
 
             if (changed)
@@ -92,8 +90,6 @@ public sealed class PunState : IDisposable
                             )
                         )
                         .ToList();
-
-                Console.WriteLine($"Synsets changed to {AllSynSets.Count}");
 
                 ClearPuns();
             }
@@ -150,7 +146,7 @@ public sealed class PunState : IDisposable
 
         var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>>(
             () => GetPuns(
-                PunCategory.Value,
+                PunCategory!.Value,
                 Theme,
                 AllSynSets.Where(x => x.Chosen).Select(x => x.Entity.synSet).ToList(),
                 WordNetEngine,

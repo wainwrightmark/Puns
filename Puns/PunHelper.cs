@@ -42,7 +42,10 @@ public static class PunHelper
         SpellingEngine spellingEngine)
     {
         var sw = Stopwatch.StartNew();
+#if Debug
         Console.WriteLine(@"Getting Puns");
+#endif
+
         var resultCount = 0;
 
         var phrases = GetPhrases(category);
@@ -62,13 +65,17 @@ public static class PunHelper
                 .Where(x => x.Syllables.Count > 1 || x.Syllables[0].Symbols.Count > 1)
                 .Distinct(WordPronunciationComparer.Instance)
                 .ToList();
-
+#if Debug
         Console.WriteLine($@"Got Theme Words ({sw.Elapsed}");
+#endif
+
         var cache = new Dictionary<PhoneticsWord, PunReplacement>();
 
         var punStrategies = GetPunStrategies(spellingEngine, themeWords);
 
+        #if Debug
         Console.WriteLine($@"Built Strategies ({sw.Elapsed}");
+#endif
 
         //TODO run in parallel
         foreach (var phrase in phrases)
@@ -111,8 +118,10 @@ public static class PunHelper
             {
                 var pun = new Pun(wordList.ToDelimitedString(" "), phrase, punWords);
 
+                #if Debug
                 if (resultCount == 0)
                     Console.WriteLine($@"{pun.NewPhrase} ({sw.Elapsed})");
+                #endif
 
                 yield return pun;
 
@@ -120,7 +129,10 @@ public static class PunHelper
             }
         }
 
+
+        #if Debug
         Console.WriteLine($@"{resultCount} Puns Got ({sw.Elapsed})");
+        #endif
 
         static PunReplacement? BestReplacement(
             string word,

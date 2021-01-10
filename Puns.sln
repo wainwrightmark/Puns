@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pronunciation", "Pronunciat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordNet", "WordNet\WordNet.csproj", "{C57B800E-DAA3-4E1F-AA05-A5E495588076}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileDatabase", "FileDatabase\FileDatabase.csproj", "{F350E821-B269-4C47-805D-8F624C54D48B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileDatabase", "FileDatabase\FileDatabase.csproj", "{F350E821-B269-4C47-805D-8F624C54D48B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "Benchmark\Benchmark.csproj", "{9225B0E5-C413-4456-8CE1-6C7D8ED24FA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{F350E821-B269-4C47-805D-8F624C54D48B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F350E821-B269-4C47-805D-8F624C54D48B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F350E821-B269-4C47-805D-8F624C54D48B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9225B0E5-C413-4456-8CE1-6C7D8ED24FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9225B0E5-C413-4456-8CE1-6C7D8ED24FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9225B0E5-C413-4456-8CE1-6C7D8ED24FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9225B0E5-C413-4456-8CE1-6C7D8ED24FA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
