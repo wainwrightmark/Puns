@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using MoreLinq;
 using Pronunciation;
@@ -263,7 +261,6 @@ public static class PunHelper
         int maxGlossWords,
         WordNetEngine wordNetEngine)
     {
-        TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
 
         var dictionary = synSets.Distinct()
@@ -288,14 +285,14 @@ public static class PunHelper
 
             if (uniqueWords.Any())
             {
-                string newGloss = string.Join(", ", uniqueWords.Select(x => Format(x, textInfo)));
+                string newGloss = string.Join(", ", uniqueWords.Select(Format));
                 yield return (synSet, newGloss);
             }
         }
 
-        static string Format(string word, TextInfo textInfo)
+        static string Format(string word)
         {
-            return textInfo.ToTitleCase(word.Replace('_', ' '));
+            return word.Replace('_', ' ').ToUpperInvariant();
         }
     }
 

@@ -9,7 +9,7 @@ namespace Benchmark
 
 [SimpleJob(RuntimeMoniker.NetCoreApp50)]
 [RPlotExporter]
-public class PunHelper
+public class PunHelperBenchmark
 {
 
     [Params("Vegetable", "Fish", "Chocolate", "Food", "House", "Furniture", "Person")]

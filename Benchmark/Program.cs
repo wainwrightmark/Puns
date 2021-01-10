@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Running;
+using Puns;
 
 namespace Benchmark
 {
@@ -7,7 +8,7 @@ namespace Benchmark
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<FileDatabase>();
+            BenchmarkRunner.Run<PunHelperBenchmark>();
         }
     }
 }
