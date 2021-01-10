@@ -186,7 +186,8 @@ public sealed class PunState : IDisposable
             synSets,
             wordNetEngine,
             pronunciationEngine,
-            spellingEngine
+            spellingEngine,
+            PunStrategyFactory.AllFactories
         );
 
         var groupedPuns = puns

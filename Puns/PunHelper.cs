@@ -13,23 +13,6 @@ namespace Puns
 
 public static class PunHelper
 {
-    public static IReadOnlyList<PunStrategy> GetPunStrategies(
-        SpellingEngine spellingEngine,
-        IReadOnlyList<PhoneticsWord> themeWords)
-    {
-        var punStrategies = new List<PunStrategy>
-        {
-            new HomophonePunStrategy(spellingEngine, themeWords),
-            new PerfectRhymePunStrategy(spellingEngine, themeWords),
-            new PrefixPunStrategy(spellingEngine, themeWords),
-            new PrefixRhymePunStrategy(spellingEngine, themeWords),
-            new SameConsonantsPunStrategy(spellingEngine, themeWords),
-            new InfixRhymePunStrategy(spellingEngine, themeWords),
-            new SharedPrefixPunStrategy(spellingEngine, themeWords)
-        };
-
-        return punStrategies;
-    }
 
     public static IEnumerable<Pun> GetPuns(
         PunCategory category,
@@ -37,7 +20,8 @@ public static class PunHelper
         IReadOnlyCollection<SynSet> synSets,
         WordNetEngine wordNetEngine,
         PronunciationEngine pronunciationEngine,
-        SpellingEngine spellingEngine)
+        SpellingEngine spellingEngine,
+        IReadOnlyList<PunStrategyFactory> strategies)
     {
         var sw = Stopwatch.StartNew();
 #if Debug
@@ -69,7 +53,8 @@ public static class PunHelper
 
         var cache = new Dictionary<PhoneticsWord, PunReplacement>();
 
-        var punStrategies = GetPunStrategies(spellingEngine, themeWords);
+        var punStrategies =
+            strategies.Select(x => x.GetStrategy(spellingEngine, themeWords)).ToList();
 
         #if Debug
         Console.WriteLine($@"Built Strategies ({sw.Elapsed}");

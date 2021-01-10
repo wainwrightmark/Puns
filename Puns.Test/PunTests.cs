@@ -98,7 +98,9 @@ public class PunTests : IClassFixture<WordFixture>
 
         var themeWords = new List<PhoneticsWord>() { theme };
 
-        var punStrategies = PunHelper.GetPunStrategies(SpellingEngine, themeWords);
+        var punStrategies = PunStrategyFactory.AllFactories
+            .Select(x => x.GetStrategy(SpellingEngine, themeWords))
+            .ToList();
 
         var bestReplacement = punStrategies
             .SelectMany(x => x.GetPossibleReplacements(originalWord))
@@ -150,7 +152,8 @@ public class PunTests : IClassFixture<WordFixture>
             synSets,
             WordNetEngine,
             PronunciationEngine,
-            SpellingEngine
+            SpellingEngine,
+            PunStrategyFactory.AllFactories
         ).ToList();
 
         puns.Should().HaveCountGreaterThan(2);

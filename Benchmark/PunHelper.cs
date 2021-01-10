@@ -31,7 +31,8 @@ public class PunHelperBenchmark
                 synSets,
                 fixture.WordNetEngine,
                 fixture.PronunciationEngine,
-                fixture.SpellingEngine
+                fixture.SpellingEngine,
+                PunStrategyFactory.AllFactories
             )
             .ToList();
 

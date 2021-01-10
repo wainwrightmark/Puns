@@ -8,7 +8,7 @@ namespace Benchmark
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<PunHelperBenchmark>();
+            BenchmarkRunner.Run<PunStrategyBenchmark>();
         }
     }
 }
