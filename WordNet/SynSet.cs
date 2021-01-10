@@ -113,6 +113,13 @@ public class SynSet
         ILookup<SynSetRelation, (SynsetId synSetId, int sourceWordIndex, int targetWordIndex)>
         _lexicalRelations;
 
+    public static int GetKeyFromDefinitionString(string definition)
+    {
+        var spaceIndex = definition.IndexOf(' ');
+        var intString  = definition.Substring(0, spaceIndex);
+        return int.Parse(intString);
+    }
+
     /// <summary>
     /// Instantiates the current synset. If idSynset is non-null, related synsets references are set to those from
     /// idSynset; otherwise, related synsets are created as shells.
@@ -183,7 +190,7 @@ public class SynSet
 
         for (var relationNum = 0; relationNum < numRelations; ++relationNum)
         {
-            static string GetNextFieldValue(string definition, ref int fieldStart)
+            static string NextFieldValue(string definition, ref int fieldStart)
             {
                 var fieldEnd = definition.IndexOf(' ', fieldStart + 1) - 1;
                 var fieldLen = fieldEnd - fieldStart + 1;
@@ -194,15 +201,15 @@ public class SynSet
                 return fieldValue;
             }
 
-            var relationSymbol = GetNextFieldValue(definition, ref relationFieldStart);
+            var relationSymbol = NextFieldValue(definition, ref relationFieldStart);
 
             var relatedSynSetOffset =
-                int.Parse(GetNextFieldValue(definition, ref relationFieldStart));
+                int.Parse(NextFieldValue(definition, ref relationFieldStart));
 
             var relatedSynSetPartOfSpeech =
-                GetPartOfSpeech(GetNextFieldValue(definition, ref relationFieldStart));
+                GetPartOfSpeech(NextFieldValue(definition, ref relationFieldStart));
 
-            var indexes         = GetNextFieldValue(definition, ref relationFieldStart);
+            var indexes         = NextFieldValue(definition, ref relationFieldStart);
             var sourceWordIndex = int.Parse(indexes.Substring(0, 2), NumberStyles.HexNumber);
             var targetWordIndex = int.Parse(indexes[2..],            NumberStyles.HexNumber);
 

@@ -26,6 +26,13 @@ public sealed class IndexEntry
         return new IndexEntry(word, partOfSpeech, ids);
     }
 
+    public static string GetKeyFromLine(string definition)
+    {
+        var spaceIndex = definition.IndexOf(' ');
+        var s = definition.Substring(0, spaceIndex);
+        return s;
+    }
+
     private IndexEntry(string word, PartOfSpeech partOfSpeech, IReadOnlyList<SynsetId> synsetIds)
     {
         Word         = word;

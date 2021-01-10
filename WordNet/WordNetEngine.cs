@@ -31,17 +31,17 @@ public sealed class WordNetEngine : IDisposable
             x => new FileDatabase.Database<SynSet, int>(
                 x.bytes,
                 Encoding.UTF8,
-                s => s.Id.Id,
+                SynSet.GetKeyFromDefinitionString,
                 s => SynSet.Instantiate(s, x.partOfSpeech)
             )
         );
 
         IndexDictionary = indexFiles.ToDictionary(
             x => x.partOfSpeech,
-            x => new FileDatabase.Database<IndexEntry, (string, PartOfSpeech)>(
+            x => new FileDatabase.Database<IndexEntry, string>(
                 x.bytes,
                 Encoding.UTF8,
-                i => (i.Word, i.PartOfSpeech),
+                IndexEntry.GetKeyFromLine,
                 s => IndexEntry.CreateFromLine(s, x.partOfSpeech)
             )
         );
@@ -51,7 +51,7 @@ public sealed class WordNetEngine : IDisposable
         SynSetDictionary;
 
     public readonly
-        IReadOnlyDictionary<PartOfSpeech, FileDatabase.Database<IndexEntry, (string, PartOfSpeech)>>
+        IReadOnlyDictionary<PartOfSpeech, FileDatabase.Database<IndexEntry, string>>
         IndexDictionary;
 
     public IEnumerable<SynSet> GetAllSynSets()
@@ -89,9 +89,9 @@ public sealed class WordNetEngine : IDisposable
         var normWord = NormalizeWord(word);
         var ids      = new HashSet<SynsetId>();
 
-        foreach (var (partOfSpeech, database) in IndexDictionary)
+        foreach (var (_, database) in IndexDictionary)
         {
-            var indexEntry = database[(normWord, partOfSpeech)];
+            var indexEntry = database[normWord];
 
             if (indexEntry is null)
                 continue;

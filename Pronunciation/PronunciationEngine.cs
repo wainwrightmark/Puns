@@ -54,21 +54,38 @@ public sealed class PronunciationEngine : IDisposable
     public PronunciationEngine() => _database = new Database<PhoneticsWord, (string, int)>(
         PhoeneticsFiles.Pronunciation,
         Encoding.UTF8,
-        x => (x.Text, x.Variant),
+        GetKeyFromLine,
         CreateFromLine
     );
 
     private readonly Database<PhoneticsWord, (string, int)> _database;
 
-    private static PhoneticsWord CreateFromLine(string s)
+    private static (string word, int number) GetKeyFromLine(string line)
     {
-        var terms = s.Split(
+        var spaceIndex = line.IndexOf(' ');
+        var firstTerm  = line.Substring(0, spaceIndex);
+
+        var match = VariantRegex.Match(firstTerm);
+
+        if (!match.Success)
+            throw new ArgumentException($"Could not match '{firstTerm}'");
+
+        var word = match.Groups["word"].Value;
+
+        var number = match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 0;
+
+        return (word, number);
+    }
+
+    private static PhoneticsWord CreateFromLine(string line)
+    {
+        var terms = line.Split(
             ' ',
             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
         );
 
         if (terms.Length < 2)
-            throw new ArgumentException($"Not enough terms in '{s}'");
+            throw new ArgumentException($"Not enough terms in '{line}'");
 
         var match = VariantRegex.Match(terms[0]);
 
@@ -104,7 +121,7 @@ public sealed class PronunciationEngine : IDisposable
         return new PhoneticsWord(word, number, false, syllables);
     }
 
-    private static readonly Regex VariantRegex = new Regex(
+    private static readonly Regex VariantRegex = new(
         @"\A(?<word>.+?)(?:\((?<number>\d+)\))?\Z",
         RegexOptions.Compiled
     );

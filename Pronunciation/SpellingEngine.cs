@@ -11,25 +11,34 @@ public sealed class SpellingEngine : IDisposable
 {
     public IEnumerable<Spelling> GetAllSpellings() => _database.GetAll();
 
-    public SpellingEngine() => _database = new Database<Spelling, (string, bool)>(
+    private readonly Database<Spelling, string> _database;
+
+    public SpellingEngine() => _database = new Database<Spelling, string>(
         PhoeneticsFiles.Spelling,
         Encoding.UTF8,
-        x => (x.Syllable.ToString(), true),
+        GetKeyFromLine,
         CreateFromLine
     );
 
     public Spelling? GetSpelling(Syllable syllable)
     {
-        var key = (syllable.ToString(), true);
+        var key = syllable.ToString();
         var r   = _database[key];
         return r;
     }
 
-    public static Spelling CreateFromLine(string s)
+    private static string GetKeyFromLine(string line)
     {
-        var tabIndex     = s.IndexOf('\t');
-        var syllableText = s.Substring(0, tabIndex);
-        var text         = s.Substring(tabIndex + 1);
+        var tabIndex     = line.IndexOf('\t');
+        var syllableText = line.Substring(0, tabIndex);
+        return syllableText;
+    }
+
+    private static Spelling CreateFromLine(string line)
+    {
+        var tabIndex     = line.IndexOf('\t');
+        var syllableText = line.Substring(0, tabIndex);
+        var text         = line[(tabIndex + 1)..];
 
         var symbols = syllableText.Split(' ')
             .Select(
@@ -45,13 +54,8 @@ public sealed class SpellingEngine : IDisposable
         return spelling;
     }
 
-    private readonly Database<Spelling, (string, bool)> _database;
-
     /// <inheritdoc />
-    public void Dispose()
-    {
-        _database.Dispose();
-    }
+    public void Dispose() => _database.Dispose();
 }
 
 public record Spelling(Syllable Syllable, string Text);
