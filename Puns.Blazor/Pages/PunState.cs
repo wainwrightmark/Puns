@@ -42,7 +42,7 @@ public class Choice<T>
 
 public sealed class PunState : IDisposable
 {
-    public PunState(string initialTheme, PunCategory? initialCategory, Action stateHasChanged)
+    public PunState(string initialTheme, PunCategory initialCategory, Action stateHasChanged)
     {
         WordNetEngine       = new WordNetEngine();
         PronunciationEngine = new PronunciationEngine();
@@ -52,9 +52,9 @@ public sealed class PunState : IDisposable
         PunCategory         = initialCategory;
     }
 
-    private PunCategory? _punCategory;
+    private PunCategory _punCategory;
 
-    public PunCategory? PunCategory
+    public PunCategory PunCategory
     {
         get => _punCategory;
         set
@@ -111,13 +111,8 @@ public sealed class PunState : IDisposable
         PunList = null;
     }
 
-    public IReadOnlyList<PunCategory?> PossibleCategories = Enum.GetValues<PunCategory>()
-        .Cast<PunCategory?>()
-        .Prepend(null)
-        .ToList();
-
     public bool IsGenerating => _generatingTask != null;
-    public bool CanGenerate => !string.IsNullOrWhiteSpace(Theme) && PunCategory.HasValue;
+    public bool CanGenerate => !string.IsNullOrWhiteSpace(Theme);
 
     private Task<IReadOnlyCollection<IGrouping<string, Pun>>>? _generatingTask = null;
 
@@ -146,7 +141,7 @@ public sealed class PunState : IDisposable
 
         var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>>(
             () => GetPuns(
-                PunCategory!.Value,
+                PunCategory,
                 Theme,
                 AllSynSets.Where(x => x.Chosen).Select(x => x.Entity.synSet).ToList(),
                 WordNetEngine,

@@ -234,17 +234,6 @@ public class MyStreamReader : TextReader
         {
             //https://stackoverflow.com/questions/5404267/streamreader-and-seeking
 
-            // The current buffer of decoded characters
-
-            // The index of the next char to be read from charBuffer
-
-            // The number of decoded chars presently used in charBuffer
-
-            // The current buffer of read bytes (byteBuffer.Length = 1024; this is critical).
-
-            // The number of bytes read while advancing reader.BaseStream.Position to (re)fill charBuffer
-
-            // The number of bytes the remaining chars use in the original encoding.
             var numBytesLeft =CurrentEncoding.GetByteCount(_charBuffer, _charPos, _charLen - _charPos);
 
             // For variable-byte encodings, deal with partial chars at the end of the buffer
@@ -329,14 +318,11 @@ public class MyStreamReader : TextReader
     // Init used by NullStreamReader, to delay load encoding
     internal void Init(Stream stream)
     {
-        this._stream = stream;
+        _stream = stream;
         _closable   = true;
     }
 
-    public override void Close()
-    {
-        Dispose(true);
-    }
+    public override void Close() => Dispose(true);
 
     protected override void Dispose(bool disposing)
     {
