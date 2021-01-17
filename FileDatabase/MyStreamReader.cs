@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Diagnostics.Contracts;
 using System.IO;
+#pragma warning disable 8625
+#pragma warning disable 8618
 
 namespace FileDatabase
 {
@@ -188,15 +190,6 @@ public class MyStreamReader : TextReader
     public MyStreamReader(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks)
         : this(path, encoding, detectEncodingFromByteOrderMarks, DefaultBufferSize) { }
 
-    [System.Security.SecuritySafeCritical]
-    [ResourceExposure(ResourceScope.Machine)]
-    [ResourceConsumption(ResourceScope.Machine)]
-    public MyStreamReader(
-        string path,
-        Encoding encoding,
-        bool detectEncodingFromByteOrderMarks,
-        int bufferSize)
-        : this(path, encoding, detectEncodingFromByteOrderMarks, bufferSize, true) { }
 
     [System.Security.SecurityCritical]
     [ResourceExposure(ResourceScope.Machine)]
@@ -205,8 +198,7 @@ public class MyStreamReader : TextReader
         string path,
         Encoding encoding,
         bool detectEncodingFromByteOrderMarks,
-        int bufferSize,
-        bool checkHost)
+        int bufferSize)
     {
         // Don't open a Stream before checking for invalid arguments,
         // or we'll create a FileStream on disk and we won't close it until
@@ -218,7 +210,7 @@ public class MyStreamReader : TextReader
             throw new ArgumentException("Argument_EmptyPath");
 
         if (bufferSize <= 0)
-            throw new ArgumentOutOfRangeException("bufferSize", "ArgumentOutOfRange_NeedPosNum");
+            throw new ArgumentOutOfRangeException(nameof(bufferSize), "ArgumentOutOfRange_NeedPosNum");
 
         Contract.EndContractBlock();
 

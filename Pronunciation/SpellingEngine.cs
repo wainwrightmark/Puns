@@ -44,7 +44,7 @@ public sealed class SpellingEngine : IDisposable
             .Select(
                 x => Enum.TryParse(x, out Symbol symbol)
                     ? symbol
-                    : throw new Exception($"Could not parse Symbol '{symbol}'")
+                    : throw new Exception($"Could not parse Symbol '{x}' on line '{line}'")
             )
             .ToList();
 
