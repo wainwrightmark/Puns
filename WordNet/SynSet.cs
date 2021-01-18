@@ -7,20 +7,6 @@ using System.Text;
 namespace WordNet
 {
 
-//public static class SynSetExtension
-//{
-//    public static string GetShortDescription(this SynSet synSet, IReadOnlyCollection<SynSet> allSynSets)
-//    {
-//        //var uniqueWords =
-//        //    synSet.Words.Where(word => allSynSets.All(s => s == synSet || !s.Words.Contains(word, StringComparer.OrdinalIgnoreCase))).ToHashSet();
-
-//        //if (uniqueWords.Any())
-//        //    return $"e.g. {string.Join(", ", uniqueWords)}";
-
-//        return synSet.Gloss;
-//    }
-//}
-
 /// <summary>
 /// Represents a WordNet synset
 /// </summary>

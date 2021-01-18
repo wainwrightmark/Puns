@@ -5,40 +5,36 @@
 @inject NavigationManager NavManager
 
 
-<AutoComplete Options="@_themeSuggestions" Placeholder="Any Word" @bind-Value="@State.Theme"/>
+<AutoComplete Options="@_themeSuggestions" Placeholder="Theme" @bind-Value="@State.Theme"/>
 
-@*<Select Mode="multiple"
-        Placeholder="Choose Meanings"
-		TItemValue="Choice<(synSet,gloss)>"
-        TItem="Choice<(synSet,gloss)>"
 
+
+
+<Select Mode="multiple"
+        Bordered="false"
+        DataSource="@State.PossibleSynsets"
+        Placeholder="Meaning"
+        Disabled="@(!State.PossibleSynsets.Any())"
+		TItemValue="int"
+        TItem="SynsetWithGloss"
+        @bind-Values="@State.ChosenSynsets"
+        OnSelectedItemsChanged="@(_=>State.ClearPuns())"
+        ValueName="@nameof(SynsetWithGloss.Index)"
+        LabelName="@nameof(SynsetWithGloss.Gloss)"
+        DefaultValues="@(State.ChosenSynsets)"
 		AllowClear>
-		<SelectOptions>
-			@foreach(var item in State.AllSynSets)
-			{
-				<SelectOption TItemValue="Choice<(synSet,gloss)>" TItem="string" Value=@item Label=@item />
-			}
-		</SelectOptions>
-</Select>*@
+</Select>
 
-
-
-@foreach (var synSet in State.AllSynSets)
-{
-    <br/>
-
-    <Checkbox @bind-Value="@synSet.Chosen">@synSet.Entity.gloss</Checkbox>
-}
-<br/>
 
 
 
 <Select
+    Placeholder="Category"
     TItem="PunCategory"
     TItemValue="PunCategory"
     @bind-Value="@State.PunCategory">
     <SelectOptions>
-        @foreach (var v in Enum.GetValues<PunCategory>())
+        @foreach (var v in Enum.GetValues<PunCategory>().OrderBy(x=>x))
         {
             <SelectOption TItem="PunCategory" TItemValue="PunCategory" Value="@v" Label="@v.ToString()"/>
         }
@@ -72,7 +68,7 @@ else
     var totalResults = State.PunList.Select(x => x.Count()).Prepend(0).Sum();
 
     <Collapse Bordered="false">
-        @foreach (var grouping in State.PunList)
+        @foreach (var grouping in State.PunList!)
         {
             var isSmallGroup = grouping.Count() < 4 || totalResults < 20;
 

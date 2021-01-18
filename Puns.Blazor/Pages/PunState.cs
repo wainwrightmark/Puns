@@ -7,38 +7,7 @@ using WordNet;
 
 namespace Puns.Blazor.Pages
 {
-
-public class Choice<T>
-{
-    public Choice(T entity, bool chosen, Action<bool> onChanged)
-    {
-        Entity    = entity;
-        _chosen   = chosen;
-        OnChanged = onChanged;
-    }
-
-    public T Entity { get; }
-
-    private bool _chosen;
-
-    public bool Chosen
-    {
-        get => _chosen;
-        set
-        {
-            if (_chosen != value)
-            {
-                _chosen = value;
-                OnChanged(_chosen);
-            }
-        }
-    }
-
-    public Action<bool> OnChanged { get; }
-
-    /// <inheritdoc />
-    public override string ToString() => (Entity, Chosen).ToString();
-}
+    
 
 public sealed class PunState : IDisposable
 {
@@ -77,20 +46,9 @@ public sealed class PunState : IDisposable
 
             if (changed)
             {
-                var sets          = GetSynSets(Theme, WordNetEngine);
-                var setGlossPairs = PunHelper.GetRelativeGloss(sets, 3, WordNetEngine);
-
-                AllSynSets =
-                    setGlossPairs
-                        .Select(
-                            (x, i) => new Choice<(SynSet synSet, string gloss)>(
-                                x,
-                                i == 0,
-                                _ => ClearPuns()
-                            )
-                        )
-                        .ToList();
-
+                var sets = GetSynSets(Theme, WordNetEngine).ToList();
+                PossibleSynsets = PunHelper.GetRelativeGloss(sets, 3, WordNetEngine).ToList();
+                ChosenSynsets   = PossibleSynsets.Take(1).Select(x=>x.Index).ToList();
                 ClearPuns();
             }
         }
@@ -98,13 +56,14 @@ public sealed class PunState : IDisposable
 
     public Action StateHasChanged { get; }
 
-    public IReadOnlyCollection<Choice<(SynSet synSet, string gloss)>> AllSynSets
-    {
-        get;
-        private set;
-    } = new List<Choice<(SynSet synSet, string gloss)>>();
+    public IReadOnlyCollection<SynsetWithGloss> PossibleSynsets { get; private set; } =
+        new List<SynsetWithGloss>();
 
-    public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; } = null;
+    public IEnumerable<int> ChosenSynsets { get; set; } =
+        new List<int>();
+        
+
+    public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
 
     public void ClearPuns()
     {
@@ -114,7 +73,7 @@ public sealed class PunState : IDisposable
     public bool IsGenerating => _generatingTask != null;
     public bool CanGenerate => !string.IsNullOrWhiteSpace(Theme);
 
-    private Task<IReadOnlyCollection<IGrouping<string, Pun>>>? _generatingTask = null;
+    private Task<IReadOnlyCollection<IGrouping<string, Pun>>>? _generatingTask;
 
     public WordNetEngine WordNetEngine { get; }
 
@@ -143,7 +102,12 @@ public sealed class PunState : IDisposable
             () => GetPuns(
                 PunCategory,
                 Theme,
-                AllSynSets.Where(x => x.Chosen).Select(x => x.Entity.synSet).ToList(),
+                PossibleSynsets.Where(x=> ChosenSynsets.Contains(x.Index))
+                    .Select(x=>x.SynSet).ToList(),
+                //AllSynSets
+
+                //    .Where(x => x.Chosen)
+                //    .Select(x => x.Entity.synSet).ToList(),
                 WordNetEngine,
                 PronunciationEngine,
                 SpellingEngine

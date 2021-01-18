@@ -11,6 +11,23 @@ using WordNet;
 namespace Puns
 {
 
+public readonly struct SynsetWithGloss
+{
+    public SynsetWithGloss(SynSet synSet, string gloss, int index)
+    {
+        SynSet     = synSet;
+        Gloss      = gloss;
+        Index = index;
+    }
+    public SynSet SynSet { get; }
+
+    public string Gloss { get; }
+    public int Index { get; }
+
+    /// <inheritdoc />
+    public override string ToString() => Gloss;
+}
+
 public static class PunHelper
 {
 
@@ -241,7 +258,7 @@ public static class PunHelper
         };
     }
 
-    public static IEnumerable<(SynSet synSet, string newGloss)> GetRelativeGloss(
+    public static IEnumerable<SynsetWithGloss> GetRelativeGloss(
         IEnumerable<SynSet> synSets,
         int maxGlossWords,
         WordNetEngine wordNetEngine)
@@ -258,6 +275,8 @@ public static class PunHelper
                     .ToHashSet(StringComparer.OrdinalIgnoreCase)
             );
 
+        var index = 0;
+
         foreach (var (synSet, words) in dictionary)
         {
             var otherSets = dictionary.Where(x => x.Key != synSet)
@@ -271,13 +290,15 @@ public static class PunHelper
             if (uniqueWords.Any())
             {
                 string newGloss = string.Join(", ", uniqueWords.Select(Format));
-                yield return (synSet, newGloss);
+                yield return new SynsetWithGloss(synSet, newGloss, index);
+
+                index++;
             }
         }
 
         static string Format(string word)
         {
-            return word.Replace('_', ' ').ToUpperInvariant();
+            return word.Replace('_', ' ');//.ToUpperInvariant();
         }
     }
 
