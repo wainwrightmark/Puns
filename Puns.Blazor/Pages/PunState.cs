@@ -2,23 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Pronunciation;
 using WordNet;
 
 namespace Puns.Blazor.Pages
 {
-    
+
+public record FavoritePun(string NewText, decimal Score);
 
 public sealed class PunState : IDisposable
 {
-    public PunState(string initialTheme, PunCategory initialCategory, Action stateHasChanged)
+    public PunState(string initialTheme, PunCategory initialCategory, Action stateHasChanged, ISyncLocalStorageService storage)
     {
         WordNetEngine       = new WordNetEngine();
         PronunciationEngine = new PronunciationEngine();
         SpellingEngine      = new SpellingEngine();
         Theme               = initialTheme;
         StateHasChanged     = stateHasChanged;
+        Storage             = storage;
         PunCategory         = initialCategory;
+        FavoritePuns        = GetfavoritePuns(storage);
     }
 
     private PunCategory _punCategory;
@@ -54,14 +58,75 @@ public sealed class PunState : IDisposable
         }
     }
 
+    private static Dictionary<string, FavoritePun> GetfavoritePuns(ISyncLocalStorageService storage)
+    {
+        var length = storage.Length();
+        var dict   = new Dictionary<string, FavoritePun>();
+
+        for (var i = 0; i < length; i++)
+        {
+            var key   = storage.Key(i);
+            var value = storage.GetItem<FavoritePun>(key);
+            dict[key] = value;
+        }
+
+        return dict;
+
+    }
+
     public Action StateHasChanged { get; }
+    public ISyncLocalStorageService Storage { get; }
+    public Dictionary<string, FavoritePun> FavoritePuns { get; }
+
+    public void SetRating(Pun pun, decimal rating)
+    {
+        if(rating > 0)
+        {
+            var fp = new FavoritePun(pun.NewPhrase, rating);
+            bool changed;
+
+            if (FavoritePuns.TryGetValue(fp.NewText, out var oldFp) && oldFp.Score != rating)
+            {
+                changed = false;
+            }
+            else
+                changed = true;
+
+
+            if (changed)
+            {
+                FavoritePuns[fp.NewText] = fp;
+                Storage.SetItem(fp.NewText, fp);
+            }
+        }
+        else
+        {
+            if(FavoritePuns.Remove(pun.NewPhrase))
+
+            {
+                Storage.RemoveItem(pun.NewPhrase);
+            }
+        }
+
+
+    }
+
+    public decimal GetRating(Pun pun)
+    {
+        if (FavoritePuns.TryGetValue(pun.NewPhrase, out var fp))
+        {
+            return fp.Score;
+        }
+
+        return 0;
+    }
 
     public IReadOnlyCollection<SynsetWithGloss> PossibleSynsets { get; private set; } =
         new List<SynsetWithGloss>();
 
     public IEnumerable<int> ChosenSynsets { get; set; } =
         new List<int>();
-        
+
 
     public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
 

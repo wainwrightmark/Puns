@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +18,14 @@ public class Program
         builder.Services.AddScoped(
             _ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) }
         );
+
+
+        builder.Services.AddBlazoredLocalStorage(
+            config =>
+            {
+
+            });
+
 
         builder.Services.AddAntDesign();
 

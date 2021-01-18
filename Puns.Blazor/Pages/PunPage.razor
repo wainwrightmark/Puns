@@ -3,11 +3,9 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using WordNet
 @inject NavigationManager NavManager
-
+@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 
 <AutoComplete Options="@_themeSuggestions" Placeholder="Theme" @bind-Value="@State.Theme"/>
-
-
 
 
 <Select Mode="multiple"
@@ -15,17 +13,15 @@
         DataSource="@State.PossibleSynsets"
         Placeholder="Meaning"
         Disabled="@(!State.PossibleSynsets.Any())"
-		TItemValue="int"
+        TItemValue="int"
         TItem="SynsetWithGloss"
         @bind-Values="@State.ChosenSynsets"
-        OnSelectedItemsChanged="@(_=>State.ClearPuns())"
+        OnSelectedItemsChanged="@(_ => State.ClearPuns())"
         ValueName="@nameof(SynsetWithGloss.Index)"
         LabelName="@nameof(SynsetWithGloss.Gloss)"
         DefaultValues="@(State.ChosenSynsets)"
-		AllowClear>
+        AllowClear>
 </Select>
-
-
 
 
 <Select
@@ -34,18 +30,19 @@
     TItemValue="PunCategory"
     @bind-Value="@State.PunCategory">
     <SelectOptions>
-        @foreach (var v in Enum.GetValues<PunCategory>().OrderBy(x=>x))
+        @foreach (var v in Enum.GetValues<PunCategory>().OrderBy(x => x))
         {
             <SelectOption TItem="PunCategory" TItemValue="PunCategory" Value="@v" Label="@v.ToString()"/>
         }
     </SelectOptions>
 </Select>
 
+
 <br/>
 
 <Divider/>
 
-<br />
+<br/>
 
 @if (State.PunList == null)
 {
@@ -85,8 +82,12 @@ else
                 <ChildContent>
                     <AntList TItem="Pun" DataSource="@grouping">
                         <ListItem>
-                            <ListItemMeta Title="@(context.NewPhrase)" Description="@(context.IsNewDifferent? context.OldPhrase : "")">
+                            <ListItemMeta
+                                Title="@(context.NewPhrase)"
+
+                                Description="@(context.IsNewDifferent ? context.OldPhrase : "")">
                             </ListItemMeta>
+                            <Rate ValueChanged="@(i => @State.SetRating(@context, i))" Value="@State.GetRating(@context)"/>
                         </ListItem>
                     </AntList>
                 </ChildContent>
@@ -127,10 +128,10 @@ else
             punImmediately = false;
         }
 
-        State = new PunState(theme, pc??PunCategory.Idiom, StateHasChanged);
+        State = new PunState(theme, pc ?? PunCategory.Idiom, StateHasChanged, LocalStorage);
 
         if (punImmediately)
-           await State.Find();
+            await State.Find();
 
         await base.OnInitializedAsync();
     }
