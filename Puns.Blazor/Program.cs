@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor.Services;
 
 namespace Puns.Blazor
 {
@@ -27,7 +28,7 @@ public class Program
             });
 
 
-        builder.Services.AddAntDesign();
+        builder.Services.AddMudServices();
 
         await builder.Build().RunAsync();
     }

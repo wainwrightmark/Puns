@@ -2,101 +2,121 @@
 @using System.Linq
 @using Microsoft.AspNetCore.WebUtilities
 @using WordNet
-@inject NavigationManager NavManager
-@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
+@inject NavigationManager _navManager
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 
-<AutoComplete Options="@_themeSuggestions" Placeholder="Theme" @bind-Value="@State.Theme"/>
+<MudContainer MaxWidth="MaxWidth.Medium">
+
+    <MudPaper Elevation="0" Style="max-height: 60vh; height: auto; min-height: 30vh; overflow-y: scroll">
+        <MudAutocomplete FullWidth="false"
+                         Label="Theme"
+                         Placeholder="Type any word"
+                         @bind-Value="@State.Theme"
+                         SearchFunc="@SearchThemes"
+                         ResetValueOnEmptyText="true"
+                         Variant="Variant.Outlined"
+                         CoerceText="true"
+                         CoerceValue="true"
+                         Clearable="true"
+                         AutoFocus="true"
+                         InputMode="InputMode.search"
+                         AdornmentIcon="@Icons.Material.Filled.Search"/>
+        
+        
+        <MudChipSet Filter="true" MultiSelection="true" SelectedChipsChanged="SelectedCategoriesChanged">
+            @for (var index = 0; index < State.PossibleSynsets.Count; index++)
+            {
+                var synset = State.PossibleSynsets[index];
+                <MudChip Tag="index" Default="State.ChosenSynsets.Contains(index)" Text="@synset.Gloss" />
+            }
+        </MudChipSet>
+        
+
+        <MudSelect
+            FullWidth="false"
+            T="PunCategory"
+            Label="Category"
+            Variant="Variant.Outlined"
+            @bind-Value="@State.PunCategory">
+            @foreach (var v in Enum.GetValues<PunCategory>().OrderBy(x => x))
+            {
+                <MudSelectItem Value="@v">@v.ToString()</MudSelectItem>
+            }
+        </MudSelect>
 
 
-<Select Mode="multiple"
-        Bordered="false"
-        DataSource="@State.PossibleSynsets"
-        Placeholder="Meaning"
-        Disabled="@(!State.PossibleSynsets.Any())"
-        TItemValue="int"
-        TItem="SynsetWithGloss"
-        @bind-Values="@State.ChosenSynsets"
-        OnSelectedItemsChanged="@(_ => State.ClearPuns())"
-        ValueName="@nameof(SynsetWithGloss.Index)"
-        LabelName="@nameof(SynsetWithGloss.Gloss)"
-        DefaultValues="@(State.ChosenSynsets)"
-        AllowClear>
-</Select>
+    </MudPaper>
 
+    <MudPaper Elevation="0" Style="max-height: 70vh; height: auto; min-height: 40vh; overflow-y: scroll;">
 
-<Select
-    Placeholder="Category"
-    TItem="PunCategory"
-    TItemValue="PunCategory"
-    @bind-Value="@State.PunCategory">
-    <SelectOptions>
-        @foreach (var v in Enum.GetValues<PunCategory>().OrderBy(x => x))
+        @if (State.PunList == null)
         {
-            <SelectOption TItem="PunCategory" TItemValue="PunCategory" Value="@v" Label="@v.ToString()"/>
+            @if (State.IsGenerating)
+            {
+                <MudProgressLinear Size="Size.Large" Color="Color.Default" Indeterminate="true"/>
+            }
+            else if (State.CanGenerate)
+            {
+                <MudIconButton Size="Size.Large" Icon="@Icons.Material.Filled.PlayArrow" @onclick="State.Find"/>
+            }
         }
-    </SelectOptions>
-</Select>
-
-
-<br/>
-
-<Divider/>
-
-<br/>
-
-@if (State.PunList == null)
-{
-    @if (State.IsGenerating)
-    {
-        <Spin Spinning="true"/>
-    }
-    else if (State.CanGenerate)
-    {
-        <Button @onclick="State.Find">Punder</Button>
-    }
-}
-else if (!State.PunList.Any())
-{
-    <label>No Pun Invented</label>
-}
-
-else
-{
-    var totalResults = State.PunList.Select(x => x.Count()).Prepend(0).Sum();
-
-    <Collapse Bordered="false">
-        @foreach (var grouping in State.PunList!)
+        else if (!State.PunList.Any())
         {
-            var isSmallGroup = grouping.Count() < 4 || totalResults < 20;
-
-            <Panel Active="@isSmallGroup">
-                <HeaderTemplate>
-                    <p>@grouping.Key</p>
-                    @if (!isSmallGroup)
-                    {
-                        <p>
-                            @grouping.Count()
-                        </p>
-                    }
-                </HeaderTemplate>
-                <ChildContent>
-                    <AntList TItem="Pun" DataSource="@grouping">
-                        <ListItem>
-                            <ListItemMeta
-                                Title="@(context.NewPhrase)"
-
-                                Description="@(context.IsNewDifferent ? context.OldPhrase : "")">
-                            </ListItemMeta>
-                            <Rate ValueChanged="@(i => @State.SetRating(@context, i))" Value="@State.GetRating(@context)"/>
-                        </ListItem>
-                    </AntList>
-                </ChildContent>
-            </Panel>
+            <MudText>No Pun Invented</MudText>
         }
-    </Collapse>
-}
+
+        else
+        {
+            var totalResults = State.PunList.Select(x => x.Count()).Prepend(0).Sum();
+
+            <MudList Clickable="true">
+
+                <MudVirtualize T="IGrouping<string,Pun>" Items="State.PunList">
+                    @{ var isSmallGroup = context.Count() < 4 || totalResults < 20; }
+
+                    <MudListItem InitiallyExpanded="@isSmallGroup">
+                        <ChildContent>
 
 
+                            @if (!isSmallGroup)
+                            {
+                                <MudBadge Content="@context.Count()" Color="Color.Primary" Overlap="true" Class="d-flex ml-auto">
+                                    <MudText>@context.Key</MudText>
+                                </MudBadge>
+                            }
+                            else
+                            {
+                                <MudText>@context.Key</MudText>
+                            }
+                        </ChildContent>
+
+                        <NestedList>
+                            @foreach (var pun in context)
+                            {
+                                <MudCard>
+                                    <MudCardContent>
+                                        <MudText>@(pun.NewPhrase)</MudText>
+                                        @if (pun.IsNewDifferent())
+                                        {
+                                            <MudText Typo="Typo.caption">@(pun.OldPhrase)</MudText>
+                                        }
+                                    </MudCardContent>
+                                    <MudCardActions>
+                                        <MudRating SelectedValueChanged="@(i => @State.SetRating(@pun, i))" SelectedValue="@State.GetRating(@pun)"/>
+                                    </MudCardActions>
+                                </MudCard>
+                            }
+                        </NestedList>
+                    </MudListItem>
+
+
+                </MudVirtualize>
+
+            </MudList>
+        }
+
+    </MudPaper>
+</MudContainer>
 
 
 @code {
@@ -106,7 +126,7 @@ else
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        var uri = _navManager.ToAbsoluteUri(_navManager.Uri);
 
         var punImmediately = true;
 
@@ -128,7 +148,7 @@ else
             punImmediately = false;
         }
 
-        State = new PunState(theme, pc ?? PunCategory.Idiom, StateHasChanged, LocalStorage);
+        State = new PunState(theme, pc ?? PunCategory.Idiom, StateHasChanged, _localStorage);
 
         if (punImmediately)
             await State.Find();
@@ -139,5 +159,21 @@ else
     public PunState State { get; private set; } = null!;
 
     IReadOnlyCollection<string> _themeSuggestions = ThemeSuggestion.All.Value;
+
+    private async Task<IEnumerable<string>> SearchThemes(string value)
+    {
+    // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return _themeSuggestions;
+
+        return _themeSuggestions.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private void SelectedCategoriesChanged(MudChip[] obj)
+    {
+        var set = obj.Select(x => x.Tag).OfType<int>().ToHashSet();
+
+        State.ChosenSynsets = set;
+    }
 
 }

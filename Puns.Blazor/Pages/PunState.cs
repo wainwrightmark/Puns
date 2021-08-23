@@ -9,7 +9,7 @@ using WordNet;
 namespace Puns.Blazor.Pages
 {
 
-public record FavoritePun(string NewText, decimal Score);
+public record FavoritePun(string NewText, int Score);
 
 public sealed class PunState : IDisposable
 {
@@ -22,7 +22,7 @@ public sealed class PunState : IDisposable
         StateHasChanged     = stateHasChanged;
         Storage             = storage;
         PunCategory         = initialCategory;
-        FavoritePuns        = GetfavoritePuns(storage);
+        FavoritePuns        = GetFavoritePuns(storage);
     }
 
     private PunCategory _punCategory;
@@ -37,28 +37,28 @@ public sealed class PunState : IDisposable
         }
     }
 
-    private string _theme = "";
+    private string? _theme = "";
 
-    public string Theme
+    public string? Theme
     {
         get => _theme;
         set
         {
-            var changed = !_theme.Trim().Equals(value.Trim(), StringComparison.OrdinalIgnoreCase);
+            var changed = !(_theme??"").Trim().Equals((value??"").Trim(), StringComparison.OrdinalIgnoreCase);
 
-            _theme = value.Trim();
+            _theme = value?.Trim();
 
             if (changed)
             {
                 var sets = GetSynSets(Theme, WordNetEngine).ToList();
                 PossibleSynsets = PunHelper.GetRelativeGloss(sets, 3, WordNetEngine).ToList();
-                ChosenSynsets   = PossibleSynsets.Take(1).Select(x=>x.Index).ToList();
+                ChosenSynsets   = PossibleSynsets.Take(1).Select(x=>x.Index).ToHashSet();
                 ClearPuns();
             }
         }
     }
 
-    private static Dictionary<string, FavoritePun> GetfavoritePuns(ISyncLocalStorageService storage)
+    private static Dictionary<string, FavoritePun> GetFavoritePuns(ISyncLocalStorageService storage)
     {
         var length = storage.Length();
         var dict   = new Dictionary<string, FavoritePun>();
@@ -78,7 +78,7 @@ public sealed class PunState : IDisposable
     public ISyncLocalStorageService Storage { get; }
     public Dictionary<string, FavoritePun> FavoritePuns { get; }
 
-    public void SetRating(Pun pun, decimal rating)
+    public void SetRating(Pun pun, int rating)
     {
         if(rating > 0)
         {
@@ -111,7 +111,7 @@ public sealed class PunState : IDisposable
 
     }
 
-    public decimal GetRating(Pun pun)
+    public int GetRating(Pun pun)
     {
         if (FavoritePuns.TryGetValue(pun.NewPhrase, out var fp))
         {
@@ -121,24 +121,33 @@ public sealed class PunState : IDisposable
         return 0;
     }
 
-    public IReadOnlyCollection<SynsetWithGloss> PossibleSynsets { get; private set; } =
+    public IReadOnlyList<SynsetWithGloss> PossibleSynsets { get; private set; } =
         new List<SynsetWithGloss>();
 
-    public IEnumerable<int> ChosenSynsets { get; set; } =
-        new List<int>();
+    private HashSet<int> _chosenSynsets = new();
 
+    public HashSet<int> ChosenSynsets
+    {
+        get => _chosenSynsets;
+        set
+        {
+            _chosenSynsets = value;
+            ClearPuns();
+        }
+    }
 
-    public IReadOnlyCollection<IGrouping<string, Pun>>? PunList { get; set; }
+    public ICollection<IGrouping<string, Pun>>? PunList { get; set; }
 
     public void ClearPuns()
     {
         PunList = null;
+        StateHasChanged();
     }
 
     public bool IsGenerating => _generatingTask != null;
     public bool CanGenerate => !string.IsNullOrWhiteSpace(Theme);
 
-    private Task<IReadOnlyCollection<IGrouping<string, Pun>>>? _generatingTask;
+    private Task<ICollection<IGrouping<string, Pun>>>? _generatingTask;
 
     public WordNetEngine WordNetEngine { get; }
 
@@ -160,10 +169,10 @@ public sealed class PunState : IDisposable
         _generatingTask = null;
         ClearPuns();
 
-        if (!CanGenerate)
+        if (!CanGenerate || Theme is null)
             return;
 
-        var task = new Task<IReadOnlyCollection<IGrouping<string, Pun>>>(
+        var task = new Task<ICollection<IGrouping<string, Pun>>>(
             () => GetPuns(
                 PunCategory,
                 Theme,
@@ -194,7 +203,7 @@ public sealed class PunState : IDisposable
         StateHasChanged();
     }
 
-    private static IReadOnlyCollection<IGrouping<string, Pun>> GetPuns(
+    private static ICollection<IGrouping<string, Pun>> GetPuns(
         PunCategory punCategory,
         string theme,
         IReadOnlyCollection<SynSet> synSets,
