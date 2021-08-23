@@ -30,7 +30,7 @@ public sealed class Syllable : IEquatable<Syllable>
     public Syllable GetRhymeSyllable => new(Coda.Prepend(Nucleus).ToList());
 
     public Syllable GetNoConsonantSyllable =>
-        new Syllable(Onset.Append(Symbol.AA).Concat(Coda).ToList());
+        new (Onset.Append(Symbol.AA).Concat(Coda).ToList());
 
     /// <inheritdoc />
     public override string ToString() => string.Join(" ", Symbols.Select(x => x.ToString()));
