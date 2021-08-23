@@ -86,6 +86,7 @@ public class PunTests : IClassFixture<WordFixture>
     [InlineData("pieces",       "pisces",       PunType.SameConsonants, "pieces")]
     [InlineData("ray",          "relationship", PunType.Infix,          "reraytionship")]
     [InlineData("ray",          "away",         PunType.PerfectRhyme,   "aray")]
+    [InlineData("artichoke",    "art",          PunType.Prefix,   "artichoke")]
     public void TestPunClassification(
         string themeWord,
         string wordToReplace,
@@ -146,15 +147,16 @@ public class PunTests : IClassFixture<WordFixture>
     {
         var synSets = WordNetEngine.GetSynSets(theme).ToList();
 
-        var puns =  PunHelper.GetPuns(
-            category,
-            theme,
-            synSets,
-            WordNetEngine,
-            PronunciationEngine,
-            SpellingEngine,
-            PunStrategyFactory.AllFactories
-        ).ToList();
+        var puns = PunHelper.GetPuns(
+                category,
+                theme,
+                synSets,
+                WordNetEngine,
+                PronunciationEngine,
+                SpellingEngine,
+                PunStrategyFactory.AllFactories
+            )
+            .ToList();
 
         puns.Should().HaveCountGreaterThan(2);
 
