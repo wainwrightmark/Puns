@@ -87,6 +87,8 @@ public class PunTests : IClassFixture<WordFixture>
     [InlineData("ray",          "relationship", PunType.Infix,          "reraytionship")]
     [InlineData("ray",          "away",         PunType.PerfectRhyme,   "aray")]
     [InlineData("artichoke",    "art",          PunType.Prefix,   "artichoke")]
+    [InlineData("cinema",    "sin",          PunType.Prefix,   "cinema")]
+    [InlineData("property", "curiosity", PunType.PerfectRhyme, "creproperty")]
     public void TestPunClassification(
         string themeWord,
         string wordToReplace,

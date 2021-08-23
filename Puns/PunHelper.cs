@@ -58,6 +58,7 @@ public static class PunHelper
                 .Prepend(theme)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Except(CommonWords.Value, StringComparer.OrdinalIgnoreCase)
+                .Where(x=>x.Length > 1)
                 .Select(pronunciationEngine.GetPhoneticsWord)
                 .Where(x => x is not null)
                 .Cast<PhoneticsWord>()
