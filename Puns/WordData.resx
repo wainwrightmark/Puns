@@ -148,6 +148,9 @@
   <data name="Idioms" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Idioms.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="MovieQuotes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\MovieQuotes.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="Movies" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Movies.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
@@ -159,5 +162,8 @@
   </data>
   <data name="TVShows" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\TVShows.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Wedding" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Wedding.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

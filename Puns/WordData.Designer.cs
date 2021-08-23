@@ -482,6 +482,27 @@ namespace Puns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Frankly, my dear, I don’t give a damn.
+        ///I&apos;m going to make him an offer he can&apos;t refuse.
+        ///I coulda had class. I coulda been a contender.
+        ///Toto, I&apos;ve got a feeling we&apos;re not in Kansas anymore.
+        ///Here&apos;s looking at you, kid.
+        ///Go ahead, make my day.
+        ///All right, Mr. DeMille, I&apos;m ready for my closeup.
+        ///May the Force be with you.
+        ///Fasten your seatbelts. It&apos;s going to be a bumpy night.
+        ///You talking to me?
+        ///What we&apos;ve got here is failure to communicate.
+        ///I love the smell of napalm in the morning.
+        ///Love means never hav [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MovieQuotes {
+            get {
+                return ResourceManager.GetString("MovieQuotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Shawshank Redemption
         ///The Godfather
         ///Soorarai Pottru
@@ -637,6 +658,57 @@ namespace Puns {
         internal static string TVShows {
             get {
                 return ResourceManager.GetString("TVShows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Altar
+        ///Best Man
+        ///Black Tie
+        ///Buttonholes
+        ///Bow Tie
+        ///Bouquet
+        ///Bridesmaids
+        ///Bride
+        ///Bachelor
+        ///Budget
+        ///Buffet
+        ///Bustle
+        ///Buttercream
+        ///Calligraphy
+        ///Canapes
+        ///Candle
+        ///Caterer
+        ///Cathedral
+        ///Celebrant
+        ///Centrepiece 
+        ///Chapel
+        ///Charger Plate
+        ///Civil Ceremony
+        ///Comb
+        ///Corsage
+        ///Cummerbund
+        ///Cutting the Cake
+        ///Decorations
+        ///Destination Wedding
+        ///Dress Code
+        ///Drinks Reception
+        ///Elopement
+        ///Engagement Photos
+        ///Entertainment
+        ///Evening Reception
+        ///Exchanging of Rings
+        ///Father of the Bride
+        ///Favours
+        ///Fiance 
+        ///First Look
+        ///Florist
+        ///Flowers
+        ///Flower Gi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Wedding {
+            get {
+                return ResourceManager.GetString("Wedding", resourceCulture);
             }
         }
     }

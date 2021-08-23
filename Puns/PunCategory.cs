@@ -5,18 +5,24 @@ public enum PunCategory
 {
     Idiom,
 
-    Artists,
+    Books,
+
     Movies,
     Musicals,
+    Songs,
     Bands,
-    Books,
+
+    Wedding,
+    MovieQuotes,
+    Artists,
     Brands,
     Celebs,
     Countries,
     TVShows,
-    Songs,
+    
     CountrySongs,
-    ChristmasSongs
+    ChristmasSongs,
+    
 
     //TODO
     //Historical figures

@@ -232,7 +232,15 @@ public static class PunHelper
                 "\n",
                 StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
             ),
-            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
+            PunCategory.Wedding => WordData.Wedding.Split(
+                "\n",
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+            ),
+            PunCategory.MovieQuotes => WordData.MovieQuotes.Split(
+                "\n",
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+            ),
+            _                   => throw new ArgumentOutOfRangeException(nameof(category), category, null)
         };
     }
 
