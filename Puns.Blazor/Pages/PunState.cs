@@ -13,7 +13,11 @@ public record FavoritePun(string NewText, int Score);
 
 public sealed class PunState : IDisposable
 {
-    public PunState(string initialTheme, PunCategory initialCategory, Action stateHasChanged, ISyncLocalStorageService storage)
+    public PunState(
+        string initialTheme,
+        PunCategory initialCategory,
+        Action stateHasChanged,
+        ISyncLocalStorageService storage)
     {
         WordNetEngine       = new WordNetEngine();
         PronunciationEngine = new PronunciationEngine();
@@ -44,7 +48,8 @@ public sealed class PunState : IDisposable
         get => _theme;
         set
         {
-            var changed = !(_theme??"").Trim().Equals((value??"").Trim(), StringComparison.OrdinalIgnoreCase);
+            var changed = !(_theme ?? "").Trim()
+                .Equals((value ?? "").Trim(), StringComparison.OrdinalIgnoreCase);
 
             _theme = value?.Trim();
 
@@ -52,7 +57,7 @@ public sealed class PunState : IDisposable
             {
                 var sets = GetSynSets(Theme, WordNetEngine).ToList();
                 PossibleSynsets = PunHelper.GetRelativeGloss(sets, 3, WordNetEngine).ToList();
-                ChosenSynsets   = PossibleSynsets.Take(1).Select(x=>x.Index).ToHashSet();
+                ChosenSynsets   = PossibleSynsets.Take(1).Select(x => x.Index).ToHashSet();
                 ClearPuns();
             }
         }
@@ -65,13 +70,17 @@ public sealed class PunState : IDisposable
 
         for (var i = 0; i < length; i++)
         {
-            var key   = storage.Key(i);
-            var value = storage.GetItem<FavoritePun>(key);
-            dict[key] = value;
+            try
+            {
+                var key = storage.Key(i);
+
+                var value = storage.GetItem<FavoritePun>(key);
+                dict[key] = value;
+            }
+            catch (Exception e) { }
         }
 
         return dict;
-
     }
 
     public Action StateHasChanged { get; }
@@ -80,9 +89,9 @@ public sealed class PunState : IDisposable
 
     public void SetRating(Pun pun, int rating)
     {
-        if(rating > 0)
+        if (rating > 0)
         {
-            var fp = new FavoritePun(pun.NewPhrase, rating);
+            var  fp = new FavoritePun(pun.NewPhrase, rating);
             bool changed;
 
             if (FavoritePuns.TryGetValue(fp.NewText, out var oldFp) && oldFp.Score != rating)
@@ -92,7 +101,6 @@ public sealed class PunState : IDisposable
             else
                 changed = true;
 
-
             if (changed)
             {
                 FavoritePuns[fp.NewText] = fp;
@@ -101,14 +109,12 @@ public sealed class PunState : IDisposable
         }
         else
         {
-            if(FavoritePuns.Remove(pun.NewPhrase))
+            if (FavoritePuns.Remove(pun.NewPhrase))
 
             {
                 Storage.RemoveItem(pun.NewPhrase);
             }
         }
-
-
     }
 
     public int GetRating(Pun pun)
@@ -176,8 +182,9 @@ public sealed class PunState : IDisposable
             () => GetPuns(
                 PunCategory,
                 Theme,
-                PossibleSynsets.Where(x=> ChosenSynsets.Contains(x.Index))
-                    .Select(x=>x.SynSet).ToList(),
+                PossibleSynsets.Where(x => ChosenSynsets.Contains(x.Index))
+                    .Select(x => x.SynSet)
+                    .ToList(),
                 //AllSynSets
 
                 //    .Where(x => x.Chosen)

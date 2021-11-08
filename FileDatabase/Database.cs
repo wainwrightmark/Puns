@@ -45,7 +45,7 @@ public sealed class Database<T, TKey> : IDisposable
             {
                 var line = _myStreamReader.ReadLine();
 
-                if (line is null!)
+                if (line is null)
                     break;
 
                 if (string.IsNullOrWhiteSpace(line))

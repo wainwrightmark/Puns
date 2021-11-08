@@ -6,9 +6,11 @@
 @inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 
 
+@if (State is null)
+{
 
-
-@if (State.PunList is null)
+}
+else if (State.PunList is null)
 {
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudAutocomplete FullWidth="false"
@@ -165,6 +167,7 @@ else
 
     private async Task<IEnumerable<string>> SearchThemes(string value)
     {
+        await Task.CompletedTask;
     // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
             return _themeSuggestions;

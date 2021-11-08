@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="Word2vec.Tools" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Puns\Puns.csproj" />
+    <ProjectReference Include="..\WordNet\WordNet.csproj" />
   </ItemGroup>
 
 </Project>
