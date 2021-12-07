@@ -17,6 +17,9 @@ jobs:
         uses: actions/setup-dotnet@v1.7.2
         with:
           dotnet-version: '6.0.x'
+          
+      - name: Install WASM Tools
+        run: dotnet workload install wasm-tools
       
       - name: Publish .NET Core Project
         run: dotnet publish Puns.Blazor/Puns.Blazor.csproj -c Release -o release --nologo
