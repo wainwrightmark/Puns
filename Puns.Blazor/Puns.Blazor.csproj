@@ -7,6 +7,8 @@
     <RunAOTCompilation>true</RunAOTCompilation>
     <InvariantGlobalization>true</InvariantGlobalization>
     <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+    <EmccTotalMemory>16777216</EmccTotalMemory>
+
   </PropertyGroup>
 
   <ItemGroup>
